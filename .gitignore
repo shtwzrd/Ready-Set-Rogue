@@ -61,3 +61,6 @@ build/
 
 ## OS Specific
 .DS_Store
+
+## Can't push our assets to a public repo due to licensing
+android/assets
