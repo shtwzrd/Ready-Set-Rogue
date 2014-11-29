@@ -34,6 +34,12 @@ eclipse {
     }
 }
 
+task packAssets(type: JavaExec, description: "Takes loose files and packs them into texture atlases") {
+    main = 'com.warsheep.scamp.desktop.AssetPacker'
+    classpath = sourceSets.main.runtimeClasspath
+    args = [];
+}
+
 task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
   doLast {
     def classpath = new XmlParser().parse(file(".classpath"))
