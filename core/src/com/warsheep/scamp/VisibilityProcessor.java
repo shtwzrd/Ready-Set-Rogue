@@ -24,9 +24,11 @@ public class VisibilityProcessor extends EntitySystem {
         entities = engine.getEntitiesFor(Family.getFor(VisibleComponent.class));
     }
 
-    public void process() {
+    public void update() {
+        // Clear buffer
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         batch.begin();
         for (int i = 0; i < entities.size(); i++) {
             VisibleComponent v = ECSMapper.visible.get(entities.get(i));
@@ -35,13 +37,18 @@ public class VisibilityProcessor extends EntitySystem {
             } else {
                 batch.setColor(Color.WHITE);
             }
+            // TODO: Transform world coords to screen coords
+            float screenX = ECSMapper.position.get(entities.get(i)).currentX;
+            float screenY = ECSMapper.position.get(entities.get(i)).currentY;
+
             batch.draw(v.image,
-                    v.screenPositionX, v.screenPositionY,
+                    screenX, screenY,
                     v.originX, v.originY,
                     v.image.originalWidth, v.image.originalHeight,
                     v.scale, v.scale,
                     v.rotation, true);
         }
+
         batch.end();
 
     }

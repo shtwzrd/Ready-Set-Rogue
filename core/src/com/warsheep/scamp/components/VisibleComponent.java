@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 public class VisibleComponent extends Component {
     public TextureAtlas.AtlasRegion image;
     public Color color = Color.WHITE;
-    public float screenPositionX = 0;
-    public float screenPositionY = 0;
     public float originX = 0.0f;
     public float originY = 0.0f;
     public float scale = 1.0f;
