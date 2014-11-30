@@ -19,4 +19,7 @@ public class ECSMapper {
 
     public static final ComponentMapper<ControllableComponent> control =
             ComponentMapper.getFor(ControllableComponent.class);
+
+    public static final ComponentMapper<CameraComponent> camera =
+            ComponentMapper.getFor(CameraComponent.class);
 }

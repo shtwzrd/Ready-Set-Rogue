@@ -9,7 +9,7 @@ import com.warsheep.scamp.components.TransformComponent;
 
 public class MovementProcessor extends IteratingSystem {
     private boolean pause = false;
-    public static final float MOVE_SPEED = 16.0f; // TODO: Externalize this (maybe a property of the Component?)
+    public static final float MOVE_SPEED = 12.0f; // TODO: Externalize this (maybe a property of the Component?)
 
     public MovementProcessor() {
         super(Family.getFor(TransformComponent.class, MovementComponent.class));
@@ -22,7 +22,7 @@ public class MovementProcessor extends IteratingSystem {
         MovementComponent mov = ECSMapper.movement.get(entity);
 
         // Don't do anything if we're already at our target
-        if(trans.position.x != mov.target.x || trans.position.y != mov.target.y) {
+        if (trans.position.x != mov.target.x || trans.position.y != mov.target.y) {
             mov.timeSinceMove += deltaTime; // Update how long we've been moving ...
             mov.alpha += MOVE_SPEED / mov.timeSinceMove; // ... And how far we've come
 

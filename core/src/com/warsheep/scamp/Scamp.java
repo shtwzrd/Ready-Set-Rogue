@@ -17,6 +17,7 @@ public class Scamp extends Game {
 	VisibilityProcessor visibilityProcessor;
 	MovementProcessor movementProcessor;
 	ControlProcessor controlProcessor;
+	CameraProcessor cameraProcessor;
 
 	AssetManager assetManager = new AssetManager();
 	public static TextureAtlas CREATURES;
@@ -34,8 +35,10 @@ public class Scamp extends Game {
 		visibilityProcessor = new VisibilityProcessor();
 		movementProcessor = new MovementProcessor();
 		controlProcessor = new ControlProcessor();
+		cameraProcessor = new CameraProcessor();
 		ecs.addSystem(visibilityProcessor);
 		ecs.addSystem(movementProcessor);
+		ecs.addSystem(cameraProcessor);
 		ecs.addSystem(controlProcessor);
 		Gdx.input.setInputProcessor(controlProcessor);
 
@@ -56,6 +59,8 @@ public class Scamp extends Game {
 		wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
 		wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
 
+		createCamera(wizard);
+
 		//Start calculating game time
 		startTime = System.currentTimeMillis();
 
@@ -65,5 +70,17 @@ public class Scamp extends Game {
 	public void render () {
 		delta = (System.currentTimeMillis() - startTime);
 		ecs.update(delta);
+	}
+
+	private void createCamera(Entity target) {
+		Entity entity = new Entity();
+
+		CameraComponent camera = new CameraComponent();
+		camera.camera = ecs.getSystem(VisibilityProcessor.class).getCamera();
+		camera.target = target;
+
+		entity.add(camera);
+
+		ecs.addEntity(entity);
 	}
 }
