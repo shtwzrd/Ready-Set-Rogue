@@ -1,45 +1,42 @@
 package com.warsheep.scamp;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.warsheep.scamp.components.ECSMapper;
-import com.warsheep.scamp.components.PositionComponent;
-import com.warsheep.scamp.components.VelocityComponent;
+import com.warsheep.scamp.components.MovementComponent;
+import com.warsheep.scamp.components.TransformComponent;
 
-public class MovementProcessor extends EntitySystem {
-    private ImmutableArray<Entity> entities;
+public class MovementProcessor extends IteratingSystem {
+    private boolean pause = false;
+    public static final float MOVE_SPEED = 16.0f; // TODO: Externalize this (maybe a property of the Component?)
 
-    public MovementProcessor() {}
-
-    public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.getFor(PositionComponent.class, VelocityComponent.class));
+    public MovementProcessor() {
+        super(Family.getFor(TransformComponent.class, MovementComponent.class));
     }
 
-    public void update(float deltaTime) {
-        for (int i = 0; i < entities.size(); ++i) {
-            Entity entity = entities.get(i);
-            PositionComponent position = ECSMapper.position.get(entity);
-            VelocityComponent velocity = ECSMapper.velocity.get(entity);
+    @Override
+    public void processEntity(Entity entity, float deltaTime) {
 
-            // Update position each frame while current position != future position
-            if(position.currentX <= position.futureX) {
-                position.currentX += velocity.x * deltaTime;
-            }
+        TransformComponent trans = ECSMapper.transform.get(entity);
+        MovementComponent mov = ECSMapper.movement.get(entity);
 
-            if(position.currentY <= position.futureY) {
-                position.currentY += velocity.y * deltaTime;
-            }
+        // Don't do anything if we're already at our target
+        if(trans.position.x != mov.target.x || trans.position.y != mov.target.y) {
+            mov.timeSinceMove += deltaTime; // Update how long we've been moving ...
+            mov.alpha += MOVE_SPEED / mov.timeSinceMove; // ... And how far we've come
 
-            if(position.currentX >= position.futureX) {
-                position.currentX -= velocity.x * deltaTime;
-            }
-
-            if(position.currentY >= position.futureY) {
-                position.currentY -= velocity.y * deltaTime;
-            }
+            trans.position.interpolate(mov.target, mov.alpha, mov.interpolation);
         }
     }
+
+    @Override
+    public boolean checkProcessing() {
+        return !pause;
+    }
+
+    public void pause(boolean pause) {
+        this.pause = pause;
+    }
+
 }

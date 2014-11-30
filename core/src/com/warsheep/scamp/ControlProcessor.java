@@ -8,12 +8,13 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.warsheep.scamp.components.ControllableComponent;
-import com.warsheep.scamp.components.PositionComponent;
+import com.warsheep.scamp.components.MovementComponent;
 
 
 public class ControlProcessor extends EntitySystem implements InputProcessor {
 
     private ImmutableArray<Entity> entities;
+
 
     public void addedToEngine(Engine engine) {
         entities = engine.getEntitiesFor(Family.getFor(ControllableComponent.class));
@@ -24,42 +25,42 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
         switch (keycode) {
             case Input.Keys.UP:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureY += 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
                 }
                 return true;
             case Input.Keys.DOWN:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureY -= 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
                 }
                 return true;
             case Input.Keys.RIGHT:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureX += 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
                 }
                 return true;
             case Input.Keys.LEFT:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureX -= 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
                 }
                 return true;
             case Input.Keys.W:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureY += 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
                 }
                 return true;
             case Input.Keys.S:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureY -= 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
                 }
                 return true;
             case Input.Keys.D:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureX += 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
                 }
                 return true;
             case Input.Keys.A:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(PositionComponent.class).futureX -= 24f;
+                    entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
                 }
                 return true;
         }

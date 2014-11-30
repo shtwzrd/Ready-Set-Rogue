@@ -10,11 +10,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.warsheep.scamp.components.ECSMapper;
+import com.warsheep.scamp.components.TransformComponent;
 import com.warsheep.scamp.components.VisibleComponent;
 
 public class VisibilityProcessor extends EntitySystem {
     private ImmutableArray<Entity> entities;
     private SpriteBatch batch;
+    private TransformComponent trans;
 
     public VisibilityProcessor() {
         batch = new SpriteBatch();
@@ -24,7 +26,9 @@ public class VisibilityProcessor extends EntitySystem {
         entities = engine.getEntitiesFor(Family.getFor(VisibleComponent.class));
     }
 
-    public void update() {
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+
         // Clear buffer
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -38,15 +42,13 @@ public class VisibilityProcessor extends EntitySystem {
                 batch.setColor(Color.WHITE);
             }
             // TODO: Transform world coords to screen coords
-            float screenX = ECSMapper.position.get(entities.get(i)).currentX;
-            float screenY = ECSMapper.position.get(entities.get(i)).currentY;
-
+            trans = ECSMapper.transform.get(entities.get(i));
             batch.draw(v.image,
-                    screenX, screenY,
+                    trans.position.x, trans.position.y,
                     v.originX, v.originY,
                     v.image.originalWidth, v.image.originalHeight,
-                    v.scale, v.scale,
-                    v.rotation, true);
+                    trans.scale.x, trans.scale.y,
+                    trans.rotation, true);
         }
 
         batch.end();

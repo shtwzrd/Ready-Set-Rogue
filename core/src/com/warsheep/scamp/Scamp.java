@@ -47,8 +47,8 @@ public class Scamp extends Game {
 		// Crappy Debug Wizard mans
 		wizard = new Entity();
 		wizard.add(new VisibleComponent());
-		wizard.add(new PositionComponent());
-		wizard.add(new VelocityComponent());
+		wizard.add(new TransformComponent());
+		wizard.add(new MovementComponent());
 		wizard.add(new ControllableComponent());
 		ecs.addEntity(wizard);
 		VisibleComponent wizardVisComp = ECSMapper.visible.get(wizard);
@@ -63,9 +63,7 @@ public class Scamp extends Game {
 
 	@Override
 	public void render () {
-		delta = System.currentTimeMillis() - startTime;
+		delta = (System.currentTimeMillis() - startTime);
 		ecs.update(delta);
-		movementProcessor.update(delta);
-		visibilityProcessor.update();
 	}
 }
