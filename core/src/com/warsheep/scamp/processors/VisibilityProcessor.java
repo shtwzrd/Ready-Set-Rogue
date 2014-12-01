@@ -1,4 +1,4 @@
-package com.warsheep.scamp;
+package com.warsheep.scamp.processors;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.warsheep.scamp.Scamp;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.TransformComponent;
 import com.warsheep.scamp.components.VisibleComponent;
