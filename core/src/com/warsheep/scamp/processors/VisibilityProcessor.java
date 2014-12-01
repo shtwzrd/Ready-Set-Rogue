@@ -16,8 +16,6 @@ import com.warsheep.scamp.components.TransformComponent;
 import com.warsheep.scamp.components.VisibleComponent;
 
 public class VisibilityProcessor extends EntitySystem {
-    private static final float FRUSTUM_WIDTH = 10;
-    private static final float FRUSTUM_HEIGHT = 15;
 
     private ImmutableArray<Entity> entities;
     private OrthographicCamera camera;
