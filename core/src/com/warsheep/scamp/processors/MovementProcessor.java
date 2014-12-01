@@ -1,4 +1,4 @@
-package com.warsheep.scamp;
+package com.warsheep.scamp.processors;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;

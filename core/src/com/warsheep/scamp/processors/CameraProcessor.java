@@ -1,4 +1,4 @@
-package com.warsheep.scamp;
+package com.warsheep.scamp.processors;
 
 import com.warsheep.scamp.components.CameraComponent;
 import com.warsheep.scamp.components.ECSMapper;
