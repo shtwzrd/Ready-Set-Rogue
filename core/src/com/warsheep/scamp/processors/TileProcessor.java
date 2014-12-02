@@ -32,7 +32,7 @@ public class TileProcessor extends EntitySystem implements EntityListener {
 
         trans.position.x = tile.x * TILE_SIZE;
         trans.position.y = tile.y * TILE_SIZE;
-        trans.position.z = tile.z * -1;
+        trans.position.z = tile.z;
     }
 
     @Override

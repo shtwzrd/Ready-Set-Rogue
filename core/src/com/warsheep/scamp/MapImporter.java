@@ -16,12 +16,27 @@ import java.util.Map;
 
 public class MapImporter {
 
-    public static ArrayList<TileComponent> getTileComponents(String mapPath) {
+    private int tileSize = 24;
+
+    private ArrayList<TileComponent> tileComponents;
+    private ArrayList<VisibleComponent> visibleComponents;
+    private ArrayList<CollidableComponent> collidableComponents;
+    private ArrayList<Entity> entities;
+
+    public MapImporter() {
+       this.tileComponents = new ArrayList();
+       this.visibleComponents = new ArrayList();
+       this.collidableComponents = new ArrayList();
+       this.entities = new ArrayList();
+    }
+
+    public void loadTiledMapJson(String mapPath) {
         FileHandle handle = new FileHandle(mapPath);
 
         JsonReader reader = new JsonReader();
         JsonValue jsonMap = reader.parse(handle);
 
+        tileSize = jsonMap.getInt("tileheight");
         JsonValue layers = jsonMap.getChild("layers");
         JsonValue tileSets = jsonMap.getChild("tilesets");
         Map<String, Map<Integer, String>> tileMaps = new HashMap();
@@ -42,57 +57,84 @@ public class MapImporter {
         }
 
         // Construct the respective Components
-        int layerLevel = 0;
+
+        int layerLevel = layers.getInt("height");
+
         for (JsonValue layer = layers; layer != null; layer = layer.next) {
             int width = layer.getInt("width");
+            int height = layer.getInt("height");
             String name = layer.getString("name");
             int[] data = layer.get("data").asIntArray();
 
-            int x = 0, y = 0;
-            for(int i = 0; i < data.length; i++) {
+            int x = 0, y = height - 1;
+            for (int i = 0; i < data.length; i++) {
 
-                Entity e = new Entity();
-
-                TileComponent tc = new TileComponent();
-                tc.x = x;
-                tc.y = y;
-                tc.z = layerLevel;
-
-                VisibleComponent vc = new VisibleComponent();
-                //TODO: we shouldn't assume everything is in WORLD Atlas
-                String imageString = tileMaps.get("world_24x24").get(data[i]);
-
-                if(imageString == null) {
-                    imageString = "blank_1";
+                int id = data[i];
+                if (id != 0) {
+                    id--; // Tiled Json is weird. Just accept it.
                 }
 
-                String imageIndex = imageString.substring(imageString.lastIndexOf('_') + 1, imageString.length());
-                imageString = imageString.substring(0, imageString.lastIndexOf('_'));
-                vc.image = Scamp.WORLD.findRegion(imageString, Integer.parseInt(imageIndex));
-                vc.originX = 12;
-                vc.originY = 12;
+                String imageString = tileMaps.get("world_24x24").get(id);
 
-                if(name == "Walls") {
-                   // TODO:
-                   // CollideableComponent = new CollideableComponent();
-                    e.add(new CollidableComponent());
+                if (!imageString.equals("blank_1") && imageString != null) {
+                    // Separate handle from index
+                    String imageIndex = imageString.substring(imageString.lastIndexOf('_') + 1, imageString.length());
+                    imageString = imageString.substring(0, imageString.lastIndexOf('_'));
+
+                    Entity e = new Entity();
+
+                    TileComponent tc = new TileComponent();
+                    tc.x = x;
+                    tc.y = y;
+                    tc.z = layerLevel;
+
+                    this.tileComponents.add(tc);
+
+                    VisibleComponent vc = new VisibleComponent();
+                    //TODO: we shouldn't assume everything is in WORLD Atlas
+
+                    vc.image = Scamp.WORLD.findRegion(imageString, Integer.parseInt(imageIndex));
+                    vc.originX = this.tileSize / 2;
+                    vc.originY = this.tileSize / 2;
+
+                    this.visibleComponents.add(vc);
+
+                    if (name.equals("Walls")) {
+                        CollidableComponent cc = new CollidableComponent();
+                        e.add(cc);
+                        this.collidableComponents.add(cc);
+                    }
+
+                    e.add(tc);
+                    e.add(vc);
+                    e.add(new TransformComponent());
+                    this.entities.add(e);
                 }
-                e.add(tc);
-                e.add(vc);
-                e.add(new TransformComponent());
-                Scamp.ecs.addEntity(e);
-               x++;
-               if(x == width) {
-                  x = 0;
-                  y++;
-               }
+                x++;
+                if (x == width) {
+                    x = 0;
+                    y--;
+                }
 
             }
 
-            layerLevel++;
+            layerLevel--;
         }
+    }
 
-        return new ArrayList<TileComponent>();
+    public ArrayList<TileComponent> getTileComponents() {
+        return this.tileComponents;
+    }
 
+    public ArrayList<VisibleComponent> getVisibleComponents() {
+        return this.visibleComponents;
+    }
+
+    public ArrayList<CollidableComponent> getCollidableComponents() {
+        return this.collidableComponents;
+    }
+
+    public ArrayList<Entity> getEntities() {
+       return this.entities;
     }
 }

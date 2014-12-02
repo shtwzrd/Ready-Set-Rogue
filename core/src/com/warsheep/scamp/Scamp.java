@@ -80,8 +80,8 @@ public class Scamp extends Game {
         WORLD = assetManager.get(WORLD_PATH, TextureAtlas.class);
 
 
-        // Lol load map first sos it gets drawn first
-        MapImporter.getTileComponents(MAP_PATH);
+        MapImporter mapImporter = new MapImporter();
+		mapImporter.loadTiledMapJson(MAP_PATH);
 
 		// Skeleton blocker of doom
 		for (int i = 1; i < 10; i++) {
@@ -127,8 +127,22 @@ public class Scamp extends Game {
 		wizardVisComp.image = CREATURES.findRegion("oryx_m_wizard");
 		wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
 		wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
+		TilePositionComponent wizPosComp = ECSMapper.tilePosition.get(wizard);
+		wizPosComp.x = -2;
+		wizPosComp.y = -2;
+		wizPosComp.prevX = -2;
+		wizPosComp.prevY = -2;
+
+		MovementComponent wizMoveComp = ECSMapper.movement.get(wizard);
+		wizMoveComp.target.x = -2;
+		wizMoveComp.target.y = -2;
+
 
         createCamera(wizard);
+
+		for(Entity e : mapImporter.getEntities()) {
+			ecs.addEntity(e);
+		}
 
         //Start calculating game time
         startTime = System.currentTimeMillis();

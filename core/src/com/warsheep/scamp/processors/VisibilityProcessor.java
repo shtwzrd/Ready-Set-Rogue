@@ -74,7 +74,7 @@ public class VisibilityProcessor extends SortedIteratingSystem {
         public int compare(Entity a, Entity b) {
             float aZ = ECSMapper.transform.get(a).position.z;
             float bZ = ECSMapper.transform.get(b).position.z;
-            return (int) Math.signum(aZ - bZ);
+            return (int) Math.signum(bZ - aZ);
         }
 
         @Override
