@@ -18,7 +18,7 @@ public class CombatProcessor extends EntitySystem {
 
     public void addedToEngine(Engine engine) {
         attackerEntities = engine.getEntitiesFor(Family.getFor(AttackerComponent.class, TilePositionComponent.class));
-        damageableEntities = engine.getEntitiesFor(Family.getFor(DamageableComponent.class, TilePositionComponent.class));
+        damageableEntities = engine.getEntitiesFor(Family.getFor(DamageableComponent.class, TilePositionComponent.class, StateComponent.class));
     }
 
     public void update(float deltaTime) {
@@ -38,31 +38,33 @@ public class CombatProcessor extends EntitySystem {
                     Entity damageable = damageableEntities.get(k);
                     DamageableComponent damageableComponent = ECSMapper.damage.get(damageable);
                     TilePositionComponent tilePosDamageableComp = ECSMapper.tilePosition.get(damageable);
+                    if (ECSMapper.state.get(damageable).state == StateComponent.State.ALIVE) {
+                        if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.UP) {
+                            if (tilePosAttackerComp.x == tilePosDamageableComp.x && tilePosAttackerComp.y+1 == tilePosDamageableComp.y) {
+                                System.out.println("HitUp");
+                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                            }
+                        }
+                        else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.DOWN) {
+                            if (tilePosAttackerComp.x == tilePosDamageableComp.x && tilePosAttackerComp.y-1 == tilePosDamageableComp.y) {
+                                System.out.println("HitDown");
+                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                            }
+                        }
+                        else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.RIGHT) {
+                            if (tilePosAttackerComp.x+1 == tilePosDamageableComp.x && tilePosAttackerComp.y == tilePosDamageableComp.y) {
+                                System.out.println("HitRight");
+                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                            }
+                        }
+                        else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.LEFT) {
+                            if (tilePosAttackerComp.x-1 == tilePosDamageableComp.x && tilePosAttackerComp.y == tilePosDamageableComp.y) {
+                                System.out.println("HitLeft");
+                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                            }
+                        }
+                    }
 
-                    if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.UP) {
-                        if (tilePosAttackerComp.x == tilePosDamageableComp.x && tilePosAttackerComp.y+1 == tilePosDamageableComp.y) {
-                            System.out.println("HitUp");
-                            damageableComponent.healthPoints -= attackerComp.baseDamage;
-                        }
-                    }
-                    else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.DOWN) {
-                        if (tilePosAttackerComp.x == tilePosDamageableComp.x && tilePosAttackerComp.y-1 == tilePosDamageableComp.y) {
-                            System.out.println("HitDown");
-                            damageableComponent.healthPoints -= attackerComp.baseDamage;
-                        }
-                    }
-                    else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.RIGHT) {
-                        if (tilePosAttackerComp.x+1 == tilePosDamageableComp.x && tilePosAttackerComp.y == tilePosDamageableComp.y) {
-                            System.out.println("HitRight");
-                            damageableComponent.healthPoints -= attackerComp.baseDamage;
-                        }
-                    }
-                    else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.LEFT) {
-                        if (tilePosAttackerComp.x-1 == tilePosDamageableComp.x && tilePosAttackerComp.y == tilePosDamageableComp.y) {
-                            System.out.println("HitLeft");
-                            damageableComponent.healthPoints -= attackerComp.baseDamage;
-                        }
-                    }
                 }
 
                 attackerComp.attacking = false;

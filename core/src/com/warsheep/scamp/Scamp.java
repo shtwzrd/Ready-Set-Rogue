@@ -27,6 +27,7 @@ public class Scamp extends Game {
 	CombatProcessor combatProcessor;
     CameraProcessor cameraProcessor;
     TileProcessor tileProcessor;
+	AIProcessor aiProcessor;
 
     AssetManager assetManager = new AssetManager();
     public static TextureAtlas CREATURES;
@@ -50,6 +51,7 @@ public class Scamp extends Game {
 		deathProcessor = new DeathProcessor();
 		combatProcessor = new CombatProcessor(3);
         tileProcessor = new TileProcessor();
+		aiProcessor = new AIProcessor(4);
         ecs.addSystem(visibilityProcessor);
 		ecs.addSystem(collisionProcessor);
 		ecs.addSystem(tileProcessor);
@@ -57,6 +59,7 @@ public class Scamp extends Game {
 		ecs.addSystem(cameraProcessor);
 		ecs.addSystem(deathProcessor);
 		ecs.addSystem(combatProcessor);
+		ecs.addSystem(aiProcessor);
 		Gdx.input.setInputProcessor(controlProcessor);
 
 		// Load assets
@@ -73,21 +76,28 @@ public class Scamp extends Game {
         MapImporter.getTileComponents(MAP_PATH);
 
 		// Skeleton blocker of doom
-		Entity skeleton = new Entity();
-		skeleton.add(new VisibleComponent());
-		skeleton.add(new TransformComponent());
-		skeleton.add(new CollidableComponent());
-		skeleton.add(new DamageableComponent());
-		skeleton.add(new TilePositionComponent());
-		ecs.addEntity(skeleton);
-		VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
-		skeletonVisComp.image = CREATURES.findRegion("oryx_n_skeleton");
-		skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
-		skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
-		ECSMapper.transform.get(skeleton).position.y = 48;
-		ECSMapper.transform.get(skeleton).position.x = 48;
-		ECSMapper.tilePosition.get(skeleton).y = 2;
-		ECSMapper.tilePosition.get(skeleton).x = 2;
+		for (int i = 1; i < 10; i++) {
+			Entity skeleton = new Entity();
+			skeleton.add(new VisibleComponent());
+			skeleton.add(new TransformComponent());
+			skeleton.add(new CollidableComponent());
+			skeleton.add(new DamageableComponent());
+			skeleton.add(new TilePositionComponent());
+			skeleton.add(new AIControllableComponent());
+			skeleton.add(new AttackerComponent());
+			skeleton.add(new MovementComponent());
+			skeleton.add(new StateComponent());
+			ecs.addEntity(skeleton);
+			VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
+			skeletonVisComp.image = CREATURES.findRegion("oryx_n_skeleton");
+			skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
+			skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
+			ECSMapper.transform.get(skeleton).position.y = i*24;
+			ECSMapper.transform.get(skeleton).position.x = i*24;
+			ECSMapper.movement.get(skeleton).target = new Vector3(i*24, i*24, 0);
+			ECSMapper.tilePosition.get(skeleton).y = i;
+			ECSMapper.tilePosition.get(skeleton).x = i;
+		}
 
 		// Crappy Debug Wizard mans
 		wizard = new Entity();
@@ -99,6 +109,7 @@ public class Scamp extends Game {
 		wizard.add(new AttackerComponent());
 		wizard.add(new DamageableComponent());
 		wizard.add(new TilePositionComponent());
+		wizard.add(new StateComponent());
 		ecs.addEntity(wizard);
 
 		DamageableComponent dmgComp = ECSMapper.damage.get(wizard);

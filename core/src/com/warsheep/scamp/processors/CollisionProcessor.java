@@ -41,9 +41,6 @@ public class CollisionProcessor extends EntitySystem {
                     if (tilePosMain.x == tilePosCheck.x && tilePosMain.y == tilePosCheck.y) {
                         System.out.println("Block TilePos");
 
-                        System.out.println(tilePosMain.x + " " + tilePosMain.y);
-                        System.out.println(tilePosCheck.x + " " + tilePosCheck.y);
-
                         tilePosMain.x = tilePosMain.prevX;
                         tilePosMain.y = tilePosMain.prevY;
                         m.target = new Vector3(tilePosMain.x*24, tilePosMain.y*24, m.target.z);
@@ -59,9 +56,6 @@ public class CollisionProcessor extends EntitySystem {
                 if (entityMain.getId() != entityCheck.getId()) {
                     if (tilePosMain.x == tileCheck.x && tilePosMain.y == tileCheck.y) {
                         System.out.println("Block Tile");
-
-                        System.out.println(tilePosMain.x + " " + tilePosMain.y);
-                        System.out.println(tileCheck.x + " " + tileCheck.y);
 
                         tilePosMain.x = tilePosMain.prevX;
                         tilePosMain.y = tilePosMain.prevY;

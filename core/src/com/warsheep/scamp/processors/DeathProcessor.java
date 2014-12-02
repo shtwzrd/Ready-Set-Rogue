@@ -8,21 +8,27 @@ import com.warsheep.scamp.components.*;
 public class DeathProcessor extends IteratingSystem {
 
     public DeathProcessor() {
-        super(Family.getFor(DamageableComponent.class));
+        super(Family.getFor(DamageableComponent.class, StateComponent.class));
     }
 
     @Override
     public void processEntity(Entity entity, float deltaTime) {
         DamageableComponent dmgComp = ECSMapper.damage.get(entity);
+        StateComponent stateComp = ECSMapper.state.get(entity);
 
         if (dmgComp.healthPoints <= 0) {
+            stateComp.state = StateComponent.State.DEAD;
+
             if (dmgComp.essential) {
-                // TODO: Figure out what to do when losing the game
-                System.out.println("You lost the game...");
+                // Lose the game....
             }
-            else {
-                // TODO: Implement proper death
-                System.out.println("Yo, mob! You deeed!");
+
+            if (ECSMapper.collide.get(entity) != null) {
+                entity.remove(CollidableComponent.class);
+            }
+
+            if (ECSMapper.control.get(entity) != null) {
+                entity.remove(ControllableComponent.class);
             }
         }
     }

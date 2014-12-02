@@ -37,5 +37,8 @@ public class ECSMapper {
 
     public static final ComponentMapper<TilePositionComponent> tilePosition =
             ComponentMapper.getFor(TilePositionComponent.class);
+
+    public static final ComponentMapper<StateComponent> state =
+            ComponentMapper.getFor(StateComponent.class);
 }
 
