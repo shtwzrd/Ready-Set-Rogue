@@ -17,8 +17,8 @@ public class CombatProcessor extends EntitySystem {
     }
 
     public void addedToEngine(Engine engine) {
-        attackerEntities = engine.getEntitiesFor(Family.getFor(AttackerComponent.class, TransformComponent.class));
-        damageableEntities = engine.getEntitiesFor(Family.getFor(DamageableComponent.class, TransformComponent.class));
+        attackerEntities = engine.getEntitiesFor(Family.getFor(AttackerComponent.class, TilePositionComponent.class));
+        damageableEntities = engine.getEntitiesFor(Family.getFor(DamageableComponent.class, TilePositionComponent.class));
     }
 
     public void update(float deltaTime) {
@@ -31,32 +31,38 @@ public class CombatProcessor extends EntitySystem {
 
             // Check if attacker is currently attacking
             if (attackerComp.attacking) {
-                System.out.println("Attacker");
                 // Get attackers "position"
-                AttackerComponent transAttackerComp = ECSMapper.attack.get(attacker);
+                TilePositionComponent tilePosAttackerComp = ECSMapper.tilePosition.get(attacker);
 
-                // Check if attacker is currently attacking
                 for (int k = 0; k < damageableEntities.size(); k++) {
                     Entity damageable = damageableEntities.get(k);
                     DamageableComponent damageableComponent = ECSMapper.damage.get(damageable);
-                    TransformComponent transDamageableComp = ECSMapper.transform.get(damageable);
+                    TilePositionComponent tilePosDamageableComp = ECSMapper.tilePosition.get(damageable);
 
                     if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.UP) {
-                        // Check if hit using Tile positions
-                        damageableComponent.healthPoints--;
-                        System.out.println("Hit!! <");
+                        if (tilePosAttackerComp.x == tilePosDamageableComp.x && tilePosAttackerComp.y+1 == tilePosDamageableComp.y) {
+                            System.out.println("HitUp");
+                            damageableComponent.healthPoints -= attackerComp.baseDamage;
+                        }
                     }
                     else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.DOWN) {
-
+                        if (tilePosAttackerComp.x == tilePosDamageableComp.x && tilePosAttackerComp.y-1 == tilePosDamageableComp.y) {
+                            System.out.println("HitDown");
+                            damageableComponent.healthPoints -= attackerComp.baseDamage;
+                        }
                     }
                     else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.RIGHT) {
-
+                        if (tilePosAttackerComp.x+1 == tilePosDamageableComp.x && tilePosAttackerComp.y == tilePosDamageableComp.y) {
+                            System.out.println("HitRight");
+                            damageableComponent.healthPoints -= attackerComp.baseDamage;
+                        }
                     }
                     else if (attackerComp.attackerDirection == AttackerComponent.AttackDirection.LEFT) {
-
+                        if (tilePosAttackerComp.x-1 == tilePosDamageableComp.x && tilePosAttackerComp.y == tilePosDamageableComp.y) {
+                            System.out.println("HitLeft");
+                            damageableComponent.healthPoints -= attackerComp.baseDamage;
+                        }
                     }
-
-
                 }
 
                 attackerComp.attacking = false;

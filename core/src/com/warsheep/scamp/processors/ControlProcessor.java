@@ -11,6 +11,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.warsheep.scamp.components.AttackerComponent;
 import com.warsheep.scamp.components.ControllableComponent;
 import com.warsheep.scamp.components.MovementComponent;
+import com.warsheep.scamp.components.TilePositionComponent;
 
 import java.awt.*;
 
@@ -30,41 +31,57 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             case Input.Keys.UP:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
+                    entities.get(i).getComponent(TilePositionComponent.class).y += 1;
                 }
                 return true;
             case Input.Keys.DOWN:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
+                    entities.get(i).getComponent(TilePositionComponent.class).y -= 1;
                 }
                 return true;
             case Input.Keys.RIGHT:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
+                    entities.get(i).getComponent(TilePositionComponent.class).x += 1;
                 }
                 return true;
             case Input.Keys.LEFT:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
+                    entities.get(i).getComponent(TilePositionComponent.class).x -= 1;
                 }
                 return true;
             case Input.Keys.W:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
+                    entities.get(i).getComponent(TilePositionComponent.class).y += 1;
                 }
                 return true;
             case Input.Keys.S:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
+                    entities.get(i).getComponent(TilePositionComponent.class).y -= 1;
                 }
                 return true;
             case Input.Keys.D:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
+                    entities.get(i).getComponent(TilePositionComponent.class).x += 1;
                 }
                 return true;
             case Input.Keys.A:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
+                    entities.get(i).getComponent(TilePositionComponent.class).x -= 1;
                 }
                 return true;
 
@@ -125,10 +142,12 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             if (clickPosX > 0) {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).x += 1;
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).x -= 1;
                 }
             }
         } else {
@@ -136,10 +155,12 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             if (clickPosY > 0) {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).y -= 1;
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
+                    entities.get(i).getComponent(TilePositionComponent.class).y += 1;
                 }
             }
         }

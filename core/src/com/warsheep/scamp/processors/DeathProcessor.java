@@ -8,7 +8,7 @@ import com.warsheep.scamp.components.*;
 public class DeathProcessor extends IteratingSystem {
 
     public DeathProcessor() {
-        super(Family.getFor(DamageableComponent.class, ControllableComponent.class));
+        super(Family.getFor(DamageableComponent.class));
     }
 
     @Override

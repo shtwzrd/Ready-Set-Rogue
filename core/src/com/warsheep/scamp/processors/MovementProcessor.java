@@ -3,7 +3,6 @@ package com.warsheep.scamp.processors;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.MovementComponent;
 import com.warsheep.scamp.components.TransformComponent;
@@ -29,7 +28,6 @@ public class MovementProcessor extends IteratingSystem {
             mov.timeSinceMove += deltaTime; // Update how long we've been moving ...
             mov.alpha += MOVE_SPEED / mov.timeSinceMove; // ... And how far we've c
 
-            trans.previousPosition = new Vector3(trans.position.x, trans.position.y, trans.position.z);
             trans.position.interpolate(mov.target, mov.alpha, mov.interpolation);
         }
     }
