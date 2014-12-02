@@ -11,7 +11,8 @@ import com.warsheep.scamp.components.*;
 public class CollisionProcessor extends EntitySystem {
 
     private ImmutableArray<Entity> controllableEntities;
-    private ImmutableArray<Entity> colliderEntities;
+    private ImmutableArray<Entity> colliableTilePosEntities;
+    private ImmutableArray<Entity> colliableTileEntities;
 
     public CollisionProcessor(int order) {
         super(order);
@@ -19,7 +20,8 @@ public class CollisionProcessor extends EntitySystem {
 
     public void addedToEngine(Engine engine) {
         controllableEntities = engine.getEntitiesFor(Family.getFor(CollidableComponent.class, TilePositionComponent.class, MovementComponent.class));
-        colliderEntities = engine.getEntitiesFor(Family.getFor(CollidableComponent.class, TilePositionComponent.class));
+        colliableTilePosEntities = engine.getEntitiesFor(Family.getFor(CollidableComponent.class, TilePositionComponent.class));
+        colliableTileEntities = engine.getEntitiesFor(Family.getFor(CollidableComponent.class, TileComponent.class));
     }
 
     public void update(float deltaTime) {
@@ -30,16 +32,36 @@ public class CollisionProcessor extends EntitySystem {
             MovementComponent m = ECSMapper.movement.get(entityMain);
             TilePositionComponent tilePosMain = ECSMapper.tilePosition.get(entityMain);
 
-            for (int k = 0; k < colliderEntities.size(); k++) {
-                Entity entityCheck = colliderEntities.get(k);
+            // TilePos + Collidable
+            for (int k = 0; k < colliableTilePosEntities.size(); k++) {
+                Entity entityCheck = colliableTilePosEntities.get(k);
                 TilePositionComponent tilePosCheck = ECSMapper.tilePosition.get(entityCheck);
 
                 if (entityMain.getId() != entityCheck.getId()) {
                     if (tilePosMain.x == tilePosCheck.x && tilePosMain.y == tilePosCheck.y) {
-                        System.out.println("Block");
+                        System.out.println("Block TilePos");
 
                         System.out.println(tilePosMain.x + " " + tilePosMain.y);
                         System.out.println(tilePosCheck.x + " " + tilePosCheck.y);
+
+                        tilePosMain.x = tilePosMain.prevX;
+                        tilePosMain.y = tilePosMain.prevY;
+                        m.target = new Vector3(tilePosMain.x*24, tilePosMain.y*24, m.target.z);
+                    }
+                }
+            }
+
+            // Tile + Collidable
+            for (int k = 0; k < colliableTileEntities.size(); k++) {
+                Entity entityCheck = colliableTileEntities.get(k);
+                TileComponent tileCheck = ECSMapper.tile.get(entityCheck);
+
+                if (entityMain.getId() != entityCheck.getId()) {
+                    if (tilePosMain.x == tileCheck.x && tilePosMain.y == tileCheck.y) {
+                        System.out.println("Block Tile");
+
+                        System.out.println(tilePosMain.x + " " + tilePosMain.y);
+                        System.out.println(tileCheck.x + " " + tileCheck.y);
 
                         tilePosMain.x = tilePosMain.prevX;
                         tilePosMain.y = tilePosMain.prevY;
