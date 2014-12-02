@@ -31,57 +31,65 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             case Input.Keys.UP:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
-                    entities.get(i).getComponent(TilePositionComponent.class).y += 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevY = tilePosCom.y;
+                    tilePosCom.y++;
                 }
                 return true;
             case Input.Keys.DOWN:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
-                    entities.get(i).getComponent(TilePositionComponent.class).y -= 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevY = tilePosCom.y;
+                    tilePosCom.y--;
                 }
                 return true;
             case Input.Keys.RIGHT:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
-                    entities.get(i).getComponent(TilePositionComponent.class).x += 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevX = tilePosCom.x;
+                    tilePosCom.x++;
                 }
                 return true;
             case Input.Keys.LEFT:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
-                    entities.get(i).getComponent(TilePositionComponent.class).x -= 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevX = tilePosCom.x;
+                    tilePosCom.x--;
                 }
                 return true;
             case Input.Keys.W:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
-                    entities.get(i).getComponent(TilePositionComponent.class).y += 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevY = tilePosCom.y;
+                    tilePosCom.y++;
                 }
                 return true;
             case Input.Keys.S:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevY = entities.get(i).getComponent(TilePositionComponent.class).y;
-                    entities.get(i).getComponent(TilePositionComponent.class).y -= 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevY = tilePosCom.y;
+                    tilePosCom.y--;
                 }
                 return true;
             case Input.Keys.D:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
-                    entities.get(i).getComponent(TilePositionComponent.class).x += 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevX = tilePosCom.x;
+                    tilePosCom.x++;
                 }
                 return true;
             case Input.Keys.A:
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).prevX = entities.get(i).getComponent(TilePositionComponent.class).x;
-                    entities.get(i).getComponent(TilePositionComponent.class).x -= 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevX = tilePosCom.x;
+                    tilePosCom.x--;
                 }
                 return true;
 
@@ -142,12 +150,16 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             if (clickPosX > 0) {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).x += 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevX = tilePosCom.x;
+                    tilePosCom.x++;
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).x -= 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevX = tilePosCom.x;
+                    tilePosCom.x--;
                 }
             }
         } else {
@@ -155,12 +167,16 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             if (clickPosY > 0) {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).y -= 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevY = tilePosCom.y;
+                    tilePosCom.y--;
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
                     entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
-                    entities.get(i).getComponent(TilePositionComponent.class).y += 1;
+                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
+                    tilePosCom.prevY = tilePosCom.y;
+                    tilePosCom.y++;
                 }
             }
         }
