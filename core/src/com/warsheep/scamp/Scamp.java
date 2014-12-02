@@ -6,10 +6,12 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
 public class Scamp extends Game {
+
     public static final String TITLE = "SCAMP";
     public static final String CREATURES_PATH = "creatures_24x24/creatures.atlas";
     public static final String WORLD_PATH = "world_24x24/world.atlas";
@@ -19,7 +21,10 @@ public class Scamp extends Game {
     public static Engine ecs; // Ashley Entity-Component System
     VisibilityProcessor visibilityProcessor;
     MovementProcessor movementProcessor;
+	CollisionProcessor collisionProcessor;
     ControlProcessor controlProcessor;
+	DeathProcessor deathProcessor;
+	CombatProcessor combatProcessor;
     CameraProcessor cameraProcessor;
     TileProcessor tileProcessor;
 
@@ -38,16 +43,20 @@ public class Scamp extends Game {
 
         // Initialize processors and associate them with ecs engine
         visibilityProcessor = new VisibilityProcessor();
-        movementProcessor = new MovementProcessor();
-        controlProcessor = new ControlProcessor();
-        cameraProcessor = new CameraProcessor();
+		collisionProcessor = new CollisionProcessor(1);
+		movementProcessor = new MovementProcessor(2);
+		controlProcessor = new ControlProcessor();
+		cameraProcessor = new CameraProcessor();
+		deathProcessor = new DeathProcessor();
+		combatProcessor = new CombatProcessor(3);
         tileProcessor = new TileProcessor();
         ecs.addSystem(visibilityProcessor);
-        // ecs.addSystem(collisionProcessor);
-        ecs.addSystem(tileProcessor);
-        ecs.addSystem(movementProcessor);
-        ecs.addSystem(cameraProcessor);
-        ecs.addSystem(controlProcessor);
+		ecs.addSystem(collisionProcessor);
+		ecs.addSystem(tileProcessor);
+		ecs.addSystem(movementProcessor);
+		ecs.addSystem(cameraProcessor);
+		ecs.addSystem(deathProcessor);
+		ecs.addSystem(combatProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
 
         // Load assets
@@ -56,6 +65,23 @@ public class Scamp extends Game {
         assetManager.finishLoading(); // Synchronous, pauses until everything loads
         CREATURES = assetManager.get(CREATURES_PATH, TextureAtlas.class);
         WORLD = assetManager.get(WORLD_PATH, TextureAtlas.class);
+
+        // Lol load map first sos it gets drawn first
+        MapImporter.getTileComponents(MAP_PATH);
+
+		// Skeleton blocker of doom
+		Entity skeleton = new Entity();
+		skeleton.add(new VisibleComponent());
+		skeleton.add(new TransformComponent());
+		skeleton.add(new CollidableComponent());
+		skeleton.add(new DamageableComponent());
+		ecs.addEntity(skeleton);
+		VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
+		TransformComponent skeletonTraComp = ECSMapper.transform.get(skeleton);
+		skeletonVisComp.image = CREATURES.findRegion("oryx_n_skeleton");
+		skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
+		skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
+		skeletonTraComp.position = new Vector3(48, 48, 0);
 
         // Crappy Debug Wizard mans
         wizard = new Entity();
@@ -66,13 +92,9 @@ public class Scamp extends Game {
         wizard.add(new TilePositionComponent());
         ecs.addEntity(wizard);
         VisibleComponent wizardVisComp = ECSMapper.visible.get(wizard);
-        ECSMapper.transform.get(wizard).position.z = -500;
         wizardVisComp.image = CREATURES.findRegion("oryx_m_wizard");
         wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
         wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
-
-
-        MapImporter.getTileComponents(MAP_PATH);
 
         createCamera(wizard);
 
