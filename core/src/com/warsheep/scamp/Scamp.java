@@ -57,6 +57,7 @@ public class Scamp extends Game {
 		ecs.addSystem(cameraProcessor);
 		ecs.addSystem(deathProcessor);
 		ecs.addSystem(combatProcessor);
+        ecs.addSystem(controlProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
 
         // Load assets
