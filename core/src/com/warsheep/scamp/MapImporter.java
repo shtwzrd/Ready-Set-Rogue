@@ -56,6 +56,7 @@ public class MapImporter {
                 TileComponent tc = new TileComponent();
                 tc.x = x;
                 tc.y = y;
+                tc.z = layerLevel;
 
                 VisibleComponent vc = new VisibleComponent();
                 //TODO: we shouldn't assume everything is in WORLD Atlas

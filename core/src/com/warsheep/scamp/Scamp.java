@@ -67,6 +67,7 @@ public class Scamp extends Game {
         CREATURES = assetManager.get(CREATURES_PATH, TextureAtlas.class);
         WORLD = assetManager.get(WORLD_PATH, TextureAtlas.class);
 
+
         // Lol load map first sos it gets drawn first
         MapImporter.getTileComponents(MAP_PATH);
 
@@ -106,8 +107,10 @@ public class Scamp extends Game {
 
     @Override
     public void render() {
+        visibilityProcessor.startBatch();
         delta = (System.currentTimeMillis() - startTime);
         ecs.update(delta);
+        visibilityProcessor.endBatch();
     }
 
     private void createCamera(Entity target) {
