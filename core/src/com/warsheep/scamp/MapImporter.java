@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.warsheep.scamp.components.CollidableComponent;
 import com.warsheep.scamp.components.TileComponent;
 import com.warsheep.scamp.components.TransformComponent;
 import com.warsheep.scamp.components.VisibleComponent;
@@ -24,7 +25,6 @@ public class MapImporter {
         JsonValue layers = jsonMap.getChild("layers");
         JsonValue tileSets = jsonMap.getChild("tilesets");
         Map<String, Map<Integer, String>> tileMaps = new HashMap();
-
 
         // Build up the TileSets referenced by the map, with Atlas-friendly handles
         for (JsonValue tileset = tileSets; tileset != null; tileset = tileset.next) {
@@ -75,6 +75,7 @@ public class MapImporter {
                 if(name == "Walls") {
                    // TODO:
                    // CollideableComponent = new CollideableComponent();
+                    e.add(new CollidableComponent());
                 }
                 e.add(tc);
                 e.add(vc);
