@@ -12,7 +12,6 @@ public class AIProcessor extends EntitySystem {
 
     private ImmutableArray<Entity> aiControllableEntities;
     private ImmutableArray<Entity> damageableEntities;
-    private final int MIN_DISTANCE = 15; // TODO: Change it to be a property of AIControllableComponent?
 
     private int prevSecond = 0;
 
@@ -32,7 +31,7 @@ public class AIProcessor extends EntitySystem {
                 if (ECSMapper.state.get(aiEntity).state != StateComponent.State.DEAD) {
                     TilePositionComponent aiTilePos = ECSMapper.tilePosition.get(aiEntity);
 
-                    int minDistance = MIN_DISTANCE;
+                    int minDistance = ECSMapper.aiControllable.get(aiEntity).sightRange;
 
                     Entity closestDamageableEntity = null; // Entity to move towards
 
@@ -55,18 +54,18 @@ public class AIProcessor extends EntitySystem {
                         // Figure out what direction to move in
                         TilePositionComponent closestDmgTilePos = ECSMapper.tilePosition.get(closestDamageableEntity);
 
-                        if (minDistance <= 1) { // TODO: Should be attackdistance (property of AttackerComp?)
+                        if (minDistance <= Math.abs(closestDmgTilePos.x - aiTilePos.x) || minDistance <= Math.abs(closestDmgTilePos.y - aiTilePos.y)) {
                             // Attack!!
                             ECSMapper.state.get(aiEntity).state = StateComponent.State.ATTACKING;
                             if (Math.abs(closestDmgTilePos.x - aiTilePos.x) > Math.abs(closestDmgTilePos.y - aiTilePos.y)) {
-                                // Move sideways
+                                // Attack sideways
                                 if (closestDmgTilePos.x > aiTilePos.x) {
                                     ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.RIGHT;
                                 } else {
                                     ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.LEFT;
                                 }
                             } else {
-                                // Move vertically
+                                // Attack vertically
                                 if (closestDmgTilePos.y > aiTilePos.y) {
                                     ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.UP;
                                 } else {

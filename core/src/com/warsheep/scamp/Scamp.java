@@ -11,6 +11,7 @@ import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Scamp extends Game {
 
@@ -94,7 +95,7 @@ public class Scamp extends Game {
 		mapImporter.loadTiledMapJson(MAP_PATH);
 
 		// Skeleton blocker of doom
-		for (int i = 1; i < 2; i++) {
+		for (int i = 1; i < 10; i++) {
 			Entity skeleton = new Entity();
 			skeleton.add(new VisibleComponent());
 			skeleton.add(new TransformComponent());
@@ -104,6 +105,7 @@ public class Scamp extends Game {
 			skeleton.add(new AIControllableComponent());
 			skeleton.add(new AttackerComponent());
 			skeleton.add(new StateComponent());
+			skeleton.add(new FactionComponent());
 			ecs.addEntity(skeleton);
 			VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
 			skeletonVisComp.image = CREATURES.findRegion("oryx_n_skeleton");
@@ -125,7 +127,12 @@ public class Scamp extends Game {
 		wizard.add(new DamageableComponent());
 		wizard.add(new TilePositionComponent());
 		wizard.add(new StateComponent());
+		wizard.add(new FactionComponent());
+
 		ecs.addEntity(wizard);
+
+		ECSMapper.attack.get(wizard).attackRange = 2;
+		ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
 
 		DamageableComponent dmgComp = ECSMapper.damage.get(wizard);
 		dmgComp.essential = true;
