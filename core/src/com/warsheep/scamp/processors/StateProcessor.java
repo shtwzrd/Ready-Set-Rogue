@@ -5,8 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
-import com.warsheep.scamp.components.StateComponent.State;
-import com.warsheep.scamp.components.StateComponent.Directionality;
+import com.warsheep.scamp.components.StateComponent.*;
 
 import java.util.List;
 
@@ -15,15 +14,27 @@ public class StateProcessor extends IteratingSystem {
     private List<StateListener> listeners;
 
     public static interface StateListener {
-        public void idle(Entity entity);
 
-        public void dead(Entity entity);
+        // Do nothing defaults
+        default public void idle(Entity entity) {
+            ECSMapper.state.get(entity).inProgress = false;
+        }
 
-        public void hurt(Entity entity);
+        default public void dead(Entity entity) {
+            ECSMapper.state.get(entity).inProgress = false;
+        }
 
-        public void attacking(Entity entity, Directionality direction);
+        default public void hurt(Entity entity) {
+            ECSMapper.state.get(entity).inProgress = false;
+        }
 
-        public void moving(Entity entity, Directionality direction);
+        default public void attacking(Entity entity, Directionality direction) {
+            ECSMapper.state.get(entity).inProgress = false;
+        }
+
+        default public void moving(Entity entity, Directionality direction) {
+            ECSMapper.state.get(entity).inProgress = false;
+        }
     }
 
     public StateProcessor(List<StateListener> listeners) {
@@ -53,22 +64,19 @@ public class StateProcessor extends IteratingSystem {
                     for (StateListener listener : this.listeners) {
                         listener.dead(entity);
                     }
-                    ECSMapper.state.get(entity).inProgress = false;
                     break;
                 case IDLE:
                     for (StateListener listener : this.listeners) {
                         listener.idle(entity);
                     }
-                    ECSMapper.state.get(entity).inProgress = false;
                     break;
                 case HURT:
                     for (StateListener listener : this.listeners) {
                         listener.hurt(entity);
                     }
-                    ECSMapper.state.get(entity).inProgress = false;
-
                     break;
                 default:
+                    System.out.println("Entity " + entity + " was in an unknown state");
                     ECSMapper.state.get(entity).inProgress = false;
                     break;
             }

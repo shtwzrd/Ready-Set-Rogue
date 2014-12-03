@@ -81,26 +81,6 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
         }
     }
 
-    @Override
-    public void idle(Entity entity) {
-        // Do nothing
-    }
-
-    @Override
-    public void dead(Entity entity) {
-        // Do nothing
-    }
-
-    @Override
-    public void hurt(Entity entity) {
-        // Do nothing
-    }
-
-    @Override
-    public void attacking(Entity entity, StateComponent.Directionality direction) {
-        // Do nothing
-    }
-
     private boolean hasCollision(TilePositionComponent a, TilePositionComponent b, Directionality dir) {
         switch (dir) {
             case UP:

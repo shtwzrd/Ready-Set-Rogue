@@ -67,17 +67,6 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
     }
 
     @Override
-    public void idle(Entity entity) {
-        // Do nothing
-    }
-
-    @Override
-    public void dead(Entity entity) {
-
-        // Do nothing
-    }
-
-    @Override
     public void hurt(Entity entity) {
         for(int i = 0; i < damageableEntities.size(); i++) {
             ECSMapper.visible.get(damageableEntities.get(i)).color = Color.WHITE;
@@ -85,11 +74,5 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
         }
         VisibleComponent vc = ECSMapper.visible.get(entity); // TODO: Temporary
         vc.color = Color.RED;
-    }
-
-    @Override
-    public void moving(Entity entity, StateComponent.Directionality direction) {
-
-        // Do nothing
     }
 }
