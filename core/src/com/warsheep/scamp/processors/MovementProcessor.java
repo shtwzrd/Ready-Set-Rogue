@@ -90,9 +90,4 @@ public class MovementProcessor extends IteratingSystem implements CollisionListe
         ECSMapper.tilePosition.get(entity).y = y;
         entity.add(mov);
     }
-
-    @Override
-    public void collidedMove(Entity entity, StateComponent.Directionality direction) {
-        // Do nothing
-    }
 }

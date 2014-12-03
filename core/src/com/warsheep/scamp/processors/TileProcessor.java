@@ -13,6 +13,13 @@ public class TileProcessor extends EntitySystem implements EntityListener {
     private TileComponent tile;
     private static final int TILE_SIZE = 24;
 
+    public static interface TileBound {
+        public int x();
+        public void x(int x);
+        public int y();
+        public void y(int y);
+    }
+
     public TileProcessor() {
 
     }

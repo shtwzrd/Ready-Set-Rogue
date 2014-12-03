@@ -7,19 +7,24 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.Directionality;
+import com.warsheep.scamp.processors.TileProcessor.TileBound;
 
 import java.util.List;
 
 public class CollisionProcessor extends EntitySystem implements StateProcessor.StateListener {
 
-    private ImmutableArray<Entity> colliableTilePosEntities;
-    private ImmutableArray<Entity> colliableTileEntities;
+    private ImmutableArray<Entity> collidableTilePosEntities;
+    private ImmutableArray<Entity> collidableTileEntities;
     private List<CollisionListener> listeners;
 
     public static interface CollisionListener {
-        public void successfulMove(Entity entity, Directionality direction);
+        default public void successfulMove(Entity entity, Directionality direction) {
+            // Do nothing
+        }
 
-        public void collidedMove(Entity entity, Directionality direction);
+        default public void collidedMove(Entity entity, Directionality direction) {
+            // Do nothing
+        }
     }
 
     public CollisionProcessor(List<CollisionListener> listeners) {
@@ -27,107 +32,66 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
     }
 
     public void addedToEngine(Engine engine) {
-        colliableTilePosEntities = engine.getEntitiesFor(Family.getFor(CollidableComponent.class, TilePositionComponent.class));
-        colliableTileEntities = engine.getEntitiesFor(Family.getFor(CollidableComponent.class, TileComponent.class));
+        collidableTilePosEntities = engine.getEntitiesFor(Family.all(CollidableComponent.class, TilePositionComponent.class).get());
+        collidableTileEntities = engine.getEntitiesFor(Family.all(CollidableComponent.class, TileComponent.class).get());
     }
-
-    public void update(float deltaTime) {
-        //super.update(deltaTime);
-    }
-
 
     @Override
     public void moving(Entity entity, StateComponent.Directionality direction) {
-        TilePositionComponent tilePosMain = ECSMapper.tilePosition.get(entity);
+        TileBound tilePosMain = ECSMapper.tilePosition.get(entity);
         Directionality dir = ECSMapper.state.get(entity).direction;
 
         boolean blocked = false;
-        // TilePos + Collidable
-        for (int k = 0; k < colliableTilePosEntities.size(); k++) {
-            Entity entityCheck = colliableTilePosEntities.get(k);
-            TilePositionComponent tilePosCheck = ECSMapper.tilePosition.get(entityCheck);
 
-            if (entity.getId() != entityCheck.getId()) {
-                if (hasCollision(tilePosMain, tilePosCheck, dir)) {
-                    for (CollisionListener listener : this.listeners) {
-                        listener.collidedMove(entity, direction);
-                    }
-                    blocked = true;
-                }
+        // Iterate over all collidable components to check for a collision
+        for (int i = 0; i < collidableTileEntities.size() + collidableTilePosEntities.size(); i++) {
+            Entity entityCheck;
+            TileBound tileCheck;
+
+            if (i < collidableTileEntities.size()) {
+                entityCheck = collidableTileEntities.get(i);
+                tileCheck = ECSMapper.tile.get(entityCheck);
+            } else {
+                entityCheck = collidableTilePosEntities.get(i - collidableTileEntities.size());
+                tileCheck = ECSMapper.tilePosition.get(entityCheck);
             }
-        }
-
-        // Tile + Collidable
-        for (int k = 0; k < colliableTileEntities.size(); k++) {
-            Entity entityCheck = colliableTileEntities.get(k);
-            TileComponent tileCheck = ECSMapper.tile.get(entityCheck);
 
             if (entity.getId() != entityCheck.getId()) {
                 if (hasCollision(tilePosMain, tileCheck, dir)) {
-                    for (CollisionListener listener : this.listeners) {
-                        listener.collidedMove(entity, direction);
-                    }
                     blocked = true;
                 }
             }
         }
 
-        if (!blocked) {
-            for (CollisionListener listener : this.listeners) {
+        // Notify all Collision Listeners of the result
+        for (CollisionListener listener : this.listeners) {
+            if (blocked) {
+                listener.collidedMove(entity, direction);
+            } else {
                 listener.successfulMove(entity, direction);
             }
-        } else {
-           ECSMapper.state.get(entity).inProgress = false;
         }
     }
 
-    private boolean hasCollision(TilePositionComponent a, TilePositionComponent b, Directionality dir) {
+    private boolean hasCollision(TileBound a, TileBound b, Directionality dir) {
         switch (dir) {
             case UP:
-                if (a.x == b.x && a.y + 1 == b.y) {
+                if (a.y() == b.y() && a.y() + 1 == b.y()) {
                     return true;
                 }
                 break;
             case DOWN:
-                if (a.x == b.x && a.y - 1 == b.y) {
+                if (a.x() == b.x() && a.y() - 1 == b.y()) {
                     return true;
                 }
                 break;
             case LEFT:
-                if (a.x - 1 == b.x && a.y == b.y) {
+                if (a.x() - 1 == b.x() && a.y() == b.y()) {
                     return true;
                 }
                 break;
             case RIGHT:
-                if (a.x + 1 == b.x && a.y == b.y) {
-                    return true;
-                }
-                break;
-            default:
-                break;
-        }
-        return false;
-    }
-
-    private boolean hasCollision(TilePositionComponent a, TileComponent b, Directionality dir) {
-        switch (dir) {
-            case UP:
-                if (a.x == b.x && a.y + 1 == b.y) {
-                    return true;
-                }
-                break;
-            case DOWN:
-                if (a.x == b.x && a.y - 1 == b.y) {
-                    return true;
-                }
-                break;
-            case LEFT:
-                if (a.x - 1 == b.x && a.y == b.y) {
-                    return true;
-                }
-                break;
-            case RIGHT:
-                if (a.x + 1 == b.x && a.y == b.y) {
+                if (a.x() + 1 == b.x() && a.y() == b.y()) {
                     return true;
                 }
                 break;
@@ -138,4 +102,3 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
     }
 
 }
-
