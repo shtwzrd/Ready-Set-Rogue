@@ -3,6 +3,7 @@ package com.warsheep.scamp.processors;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.graphics.Color;
 import com.warsheep.scamp.components.*;
 
 public class DeathProcessor extends IteratingSystem {
@@ -18,6 +19,8 @@ public class DeathProcessor extends IteratingSystem {
 
         if (dmgComp.healthPoints <= 0) {
             stateComp.state = StateComponent.State.DEAD;
+            VisibleComponent vc = ECSMapper.visible.get(entity);
+            vc.color = Color.RED;
 
             if (dmgComp.essential) {
                 // Lose the game....

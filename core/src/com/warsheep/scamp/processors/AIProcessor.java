@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.warsheep.scamp.components.*;
+import com.warsheep.scamp.components.StateComponent;
 
 public class AIProcessor extends EntitySystem {
 
@@ -15,17 +16,13 @@ public class AIProcessor extends EntitySystem {
 
     private int prevSecond = 0;
 
-    public AIProcessor(int order) {
-        super(order);
-    }
-
     public void addedToEngine(Engine engine) {
-        aiControllableEntities = engine.getEntitiesFor(Family.getFor(AIControllableComponent.class, TilePositionComponent.class, AttackerComponent.class, MovementComponent.class, StateComponent.class));
+        aiControllableEntities = engine.getEntitiesFor(Family.getFor(AIControllableComponent.class, TilePositionComponent.class, AttackerComponent.class, StateComponent.class));
         damageableEntities = engine.getEntitiesFor(Family.getFor(DamageableComponent.class, TilePositionComponent.class, ControllableComponent.class, StateComponent.class));
     }
 
     public void update(float deltaTime) {
-        int seconds = (int)deltaTime / 1000;
+        int seconds = (int) deltaTime / 1000;
         if (seconds > prevSecond) {
             super.update(deltaTime);
             prevSecond = seconds;
@@ -57,48 +54,42 @@ public class AIProcessor extends EntitySystem {
                     if (closestDamageableEntity != null) {
                         // Figure out what direction to move in
                         TilePositionComponent closestDmgTilePos = ECSMapper.tilePosition.get(closestDamageableEntity);
-                        MovementComponent aiMoveComp = ECSMapper.movement.get(aiEntity);
 
                         if (minDistance <= 1) { // TODO: Should be attackdistance (property of AttackerComp?)
                             // Attack!!
-                            ECSMapper.attack.get(aiEntity).attacking = true;
+                            ECSMapper.state.get(aiEntity).state = StateComponent.State.ATTACKING;
                             if (Math.abs(closestDmgTilePos.x - aiTilePos.x) > Math.abs(closestDmgTilePos.y - aiTilePos.y)) {
                                 // Move sideways
                                 if (closestDmgTilePos.x > aiTilePos.x) {
-                                    ECSMapper.attack.get(aiEntity).attackerDirection = AttackerComponent.AttackDirection.RIGHT;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.RIGHT;
                                 } else {
-                                    ECSMapper.attack.get(aiEntity).attackerDirection = AttackerComponent.AttackDirection.LEFT;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.LEFT;
                                 }
                             } else {
                                 // Move vertically
                                 if (closestDmgTilePos.y > aiTilePos.y) {
-                                    ECSMapper.attack.get(aiEntity).attackerDirection = AttackerComponent.AttackDirection.UP;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.UP;
                                 } else {
-                                    ECSMapper.attack.get(aiEntity).attackerDirection = AttackerComponent.AttackDirection.DOWN;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.DOWN;
                                 }
                             }
-                        }
-
-                        else {
+                        } else {
                             // Move!!
+                            ECSMapper.state.get(aiEntity).state = StateComponent.State.MOVING;
                             if (Math.abs(closestDmgTilePos.x - aiTilePos.x) > Math.abs(closestDmgTilePos.y - aiTilePos.y)) {
                                 // Move sideways
-                                aiTilePos.prevX = aiTilePos.x;
                                 if (closestDmgTilePos.x > aiTilePos.x) {
-                                    aiTilePos.x++;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.RIGHT;
                                 } else {
-                                    aiTilePos.x--;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.LEFT;
                                 }
-                                aiMoveComp.target.x = aiTilePos.x*24;
                             } else {
                                 // Move vertically
-                                aiTilePos.prevY = aiTilePos.y;
                                 if (closestDmgTilePos.y > aiTilePos.y) {
-                                    aiTilePos.y++;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.UP;
                                 } else {
-                                    aiTilePos.y--;
+                                    ECSMapper.state.get(aiEntity).direction = StateComponent.Directionality.DOWN;
                                 }
-                                aiMoveComp.target.y = aiTilePos.y*24;
                             }
                         }
                     }

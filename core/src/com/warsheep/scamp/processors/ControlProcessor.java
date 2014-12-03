@@ -8,10 +8,9 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.warsheep.scamp.components.AttackerComponent;
-import com.warsheep.scamp.components.ControllableComponent;
-import com.warsheep.scamp.components.MovementComponent;
-import com.warsheep.scamp.components.TilePositionComponent;
+import com.warsheep.scamp.components.*;
+import com.warsheep.scamp.components.StateComponent.State;
+import com.warsheep.scamp.components.StateComponent.Directionality;
 
 import java.awt.*;
 
@@ -30,97 +29,77 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
         switch (keycode) {
             case Input.Keys.UP:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevY = tilePosCom.y;
-                    tilePosCom.y++;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.UP;
                 }
                 return true;
             case Input.Keys.DOWN:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevY = tilePosCom.y;
-                    tilePosCom.y--;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.DOWN;
                 }
                 return true;
             case Input.Keys.RIGHT:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevX = tilePosCom.x;
-                    tilePosCom.x++;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.RIGHT;
                 }
                 return true;
             case Input.Keys.LEFT:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevX = tilePosCom.x;
-                    tilePosCom.x--;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.LEFT;
                 }
                 return true;
             case Input.Keys.W:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevY = tilePosCom.y;
-                    tilePosCom.y++;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.UP;
                 }
                 return true;
             case Input.Keys.S:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevY = tilePosCom.y;
-                    tilePosCom.y--;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.DOWN;
                 }
                 return true;
             case Input.Keys.D:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevX = tilePosCom.x;
-                    tilePosCom.x++;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.RIGHT;
                 }
                 return true;
             case Input.Keys.A:
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevX = tilePosCom.x;
-                    tilePosCom.x--;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.LEFT;
                 }
                 return true;
 
             // Attacking scheme --> To be changed
             case Input.Keys.I:
                 for (int i = 0; i < entities.size(); i++) {
-                    AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                    attacker.attackerDirection = AttackerComponent.AttackDirection.UP;
-                    attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.UP;
 
                 }
                 return true;
             case Input.Keys.K:
                 for (int i = 0; i < entities.size(); i++) {
-                    AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                    attacker.attackerDirection = AttackerComponent.AttackDirection.DOWN;
-                    attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.DOWN;
                 }
                 return true;
             case Input.Keys.L:
                 for (int i = 0; i < entities.size(); i++) {
-                    AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                    attacker.attackerDirection = AttackerComponent.AttackDirection.RIGHT;
-                    attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.RIGHT;
                 }
                 return true;
             case Input.Keys.J:
                 for (int i = 0; i < entities.size(); i++) {
-                    AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                    attacker.attackerDirection = AttackerComponent.AttackDirection.LEFT;
-                    attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.LEFT;
                 }
                 return true;
         }
@@ -149,34 +128,26 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
             // Move Left or Right
             if (clickPosX > 0) {
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.x += 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevX = tilePosCom.x;
-                    tilePosCom.x++;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.RIGHT;
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.x -= 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevX = tilePosCom.x;
-                    tilePosCom.x--;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.LEFT;
                 }
             }
         } else {
             // Move Up or Down
             if (clickPosY > 0) {
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.y -= 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevY = tilePosCom.y;
-                    tilePosCom.y--;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.DOWN;
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
-                    entities.get(i).getComponent(MovementComponent.class).target.y += 24f;
-                    TilePositionComponent tilePosCom = entities.get(i).getComponent(TilePositionComponent.class);
-                    tilePosCom.prevY = tilePosCom.y;
-                    tilePosCom.y++;
+                    ECSMapper.state.get(entities.get(i)).state = State.MOVING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.UP;
                 }
             }
         }
@@ -194,32 +165,26 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
                 // Attack sideways
                 if (xDiff > 0) {
                     for (int i = 0; i < entities.size(); i++) {
-                        AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                        attacker.attackerDirection = AttackerComponent.AttackDirection.RIGHT;
-                        attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.RIGHT;
                     }
-                }
-                else {
+                } else {
                     for (int i = 0; i < entities.size(); i++) {
-                        AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                        attacker.attackerDirection = AttackerComponent.AttackDirection.LEFT;
-                        attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.LEFT;
                     }
                 }
             } else {
                 // Attack up/down
                 if (yDiff < 0) {
                     for (int i = 0; i < entities.size(); i++) {
-                        AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                        attacker.attackerDirection = AttackerComponent.AttackDirection.UP;
-                        attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.UP;
                     }
-                }
-                else {
+                } else {
                     for (int i = 0; i < entities.size(); i++) {
-                        AttackerComponent attacker = entities.get(i).getComponent(AttackerComponent.class);
-                        attacker.attackerDirection = AttackerComponent.AttackDirection.DOWN;
-                        attacker.attacking = true;
+                    ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
+                    ECSMapper.state.get(entities.get(i)).direction = Directionality.DOWN;
                     }
                 }
             }

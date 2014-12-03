@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
+import java.util.ArrayList;
+
 public class Scamp extends Game {
 
     public static final String TITLE = "SCAMP";
@@ -24,6 +26,7 @@ public class Scamp extends Game {
 	CollisionProcessor collisionProcessor;
     ControlProcessor controlProcessor;
 	DeathProcessor deathProcessor;
+	StateProcessor stateProcessor;
 	CombatProcessor combatProcessor;
     CameraProcessor cameraProcessor;
     TileProcessor tileProcessor;
@@ -42,16 +45,22 @@ public class Scamp extends Game {
     public void create() {
         ecs = new Engine();
 
+		ArrayList<CollisionProcessor.CollisionListener> collisionListeners = new ArrayList();
         // Initialize processors and associate them with ecs engine
         visibilityProcessor = new VisibilityProcessor();
-		collisionProcessor = new CollisionProcessor(1);
-		movementProcessor = new MovementProcessor(2);
+		movementProcessor = new MovementProcessor();
+		combatProcessor = new CombatProcessor();
+		collisionListeners.add(movementProcessor);
+		collisionProcessor = new CollisionProcessor(collisionListeners);
+		ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
+		stateListeners.add(collisionProcessor);
+		stateListeners.add(combatProcessor);
+		stateProcessor = new StateProcessor(stateListeners);
 		controlProcessor = new ControlProcessor();
 		cameraProcessor = new CameraProcessor();
 		deathProcessor = new DeathProcessor();
-		combatProcessor = new CombatProcessor(3);
         tileProcessor = new TileProcessor();
-		aiProcessor = new AIProcessor(4);
+		aiProcessor = new AIProcessor();
         ecs.addSystem(visibilityProcessor);
 		ecs.addSystem(collisionProcessor);
 		ecs.addSystem(tileProcessor);
@@ -59,6 +68,7 @@ public class Scamp extends Game {
 		ecs.addSystem(cameraProcessor);
 		ecs.addSystem(deathProcessor);
 		ecs.addSystem(combatProcessor);
+		ecs.addSystem(stateProcessor);
 		ecs.addSystem(aiProcessor);
 		Gdx.input.setInputProcessor(controlProcessor);
 
@@ -84,7 +94,7 @@ public class Scamp extends Game {
 		mapImporter.loadTiledMapJson(MAP_PATH);
 
 		// Skeleton blocker of doom
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i < 2; i++) {
 			Entity skeleton = new Entity();
 			skeleton.add(new VisibleComponent());
 			skeleton.add(new TransformComponent());
@@ -93,7 +103,6 @@ public class Scamp extends Game {
 			skeleton.add(new TilePositionComponent());
 			skeleton.add(new AIControllableComponent());
 			skeleton.add(new AttackerComponent());
-			skeleton.add(new MovementComponent());
 			skeleton.add(new StateComponent());
 			ecs.addEntity(skeleton);
 			VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
@@ -102,7 +111,6 @@ public class Scamp extends Game {
 			skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
 			ECSMapper.transform.get(skeleton).position.y = i*24;
 			ECSMapper.transform.get(skeleton).position.x = i*24;
-			ECSMapper.movement.get(skeleton).target = new Vector3(i*24, i*24, 0);
 			ECSMapper.tilePosition.get(skeleton).y = i;
 			ECSMapper.tilePosition.get(skeleton).x = i;
 		}
@@ -111,7 +119,6 @@ public class Scamp extends Game {
 		wizard = new Entity();
 		wizard.add(new VisibleComponent());
 		wizard.add(new TransformComponent());
-		wizard.add(new MovementComponent());
 		wizard.add(new CollidableComponent());
 		wizard.add(new ControllableComponent());
 		wizard.add(new AttackerComponent());
@@ -128,15 +135,6 @@ public class Scamp extends Game {
 		wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
 		wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
 		TilePositionComponent wizPosComp = ECSMapper.tilePosition.get(wizard);
-		wizPosComp.x = -2;
-		wizPosComp.y = -2;
-		wizPosComp.prevX = -2;
-		wizPosComp.prevY = -2;
-
-		MovementComponent wizMoveComp = ECSMapper.movement.get(wizard);
-		wizMoveComp.target.x = -2;
-		wizMoveComp.target.y = -2;
-
 
         createCamera(wizard);
 
