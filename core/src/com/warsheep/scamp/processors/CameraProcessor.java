@@ -11,7 +11,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 public class CameraProcessor extends IteratingSystem {
 
     public CameraProcessor() {
-        super(Family.getFor(CameraComponent.class));
+        super(Family.all(CameraComponent.class).get());
     }
 
     @Override

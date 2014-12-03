@@ -17,8 +17,8 @@ public class AIProcessor extends EntitySystem {
     private int prevSecond = 0;
 
     public void addedToEngine(Engine engine) {
-        aiControllableEntities = engine.getEntitiesFor(Family.getFor(AIControllableComponent.class, TilePositionComponent.class, AttackerComponent.class, StateComponent.class));
-        damageableEntities = engine.getEntitiesFor(Family.getFor(DamageableComponent.class, TilePositionComponent.class, ControllableComponent.class, StateComponent.class));
+        aiControllableEntities = engine.getEntitiesFor(Family.all(AIControllableComponent.class, TilePositionComponent.class, AttackerComponent.class, StateComponent.class).get());
+        damageableEntities = engine.getEntitiesFor(Family.all(DamageableComponent.class, TilePositionComponent.class, ControllableComponent.class, StateComponent.class).get());
     }
 
     public void update(float deltaTime) {

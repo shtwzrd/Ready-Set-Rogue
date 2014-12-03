@@ -21,7 +21,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
     private Point touchStartPosition = new Point();
 
     public void addedToEngine(Engine engine) {
-        entities = engine.getEntitiesFor(Family.getFor(ControllableComponent.class));
+        entities = engine.getEntitiesFor(Family.all(ControllableComponent.class).get());
     }
 
     @Override

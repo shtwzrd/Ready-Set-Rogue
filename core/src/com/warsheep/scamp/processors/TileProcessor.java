@@ -26,7 +26,7 @@ public class TileProcessor extends EntitySystem implements EntityListener {
 
     @Override
     public void addedToEngine(Engine engine) {
-        Family family = Family.getFor(TileComponent.class);
+        Family family = Family.all(TileComponent.class).get();
         engine.addEntityListener(family, this);
 
         tileEntities = engine.getEntitiesFor(Family.getFor(TileComponent.class));
