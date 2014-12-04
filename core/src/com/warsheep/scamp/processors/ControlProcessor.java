@@ -25,6 +25,30 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
         entities = engine.getEntitiesFor(Family.all(ControllableComponent.class).get());
     }
 
+    public void update(float deltaTime) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            LevelComponent lvlCmp = ECSMapper.level.get(entity);
+            DamageableComponent dmgCmp = ECSMapper.damage.get(entity);
+            AttackerComponent atkCmp = ECSMapper.attack.get(entity);
+
+            if (lvlCmp != null) {
+                MainGameScreen.level = lvlCmp.level;
+                MainGameScreen.currentExp = lvlCmp.experiencePoints;
+                MainGameScreen.nextLevelExp = lvlCmp.nextLevelExp;
+            }
+
+            if (dmgCmp != null) {
+                MainGameScreen.maxHealth = dmgCmp.maxHealth;
+                MainGameScreen.currentHealth = dmgCmp.currentHealth;
+            }
+
+            if (atkCmp != null) {
+                MainGameScreen.damage = atkCmp.baseDamage;
+            }
+        }
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode) {

@@ -4,6 +4,10 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
 import com.warsheep.scamp.Scamp;
@@ -27,10 +31,19 @@ public class MainGameScreen extends ScreenAdapter {
     CameraProcessor cameraProcessor;
     TileProcessor tileProcessor;
     AIProcessor aiProcessor;
+    LevelingProcessor levelProcessor;
 
     Entity wizard;
     Scamp game;
     public static GameState gameState;
+
+    // Temp UI Values
+    public static int damage = 0;
+    public static int currentHealth = 0;
+    public static int maxHealth = 0;
+    public static int level = 0;
+    public static int currentExp = 0;
+    public static int nextLevelExp = 0;
 
     public enum GameState {
         GAME_RUNNING, GAME_PAUSED, GAME_OVER, GAME_READY
@@ -63,6 +76,7 @@ public class MainGameScreen extends ScreenAdapter {
         deathProcessor = new DeathProcessor();
         tileProcessor = new TileProcessor();
         aiProcessor = new AIProcessor();
+        levelProcessor = new LevelingProcessor();
         ecs.addSystem(visibilityProcessor);
         ecs.addSystem(collisionProcessor);
         ecs.addSystem(tileProcessor);
@@ -73,6 +87,7 @@ public class MainGameScreen extends ScreenAdapter {
         ecs.addSystem(stateProcessor);
         ecs.addSystem(aiProcessor);
         ecs.addSystem(controlProcessor);
+        ecs.addSystem(levelProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
 
         AssetDepot assets = AssetDepot.getInstance();
@@ -90,6 +105,8 @@ public class MainGameScreen extends ScreenAdapter {
             skeleton.add(new AttackerComponent());
             skeleton.add(new StateComponent());
             skeleton.add(new FactionComponent());
+            skeleton.add(new DropComponent());
+            ECSMapper.drop.get(skeleton).experienceDrop = 100;
             ecs.addEntity(skeleton);
             VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
             skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
@@ -115,6 +132,8 @@ public class MainGameScreen extends ScreenAdapter {
         wizard.add(new TilePositionComponent());
         wizard.add(new StateComponent());
         wizard.add(new FactionComponent());
+        wizard.add(new LevelComponent());
+        wizard.add(new InventoryComponent());
         ecs.addEntity(wizard);
 
         DamageableComponent dmgComp = ECSMapper.damage.get(wizard);
@@ -155,6 +174,8 @@ public class MainGameScreen extends ScreenAdapter {
                 delta = (System.currentTimeMillis() - startTime);
                 ecs.update(delta);
                 visibilityProcessor.endBatch();
+                addPlayerStats();
+                addTimeCircle(delta);
                 break;
             case GAME_OVER:
                 game.setScreen(new MainMenuScreen(game));
@@ -162,8 +183,33 @@ public class MainGameScreen extends ScreenAdapter {
             default:
                 break;
         }
+    }
 
+    private void addTimeCircle(float delta) {
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
 
+        int size = (int) (10 - ((delta % 1000) / 100.0f));
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(1, 1, 1, 0.5f);
+        shapeRenderer.circle(Gdx.graphics.getWidth() - 15, Gdx.graphics.getHeight() - 15, size);
+        shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+
+    }
+
+    private void addPlayerStats() {
+        CharSequence str = String.format("Lvl %d | Dmg %d | HP %d/%d | Exp %d/%d",
+                level, damage, currentHealth, maxHealth, currentExp, nextLevelExp);
+        SpriteBatch spriteBatch = new SpriteBatch();
+        BitmapFont font = new BitmapFont();
+
+        spriteBatch.enableBlending();
+        spriteBatch.begin();
+        font.draw(spriteBatch, str, 10, Gdx.graphics.getHeight() - 10);
+        spriteBatch.end();
     }
 
     private void createCamera(Entity target) {

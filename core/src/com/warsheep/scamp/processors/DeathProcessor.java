@@ -18,7 +18,7 @@ public class DeathProcessor extends IteratingSystem {
         DamageableComponent dmgComp = ECSMapper.damage.get(entity);
         StateComponent stateComp = ECSMapper.state.get(entity);
 
-        if (dmgComp.healthPoints <= 0) {
+        if (dmgComp.currentHealth <= 0) {
             stateComp.state = StateComponent.State.DEAD;
             VisibleComponent vc = ECSMapper.visible.get(entity);
             vc.color = Color.RED;

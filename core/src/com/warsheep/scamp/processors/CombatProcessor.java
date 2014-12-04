@@ -32,35 +32,59 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
                     DamageableComponent damageableComponent = ECSMapper.damage.get(damageable);
                     TilePositionComponent tilePosDamageableComp = ECSMapper.tilePosition.get(damageable);
                     if (ECSMapper.state.get(damageable).state != StateComponent.State.DEAD) {
+                        boolean attacked = false;
+
+                        // Figure out what direction to attack in and apply damage
                         if (state.direction == StateComponent.Directionality.UP) {
                             if (tilePosAttackerComp.x == tilePosDamageableComp.x &&
                                     (tilePosAttackerComp.y + attackerComp.attackRange >= tilePosDamageableComp.y &&
                                             tilePosAttackerComp.y + 1 <= tilePosDamageableComp.y)) {
                                 System.out.println("HitUp");
-                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                                damageableComponent.currentHealth -= attackerComp.baseDamage;
+                                attacked = true;
                             }
                         } else if (state.direction == StateComponent.Directionality.DOWN) {
                             if (tilePosAttackerComp.x == tilePosDamageableComp.x &&
                                     (tilePosAttackerComp.y - attackerComp.attackRange <= tilePosDamageableComp.y &&
                                             tilePosAttackerComp.y - 1 >= tilePosDamageableComp.y)) {
                                 System.out.println("HitDown");
-                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                                damageableComponent.currentHealth -= attackerComp.baseDamage;
+                                attacked = true;
                             }
                         } else if (state.direction == StateComponent.Directionality.RIGHT) {
                             if (tilePosAttackerComp.y == tilePosDamageableComp.y &&
                                     (tilePosAttackerComp.x + attackerComp.attackRange >= tilePosDamageableComp.x &&
                                             tilePosAttackerComp.x + 1 <= tilePosDamageableComp.x)) {
                                 System.out.println("HitRight");
-                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                                damageableComponent.currentHealth -= attackerComp.baseDamage;
+                                attacked = true;
                             }
                         } else if (state.direction == StateComponent.Directionality.LEFT) {
                             if (tilePosAttackerComp.y == tilePosDamageableComp.y &&
                                     (tilePosAttackerComp.x - attackerComp.attackRange <= tilePosDamageableComp.x &&
                                             tilePosAttackerComp.x - 1 >= tilePosDamageableComp.x)) {
                                 System.out.println("HitLeft");
-                                damageableComponent.healthPoints -= attackerComp.baseDamage;
+                                damageableComponent.currentHealth -= attackerComp.baseDamage;
+                                attacked = true;
                             }
                         }
+
+                        // Check if the player actually attacked
+                        if (attacked) {
+                            // Check to see if the damageable entity is dead and if it has anything to drop
+                            DropComponent dropComponent = ECSMapper.drop.get(damageable);
+                            if (damageableComponent.currentHealth <= 0 && dropComponent != null) {
+                                // Check to see if exp points can be applied to attacker entity
+                                LevelComponent levelComp = ECSMapper.level.get(entity);
+                                if (levelComp != null) {
+                                    levelComp.experiencePoints += dropComponent.experienceDrop;
+                                    if (dropComponent.itemDrop != null) {
+                                        // TODO: Drop item
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
 

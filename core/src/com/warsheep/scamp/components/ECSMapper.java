@@ -45,6 +45,15 @@ public class ECSMapper {
     public static final ComponentMapper<FactionComponent> faction =
             ComponentMapper.getFor(FactionComponent.class);
 
+    public static final ComponentMapper<LevelComponent> level =
+            ComponentMapper.getFor(LevelComponent.class);
+
+    public static final ComponentMapper<InventoryComponent> inventory =
+            ComponentMapper.getFor(InventoryComponent.class);
+
+    public static final ComponentMapper<DropComponent> drop =
+            ComponentMapper.getFor(DropComponent.class);
+
     public static final ComponentMapper<AIControllableComponent> aiControllable =
             ComponentMapper.getFor(AIControllableComponent.class);
 }

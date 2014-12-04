@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.Scamp;
@@ -20,7 +22,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
         guiCam = new OrthographicCamera(Scamp.V_WIDTH, Scamp.V_HEIGHT);
         guiCam.position.set(Scamp.V_WIDTH / 2, Scamp.V_HEIGHT / 2, 0);
-        playBounds = new Rectangle(Scamp.V_WIDTH/4, Scamp.V_HEIGHT/4, Scamp.V_WIDTH/2, Scamp.V_HEIGHT/2);
+        playBounds = new Rectangle(Gdx.graphics.getWidth()/4, Gdx.graphics.getHeight()/4, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
         touchPoint = new Vector3();
     }
 
@@ -43,9 +45,13 @@ public class MainMenuScreen extends ScreenAdapter {
         guiCam.update();
         game.batcher.setProjectionMatrix(guiCam.combined);
 
-        game.batcher.begin();
-        // Draw Main Menu Screen
-        game.batcher.end();
+        CharSequence str = "Play";
+        SpriteBatch spriteBatch = new SpriteBatch();
+        BitmapFont font = new BitmapFont();
+
+        spriteBatch.begin();
+        font.draw(spriteBatch, str, Gdx.graphics.getWidth()/2 - 12, Gdx.graphics.getHeight()/2);
+        spriteBatch.end();
     }
 
     @Override
