@@ -95,7 +95,7 @@ public class Scamp extends Game {
 		mapImporter.loadTiledMapJson(MAP_PATH);
 
 		// Skeleton blocker of doom
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i < 8; i++) {
 			Entity skeleton = new Entity();
 			skeleton.add(new VisibleComponent());
 			skeleton.add(new TransformComponent());
