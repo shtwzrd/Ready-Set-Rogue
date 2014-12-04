@@ -17,7 +17,7 @@ import java.util.Map;
 public class MapImporter {
 
     private int tileSize = 24;
-    private static final String MAGIC_BLANK_TILE = "Blank_1";
+    private static final String MAGIC_BLANK_TILE = "blank_1";
 
     private ArrayList<TileComponent> tileComponents;
     private ArrayList<VisibleComponent> visibleComponents;
@@ -61,9 +61,15 @@ public class MapImporter {
                     id--; // Tiled Json is weird. Just accept it.
                 }
 
-                boolean walls = name.equals("Walls") ? true : false;
+                String[] tilePathHandle = tileMaps.get(id);
 
-                this. buildTile(x, y, layerLevel, id, walls);
+                if (tilePathHandle != null && !tilePathHandle[1].equals(MAGIC_BLANK_TILE)) {
+                    boolean walls = name.equals("Walls") ? true : false;
+                    System.out.println(name);
+                    this.buildTile(x, y, layerLevel, tilePathHandle, walls);
+                }
+
+
                 x++;
 
                 // begin new row
@@ -113,45 +119,42 @@ public class MapImporter {
         return tileMaps;
     }
 
-    private void buildTile(int x, int y, int z, int id, boolean wall) {
+    private void buildTile(int x, int y, int z, String[] tilePathHandle, boolean wall) {
 
-        String[] tilePathHandle = tileMaps.get(id);
+        // Separate handle from index
+        String imageIndex = tilePathHandle[1]
+                .substring(tilePathHandle[1].lastIndexOf('_') + 1, tilePathHandle[1].length());
+        String imageHandle = tilePathHandle[1].substring(0, tilePathHandle[1].lastIndexOf('_'));
 
-        if (tilePathHandle != null && !tilePathHandle[1].equals(MAGIC_BLANK_TILE)) {
-            // Separate handle from index
-            String imageIndex = tilePathHandle[1]
-                    .substring(tilePathHandle[1].lastIndexOf('_') + 1, tilePathHandle[1].length());
-            String imageHandle = tilePathHandle[1].substring(0, tilePathHandle[1].lastIndexOf('_'));
+        Entity e = new Entity();
 
-            Entity e = new Entity();
+        TileComponent tc = new TileComponent();
+        tc.x = x;
+        tc.y = y;
+        tc.z = z;
 
-            TileComponent tc = new TileComponent();
-            tc.x = x;
-            tc.y = y;
-            tc.z = z;
+        this.tileComponents.add(tc);
 
-            this.tileComponents.add(tc);
+        VisibleComponent vc = new VisibleComponent();
 
-            VisibleComponent vc = new VisibleComponent();
+        AssetDepot assets = AssetDepot.getInstance();
 
-            AssetDepot assets = AssetDepot.getInstance();
+        vc.image = assets.fetch(tilePathHandle[0], imageHandle, Integer.parseInt(imageIndex));
+        vc.originX = this.tileSize / 2;
+        vc.originY = this.tileSize / 2;
 
-            vc.image = assets.fetch(tilePathHandle[0], imageHandle, Integer.parseInt(imageIndex));
-            vc.originX = this.tileSize / 2;
-            vc.originY = this.tileSize / 2;
+        this.visibleComponents.add(vc);
 
-            this.visibleComponents.add(vc);
-
-            if (wall) {
-                CollidableComponent cc = new CollidableComponent();
-                e.add(cc);
-                this.collidableComponents.add(cc);
-            }
-
-            e.add(tc);
-            e.add(vc);
-            e.add(new TransformComponent());
-            this.entities.add(e);
+        if (wall) {
+            System.out.println("Adding collidable");
+            CollidableComponent cc = new CollidableComponent();
+            e.add(cc);
+            this.collidableComponents.add(cc);
         }
+
+        e.add(tc);
+        e.add(vc);
+        e.add(new TransformComponent());
+        this.entities.add(e);
     }
 }

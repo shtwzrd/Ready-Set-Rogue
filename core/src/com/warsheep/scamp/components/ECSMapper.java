@@ -32,6 +32,7 @@ public class ECSMapper {
 
     public static final ComponentMapper<DamageableComponent> damage =
             ComponentMapper.getFor(DamageableComponent.class);
+
     public static final ComponentMapper<TileComponent> tile =
             ComponentMapper.getFor(TileComponent.class);
 
@@ -40,5 +41,11 @@ public class ECSMapper {
 
     public static final ComponentMapper<StateComponent> state =
             ComponentMapper.getFor(StateComponent.class);
+
+    public static final ComponentMapper<FactionComponent> faction =
+            ComponentMapper.getFor(FactionComponent.class);
+
+    public static final ComponentMapper<AIControllableComponent> aiControllable =
+            ComponentMapper.getFor(AIControllableComponent.class);
 }
 

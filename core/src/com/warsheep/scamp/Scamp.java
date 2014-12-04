@@ -8,6 +8,7 @@ import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Scamp extends Game {
 
@@ -78,6 +79,7 @@ public class Scamp extends Game {
             skeleton.add(new AIControllableComponent());
             skeleton.add(new AttackerComponent());
             skeleton.add(new StateComponent());
+            skeleton.add(new FactionComponent());
             ecs.addEntity(skeleton);
             VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
             skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
@@ -99,6 +101,7 @@ public class Scamp extends Game {
         wizard.add(new DamageableComponent());
         wizard.add(new TilePositionComponent());
         wizard.add(new StateComponent());
+        wizard.add(new FactionComponent());
         ecs.addEntity(wizard);
 
         DamageableComponent dmgComp = ECSMapper.damage.get(wizard);
@@ -108,6 +111,7 @@ public class Scamp extends Game {
         wizardVisComp.image = assets.fetch("creatures_24x24", "oryx_m_wizard");
         wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
         wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
+        ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
 
         createCamera(wizard);
 
