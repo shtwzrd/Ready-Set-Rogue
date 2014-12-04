@@ -11,6 +11,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.State;
 import com.warsheep.scamp.components.StateComponent.Directionality;
+import com.warsheep.scamp.screens.MainGameScreen;
 
 import java.awt.*;
 
@@ -101,6 +102,9 @@ public class ControlProcessor extends EntitySystem implements InputProcessor {
                     ECSMapper.state.get(entities.get(i)).state = State.ATTACKING;
                     ECSMapper.state.get(entities.get(i)).direction = Directionality.LEFT;
                 }
+                return true;
+            case Input.Keys.R:
+                MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER;
                 return true;
         }
         return false;

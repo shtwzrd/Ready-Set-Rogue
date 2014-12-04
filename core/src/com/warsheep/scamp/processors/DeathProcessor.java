@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.warsheep.scamp.components.*;
+import com.warsheep.scamp.screens.MainGameScreen;
 
 public class DeathProcessor extends IteratingSystem {
 
@@ -23,7 +24,7 @@ public class DeathProcessor extends IteratingSystem {
             vc.color = Color.RED;
 
             if (dmgComp.essential) {
-                // Lose the game....
+                MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER;
             }
 
             if (ECSMapper.collide.get(entity) != null) {
