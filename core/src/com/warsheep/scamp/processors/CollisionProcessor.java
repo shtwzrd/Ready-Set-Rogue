@@ -76,7 +76,7 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
     private boolean hasCollision(TileBound a, TileBound b, Directionality dir) {
         switch (dir) {
             case UP:
-                if (a.y() == b.y() && a.y() + 1 == b.y()) {
+                if (a.x() == b.x() && a.y() + 1 == b.y()) {
                     return true;
                 }
                 break;
