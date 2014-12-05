@@ -65,7 +65,6 @@ public class MapImporter {
 
                 if (tilePathHandle != null && !tilePathHandle[1].equals(MAGIC_BLANK_TILE)) {
                     boolean walls = name.equals("Walls") ? true : false;
-                    System.out.println(name);
                     this.buildTile(x, y, layerLevel, tilePathHandle, walls);
                 }
 
@@ -146,7 +145,6 @@ public class MapImporter {
         this.visibleComponents.add(vc);
 
         if (wall) {
-            System.out.println("Adding collidable");
             CollidableComponent cc = new CollidableComponent();
             e.add(cc);
             this.collidableComponents.add(cc);

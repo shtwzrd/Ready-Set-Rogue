@@ -11,7 +11,7 @@ import com.warsheep.scamp.processors.TileProcessor.TileBound;
 
 import java.util.List;
 
-public class CollisionProcessor extends EntitySystem implements StateProcessor.StateListener {
+public class CollisionProcessor extends EntitySystem {
 
     private ImmutableArray<Entity> collidableTilePosEntities;
     private ImmutableArray<Entity> collidableTileEntities;
@@ -36,10 +36,9 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
         collidableTileEntities = engine.getEntitiesFor(Family.all(CollidableComponent.class, TileComponent.class).get());
     }
 
-    @Override
-    public void moving(Entity entity, StateComponent.Directionality direction) {
-        TileBound tilePosMain = ECSMapper.tilePosition.get(entity);
-        Directionality dir = ECSMapper.state.get(entity).direction;
+    public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction) {
+//        TileBound tilePosMain = ECSMapper.tilePosition.get(entity);
+        Directionality dir = direction;
 
         boolean blocked = false;
 
@@ -57,12 +56,14 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
             }
 
             if (entity.getId() != entityCheck.getId()) {
-                if (hasCollision(tilePosMain, tileCheck, dir)) {
+                if (hasCollision(x, y, tileCheck, dir)) {
                     blocked = true;
                 }
             }
         }
 
+        return blocked;
+        /*
         // Notify all Collision Listeners of the result
         for (CollisionListener listener : this.listeners) {
             if (blocked) {
@@ -71,27 +72,28 @@ public class CollisionProcessor extends EntitySystem implements StateProcessor.S
                 listener.successfulMove(entity, direction);
             }
         }
+        */
     }
 
-    private boolean hasCollision(TileBound a, TileBound b, Directionality dir) {
+    private boolean hasCollision(int x, int y, TileBound b, Directionality dir) {
         switch (dir) {
             case UP:
-                if (a.x() == b.x() && a.y() + 1 == b.y()) {
+                if (x == b.x() && y + 1 == b.y()) {
                     return true;
                 }
                 break;
             case DOWN:
-                if (a.x() == b.x() && a.y() - 1 == b.y()) {
+                if (x == b.x() && y - 1 == b.y()) {
                     return true;
                 }
                 break;
             case LEFT:
-                if (a.x() - 1 == b.x() && a.y() == b.y()) {
+                if (x - 1 == b.x() && y == b.y()) {
                     return true;
                 }
                 break;
             case RIGHT:
-                if (a.x() + 1 == b.x() && a.y() == b.y()) {
+                if (x + 1 == b.x() && y == b.y()) {
                     return true;
                 }
                 break;

@@ -63,20 +63,24 @@ public class MainGameScreen extends ScreenAdapter {
         ArrayList<CollisionProcessor.CollisionListener> collisionListeners = new ArrayList();
         // Initialize processors and associate them with ecs engine
         visibilityProcessor = new VisibilityProcessor();
+
         movementProcessor = new MovementProcessor();
         combatProcessor = new CombatProcessor();
-        collisionListeners.add(movementProcessor);
-        collisionProcessor = new CollisionProcessor(collisionListeners);
-        ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
-        stateListeners.add(collisionProcessor);
-        stateListeners.add(combatProcessor);
-        stateProcessor = new StateProcessor(stateListeners);
         controlProcessor = new ControlProcessor();
+        ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
+        stateListeners.add(movementProcessor);
+        stateListeners.add(combatProcessor);
+        stateListeners.add(controlProcessor);
+        stateProcessor = new StateProcessor(stateListeners, 1);
+
+        collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
         tileProcessor = new TileProcessor();
         aiProcessor = new AIProcessor();
         levelProcessor = new LevelingProcessor();
+
+
         ecs.addSystem(visibilityProcessor);
         ecs.addSystem(collisionProcessor);
         ecs.addSystem(tileProcessor);
@@ -112,8 +116,8 @@ public class MainGameScreen extends ScreenAdapter {
             skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
             skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
             skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
-            int x = rand.nextInt(12)+2;
-            int y = rand.nextInt(12)+2;
+            int x = rand.nextInt(12) + 2;
+            int y = rand.nextInt(12) + 2;
 
             ECSMapper.transform.get(skeleton).position.y = y * 24;
             ECSMapper.transform.get(skeleton).position.x = x * 24;
@@ -149,8 +153,8 @@ public class MainGameScreen extends ScreenAdapter {
 
         ECSMapper.tilePosition.get(wizard).x = 8;
         ECSMapper.tilePosition.get(wizard).y = 8;
-        ECSMapper.transform.get(wizard).position.x = 8*24;
-        ECSMapper.transform.get(wizard).position.y = 8*24;
+        ECSMapper.transform.get(wizard).position.x = 8 * 24;
+        ECSMapper.transform.get(wizard).position.y = 8 * 24;
 
         createCamera(wizard);
 
