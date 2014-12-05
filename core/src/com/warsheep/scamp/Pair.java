@@ -2,9 +2,7 @@ package com.warsheep.scamp;
 
 import java.io.Serializable;
 
-public class Pair<L extends Comparable<L>, R extends Comparable<R>>
-        implements Comparable<Pair<L, R>>,
-        Serializable {
+public class Pair<L, R > implements Serializable {
 
     private static final long serialVersionUID = 843L;
     private L left;
@@ -32,10 +30,6 @@ public class Pair<L extends Comparable<L>, R extends Comparable<R>>
 
     public void setRight(R value) {
         this.right = value;
-    }
-
-    public int compareTo(Pair<L, R> other) {
-        return this.left.compareTo(other.getLeft());
     }
 
     @Override

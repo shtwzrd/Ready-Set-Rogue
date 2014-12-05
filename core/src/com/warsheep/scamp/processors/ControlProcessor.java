@@ -38,34 +38,40 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     private void addAction(Entity entity, Pair<State, Directionality> pair) {
         TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
         if (pair.getLeft() == State.MOVING) {
-            if (collisions.checkMove(tilePos.x() + simulatedX, tilePos.y() + simulatedY,
-                    entity, pair.getRight())) {
-                // Some visual feedback
-            } else {
-                actions.add(pair);
-                if (ECSMapper.control.get(entity).movementSpeed < ECSMapper.control.get(entity).movesConsumed) {
+            if (ECSMapper.control.get(entity).movesConsumed <= ECSMapper.control.get(entity).movementBonus) {
+                if (collisions.checkMove(tilePos.x() + simulatedX,
+                        tilePos.y() + simulatedY,
+                        entity, pair.getRight())) {
+                    // Some visual feedback
+                } else {
+                    actions.add(pair);
                     switch (pair.getRight()) {
                         case UP:
                             simulatedY++;
+                            break;
                         case DOWN:
                             simulatedY--;
+                            break;
                         case LEFT:
                             simulatedX--;
+                            break;
                         case RIGHT:
                             simulatedX++;
+                            break;
                     }
                     ECSMapper.control.get(entity).movesConsumed++;
                 }
+
             }
         }
     }
 
     @Override
-    public Queue<Pair<Long, Pair<State, Directionality>>> turnEnd() {
-        Queue<Pair<Long, Pair<State, Directionality>>> actionQueue = new ArrayDeque<>();
+    public Queue<Pair<Entity, Pair<State, Directionality>>> turnEnd() {
+        Queue<Pair<Entity, Pair<State, Directionality>>> actionQueue = new ArrayDeque<>();
         for (int i = 0; i < entities.size(); i++) {
             for (Pair<State, Directionality> action : this.actions) {
-                actionQueue.add(new Pair(entities.get(i).getId(), action));
+                actionQueue.add(new Pair(entities.get(i), action));
             }
             ECSMapper.control.get(entities.get(i)).movesConsumed = 0;
         }

@@ -2,12 +2,10 @@ package com.warsheep.scamp;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.warsheep.scamp.components.CollidableComponent;
-import com.warsheep.scamp.components.TileComponent;
-import com.warsheep.scamp.components.TransformComponent;
-import com.warsheep.scamp.components.VisibleComponent;
+import com.warsheep.scamp.components.*;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;

@@ -21,7 +21,7 @@ public class AIProcessor extends EntitySystem {
     }
 
     public void update(float deltaTime) {
-        int seconds = (int) deltaTime / 1000;
+        int seconds = (int) deltaTime;
         if (seconds > prevSecond) {
             super.update(deltaTime); // Fire once every second
             prevSecond = seconds;

@@ -37,7 +37,6 @@ public class CollisionProcessor extends EntitySystem {
     }
 
     public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction) {
-//        TileBound tilePosMain = ECSMapper.tilePosition.get(entity);
         Directionality dir = direction;
 
         boolean blocked = false;
@@ -62,8 +61,6 @@ public class CollisionProcessor extends EntitySystem {
             }
         }
 
-        return blocked;
-        /*
         // Notify all Collision Listeners of the result
         for (CollisionListener listener : this.listeners) {
             if (blocked) {
@@ -72,7 +69,7 @@ public class CollisionProcessor extends EntitySystem {
                 listener.successfulMove(entity, direction);
             }
         }
-        */
+        return blocked;
     }
 
     private boolean hasCollision(int x, int y, TileBound b, Directionality dir) {

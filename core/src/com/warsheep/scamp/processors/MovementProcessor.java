@@ -11,7 +11,6 @@ import java.util.Queue;
 
 public class MovementProcessor extends IteratingSystem implements StateListener {
     private boolean pause = false;
-    public static final float MOVE_SPEED = 12.0f; // TODO: Externalize this (maybe a property of the Component?)
 
     public MovementProcessor() {
         super(Family.all(MovementComponent.class).get());
@@ -22,6 +21,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         TransformComponent trans = ECSMapper.transform.get(entity);
         MovementComponent mov = ECSMapper.movement.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
+        TilePositionComponent possy = ECSMapper.tilePosition.get(entity);
 //        TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
 
 /*        // Don't do anything if we're already at our target
@@ -46,7 +46,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
 
         }
         */
-        for(Vector3 pos : mov.target) {
+        for (Vector3 pos : mov.target) {
             trans.position.x = pos.x;
             trans.position.y = pos.y;
         }
@@ -71,12 +71,11 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             mov = ECSMapper.movement.get(entity);
         }
 
-        TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
 
-        for(StateComponent.Directionality dir : direction) {
+        for (StateComponent.Directionality dir : direction) {
+            TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
             int x = tilePos.x;
             int y = tilePos.y;
-
             switch (dir) {
                 case UP:
                     y++;

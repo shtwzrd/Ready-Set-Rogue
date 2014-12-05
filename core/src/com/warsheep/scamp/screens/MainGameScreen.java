@@ -21,6 +21,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
+    public static final float TURN_DURATION = 3.0f;
     VisibilityProcessor visibilityProcessor;
     MovementProcessor movementProcessor;
     CollisionProcessor collisionProcessor;
@@ -36,6 +37,7 @@ public class MainGameScreen extends ScreenAdapter {
     Entity wizard;
     Scamp game;
     public static GameState gameState;
+    private float accumulator = 0;
 
     // Temp UI Values
     public static int damage = 0;
@@ -71,7 +73,7 @@ public class MainGameScreen extends ScreenAdapter {
         stateListeners.add(movementProcessor);
         stateListeners.add(combatProcessor);
         stateListeners.add(controlProcessor);
-        stateProcessor = new StateProcessor(stateListeners, 1);
+        stateProcessor = new StateProcessor(stateListeners, TURN_DURATION);
 
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
@@ -175,7 +177,7 @@ public class MainGameScreen extends ScreenAdapter {
         switch (gameState) {
             case GAME_RUNNING:
                 visibilityProcessor.startBatch();
-                delta = (System.currentTimeMillis() - startTime);
+                delta = ((System.currentTimeMillis() - startTime) / 1000);
                 ecs.update(delta);
                 visibilityProcessor.endBatch();
                 addPlayerStats();
@@ -192,7 +194,10 @@ public class MainGameScreen extends ScreenAdapter {
     private void addTimeCircle(float delta) {
         ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-        int size = (int) (10 - ((delta % 1000) / 100.0f));
+        if (delta - accumulator > TURN_DURATION) {
+            accumulator = delta;
+        }
+        int size = (int) (10 - (delta % 3 * 3)) - 1;
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
