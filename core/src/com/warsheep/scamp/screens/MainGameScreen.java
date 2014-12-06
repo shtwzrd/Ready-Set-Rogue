@@ -21,7 +21,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
-    public static final float TURN_DURATION = 3.0f;
+    public static final float TURN_DURATION = 2;
     VisibilityProcessor visibilityProcessor;
     MovementProcessor movementProcessor;
     CollisionProcessor collisionProcessor;
@@ -68,10 +68,12 @@ public class MainGameScreen extends ScreenAdapter {
 
         movementProcessor = new MovementProcessor();
         combatProcessor = new CombatProcessor();
+        aiProcessor = new AIProcessor();
         controlProcessor = new ControlProcessor();
         ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
         stateListeners.add(movementProcessor);
         stateListeners.add(combatProcessor);
+        stateListeners.add(aiProcessor);
         stateListeners.add(controlProcessor);
         stateProcessor = new StateProcessor(stateListeners, TURN_DURATION);
 
@@ -79,7 +81,6 @@ public class MainGameScreen extends ScreenAdapter {
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
         tileProcessor = new TileProcessor();
-        aiProcessor = new AIProcessor();
         levelProcessor = new LevelingProcessor();
 
 
@@ -100,7 +101,7 @@ public class MainGameScreen extends ScreenAdapter {
 
         // Skeleton blocker of doom
         Random rand = new Random();
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < 2; i++) {
             Entity skeleton = new Entity();
             skeleton.add(new VisibleComponent());
             skeleton.add(new TransformComponent());
@@ -118,9 +119,10 @@ public class MainGameScreen extends ScreenAdapter {
             skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
             skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
             skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
-            int x = rand.nextInt(12) + 2;
-            int y = rand.nextInt(12) + 2;
-
+//            int x = rand.nextInt(12) + 2;
+//            int y = rand.nextInt(12) + 2;
+            int x = 12;
+            int y = 9;
             ECSMapper.transform.get(skeleton).position.y = y * 24;
             ECSMapper.transform.get(skeleton).position.x = x * 24;
             ECSMapper.tilePosition.get(skeleton).y = y;
