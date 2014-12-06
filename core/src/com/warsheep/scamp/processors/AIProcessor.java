@@ -35,21 +35,13 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
     @Override
     public Queue<Pair<Entity, Pair<State, Directionality>>> turnEnd() {
         this.actions.removeAll(this.actions); // clear
-        System.out.println("TURN===============================");
         for (Entity aiEntity : aiControllableEntities) {
-            System.out.println("AI Controllable: " + aiEntity.getId());
 
             if (ECSMapper.state.get(aiEntity).state != State.DEAD) {
                 TilePositionComponent aiTilePos = ECSMapper.tilePosition.get(aiEntity);
 
                 int sightRange = ECSMapper.aiControllable.get(aiEntity).sightRange;
                 Entity closestDamageableEntity = scanForEnemy(aiTilePos, sightRange, this.damageableEntities); // Entity to move towards
-                if(closestDamageableEntity == null) {
-                    System.out.println("I can't see you");
-                } else {
-                    System.out.println(ECSMapper.control.get(closestDamageableEntity).movementBonus);
-                }
-
 
                 if (closestDamageableEntity != null) { // If null, no damageable-ctrl-entities nearby
 
@@ -120,9 +112,6 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
         if (enemy.y() > ai.y()) {
             wantsUp = true;
         }
-
-        System.out.println(ECSMapper.tilePosition.get(entity).x + ", " + ECSMapper.tilePosition.get(entity).y + " wants up: " +
-                wantsUp + ", wants right: " + wantsRight);
 
         if (Math.abs(enemy.x() - ai.x()) > Math.abs(enemy.y() - ai.y())) {
             if (wantsRight) {
