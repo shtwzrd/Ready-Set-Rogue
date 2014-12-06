@@ -83,13 +83,14 @@ public class StateProcessor extends EntitySystem {
 
             if (actionQueue != null) {
                 Entity e = null;
-                Queue<Directionality> moves = new ArrayDeque<>();
 
                 for (Pair<Entity, Pair<State, Directionality>> action : actionQueue) {
                     if (action.getRight().getLeft() == State.MOVING) {
                         e = action.getLeft();
-                        moves.offer(action.getRight().getRight());
-                        movesMap.put(e, moves);
+                        if(!movesMap.containsKey(e)) {
+                            movesMap.put(e, new ArrayDeque<>());
+                        }
+                        movesMap.get(e).add(action.getRight().getRight());
                     }
                     if (action.getRight().getLeft() == State.ATTACKING) {
                         e = action.getLeft();

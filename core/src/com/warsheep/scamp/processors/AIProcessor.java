@@ -8,6 +8,9 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.warsheep.scamp.Pair;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent;
+import com.warsheep.scamp.components.StateComponent.Directionality;
+import com.warsheep.scamp.components.StateComponent.State;
+import com.warsheep.scamp.processors.TileProcessor.TileBound;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -16,7 +19,7 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 
     private ImmutableArray<Entity> aiControllableEntities;
     private ImmutableArray<Entity> damageableEntities;
-    private Queue<Pair<Entity, Pair<StateComponent.State, StateComponent.Directionality>>> actions;
+    private Queue<Pair<Entity, Pair<State, Directionality>>> actions;
     private CollisionProcessor collisions;
 
     public AIProcessor() {
@@ -30,22 +33,19 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
     }
 
     @Override
-    public Queue<Pair<Entity, Pair<StateComponent.State, StateComponent.Directionality>>> turnEnd() {
+    public Queue<Pair<Entity, Pair<State, Directionality>>> turnEnd() {
         this.actions.removeAll(this.actions); // clear
-        System.out.println("TURN===============================");
         for (Entity aiEntity : aiControllableEntities) {
-            System.out.println("AI Controllable: " + aiEntity.getId());
 
-            if (ECSMapper.state.get(aiEntity).state != StateComponent.State.DEAD) {
+            if (ECSMapper.state.get(aiEntity).state != State.DEAD) {
                 TilePositionComponent aiTilePos = ECSMapper.tilePosition.get(aiEntity);
 
                 int sightRange = ECSMapper.aiControllable.get(aiEntity).sightRange;
-                Entity closestDamageableEntity = scanForEnemy(aiTilePos, sightRange); // Entity to move towards
-
+                Entity closestDamageableEntity = scanForEnemy(aiTilePos, sightRange, this.damageableEntities); // Entity to move towards
 
                 if (closestDamageableEntity != null) { // If null, no damageable-ctrl-entities nearby
 
-                    TileProcessor.TileBound simulatedAiPos = aiTilePos;
+                    TileBound simulatedAiPos = aiTilePos;
                     TilePositionComponent closestDmgTilePos = ECSMapper.tilePosition.get(closestDamageableEntity);
                     AttackerComponent attackerComponent = ECSMapper.attack.get(aiEntity);
 
@@ -53,21 +53,22 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 
                     while (moveCount <= ECSMapper.aiControllable.get(aiEntity).movementBonus &&
                             !isInAttackRange(simulatedAiPos, closestDmgTilePos, attackerComponent.attackRange)) {
-                        System.out.println(simulatedAiPos.x() + ", " + simulatedAiPos.y());
 
-                        StateComponent.Directionality direction = approachEnemy(simulatedAiPos, closestDmgTilePos);
+                        Directionality direction = approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions);
 
-                        Pair<StateComponent.State, StateComponent.Directionality> action =
-                                new Pair<>(StateComponent.State.MOVING, direction);
-                        this.actions.add(new Pair(aiEntity, action));
+                        if (direction != Directionality.NONE) {
+                            Pair<State, Directionality> action =
+                                    new Pair<>(State.MOVING, direction);
+                            this.actions.add(new Pair(aiEntity, action));
+                            simulatedAiPos = simulateAIMovement(simulatedAiPos, direction);
+                        }
                         moveCount++;
-                        simulatedAiPos = simulateAIMovement(simulatedAiPos, direction);
                     }
 
                     // Attack if possible
                     if (isInAttackRange(simulatedAiPos, closestDmgTilePos, attackerComponent.attackRange)) {
-                        Pair<StateComponent.State, StateComponent.Directionality> action =
-                                new Pair<>(StateComponent.State.ATTACKING, approachEnemy(simulatedAiPos, closestDmgTilePos));
+                        Pair<State, Directionality> action =
+                                new Pair<>(State.ATTACKING, approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions));
                         this.actions.add(new Pair(aiEntity, action));
                     }
                 }
@@ -78,11 +79,11 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 
 
     // Find the closest damageable-ctrl-entity, if any
-    private Entity scanForEnemy(TilePositionComponent location, int sightRange) {
+    private static Entity scanForEnemy(TilePositionComponent location, int sightRange, ImmutableArray<Entity> enemies) {
         Entity closestDamageableEntity = null;
-        for (Entity damageableEntity : damageableEntities) {
+        for (Entity damageableEntity : enemies) {
 
-            if (ECSMapper.state.get(damageableEntity).state != StateComponent.State.DEAD) {
+            if (ECSMapper.state.get(damageableEntity).state != State.DEAD) {
                 TilePositionComponent damageableTilePos = ECSMapper.tilePosition.get(damageableEntity);
 
                 int distanceToAI = Math.abs(location.x - damageableTilePos.x) + Math.abs(location.y - damageableTilePos.y);
@@ -97,26 +98,45 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
     }
 
     // Figure out whether to fire an action horizontally or vertically
-    private StateComponent.Directionality approachEnemy(TileProcessor.TileBound ai, TileProcessor.TileBound enemy) {
-        if (Math.abs(enemy.x() - ai.x()) > Math.abs(enemy.y() - ai.y())) {
+    private static Directionality approachEnemy(TileBound ai, TileBound enemy, Entity entity, CollisionProcessor collisions) {
+        boolean[] blocked = new boolean[4];
+        boolean wantsUp = false;
+        boolean wantsRight = false;
+        for (int i = 0; i < Directionality.values().length - 1; i++) {
+            blocked[i] = collisions.checkMove(ai.x(), ai.y(), entity, Directionality.values()[i]);
+        }
 
-            // Horizontal action
-            if (enemy.x() > ai.x()) {
-                return StateComponent.Directionality.RIGHT;
+        if (enemy.x() > ai.x()) {
+            wantsRight = true;
+        }
+        if (enemy.y() > ai.y()) {
+            wantsUp = true;
+        }
+
+        if (Math.abs(enemy.x() - ai.x()) > Math.abs(enemy.y() - ai.y())) {
+            if (wantsRight) {
+                if (!blocked[Directionality.RIGHT.ordinal()]) {
+                    return Directionality.RIGHT;
+                }
             } else {
-                return StateComponent.Directionality.LEFT;
-            }
-        } else {
-            // Vertical action
-            if (enemy.y() > ai.y()) {
-                return StateComponent.Directionality.UP;
-            } else {
-                return StateComponent.Directionality.DOWN;
+                if (!blocked[Directionality.LEFT.ordinal()]) {
+                    return Directionality.LEFT;
+                }
             }
         }
+        if (wantsUp) {
+            if (!blocked[Directionality.UP.ordinal()]) {
+                return Directionality.UP;
+            }
+        } else {
+            if (!blocked[Directionality.DOWN.ordinal()]) {
+                return Directionality.DOWN;
+            }
+        }
+        return Directionality.NONE;
     }
 
-    private boolean isInAttackRange(TileProcessor.TileBound ai, TileProcessor.TileBound enemy, int reach) {
+    private static boolean isInAttackRange(TileBound ai, TileBound enemy, int reach) {
         boolean canAttack = false;
         if (enemy.x() - ai.x() == 0) { // Chance for vertical attack?
             if (Math.abs(enemy.y() - ai.y()) <= reach) {
@@ -131,7 +151,7 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
         return canAttack;
     }
 
-    private TileProcessor.TileBound simulateAIMovement(TileProcessor.TileBound aiPos, StateComponent.Directionality dir) {
+    private static TileBound simulateAIMovement(TileBound aiPos, Directionality dir) {
         TilePositionComponent t = new TilePositionComponent();
         t.x = aiPos.x();
         t.y = aiPos.y();
