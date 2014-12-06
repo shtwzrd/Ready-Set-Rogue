@@ -11,9 +11,11 @@ import com.warsheep.scamp.components.*;
 public class CombatProcessor extends EntitySystem implements StateProcessor.StateListener {
 
     private ImmutableArray<Entity> damageableEntities;
+    private CollisionProcessor collisions;
 
     public void addedToEngine(Engine engine) {
         damageableEntities = engine.getEntitiesFor(Family.all(DamageableComponent.class, TilePositionComponent.class, FactionComponent.class, StateComponent.class).get());
+        collisions = engine.getSystem(CollisionProcessor.class);
     }
 
     @Override
@@ -22,55 +24,81 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
         AttackerComponent attackerComp = ECSMapper.attack.get(attacker);
         StateComponent state = ECSMapper.state.get(attacker);
 
-        // Get attackers "position"
-        TilePositionComponent tilePosAttackerComp = ECSMapper.tilePosition.get(attacker);
         if (state.state != StateComponent.State.DEAD) {
+            // Get attackers "position"
+            TilePositionComponent attackerTilePos = ECSMapper.tilePosition.get(attacker);
+
             for (int k = 0; k < damageableEntities.size(); k++) {
                 Entity damageable = damageableEntities.get(k);
 
                 if (!shareFaction(ECSMapper.faction.get(damageable), ECSMapper.faction.get(attacker))) {
                     DamageableComponent damageableComponent = ECSMapper.damage.get(damageable);
-                    TilePositionComponent tilePosDamageableComp = ECSMapper.tilePosition.get(damageable);
+                    TilePositionComponent damageableTilePos = ECSMapper.tilePosition.get(damageable);
+
                     if (ECSMapper.state.get(damageable).state != StateComponent.State.DEAD) {
                         boolean attacked = false;
+                        for (int i = 0; i < attackerComp.attackRange; i++) {
 
+                        }
                         // Figure out what direction to attack in and apply damage
-                        if (state.direction == StateComponent.Directionality.UP) {
-                            if (tilePosAttackerComp.x == tilePosDamageableComp.x &&
-                                    (tilePosAttackerComp.y + attackerComp.attackRange >= tilePosDamageableComp.y &&
-                                            tilePosAttackerComp.y + 1 <= tilePosDamageableComp.y)) {
-                                System.out.println("HitUp");
-                                damageableComponent.currentHealth -= attackerComp.baseDamage;
-                                attacked = true;
+                        if (direction == StateComponent.Directionality.UP) {
+                            for (int i = 0; i < attackerComp.attackRange; i++) {
+                                if (collisions.checkMove(attackerTilePos.x, attackerTilePos.y+i, entity, direction)) {
+                                    if (attackerTilePos.x == damageableTilePos.x && attackerTilePos.y+i+1 == damageableTilePos.y) {
+                                        System.out.println("HitUp");
+                                        attacked = true;
+                                    }
+                                    else {
+                                        System.out.println("Wall hit");
+                                        break;
+                                    }
+                                }
                             }
-                        } else if (state.direction == StateComponent.Directionality.DOWN) {
-                            if (tilePosAttackerComp.x == tilePosDamageableComp.x &&
-                                    (tilePosAttackerComp.y - attackerComp.attackRange <= tilePosDamageableComp.y &&
-                                            tilePosAttackerComp.y - 1 >= tilePosDamageableComp.y)) {
-                                System.out.println("HitDown");
-                                damageableComponent.currentHealth -= attackerComp.baseDamage;
-                                attacked = true;
+                        } else if (direction == StateComponent.Directionality.DOWN) {
+                            for (int i = 0; i < attackerComp.attackRange; i++) {
+                                if (collisions.checkMove(attackerTilePos.x, attackerTilePos.y-i, entity, direction)) {
+                                    if (attackerTilePos.x == damageableTilePos.x && attackerTilePos.y-i-1 == damageableTilePos.y) {
+                                        System.out.println("HitDown");
+                                        attacked = true;
+                                    }
+                                    else {
+                                        System.out.println("Wall hit");
+                                        break;
+                                    }
+                                }
                             }
-                        } else if (state.direction == StateComponent.Directionality.RIGHT) {
-                            if (tilePosAttackerComp.y == tilePosDamageableComp.y &&
-                                    (tilePosAttackerComp.x + attackerComp.attackRange >= tilePosDamageableComp.x &&
-                                            tilePosAttackerComp.x + 1 <= tilePosDamageableComp.x)) {
-                                System.out.println("HitRight");
-                                damageableComponent.currentHealth -= attackerComp.baseDamage;
-                                attacked = true;
+                        } else if (direction == StateComponent.Directionality.RIGHT) {
+                            for (int i = 0; i < attackerComp.attackRange; i++) {
+                                if (collisions.checkMove(attackerTilePos.x+i, attackerTilePos.y, entity, direction)) {
+                                    if (attackerTilePos.x+i+1 == damageableTilePos.x && attackerTilePos.y == damageableTilePos.y) {
+                                        System.out.println("HitRight");
+                                        attacked = true;
+                                    }
+                                    else {
+                                        System.out.println("Wall hit");
+                                        break;
+                                    }
+                                }
                             }
-                        } else if (state.direction == StateComponent.Directionality.LEFT) {
-                            if (tilePosAttackerComp.y == tilePosDamageableComp.y &&
-                                    (tilePosAttackerComp.x - attackerComp.attackRange <= tilePosDamageableComp.x &&
-                                            tilePosAttackerComp.x - 1 >= tilePosDamageableComp.x)) {
-                                System.out.println("HitLeft");
-                                damageableComponent.currentHealth -= attackerComp.baseDamage;
-                                attacked = true;
+                        } else if (direction == StateComponent.Directionality.LEFT) {
+                            for (int i = 0; i < attackerComp.attackRange; i++) {
+                                if (collisions.checkMove(attackerTilePos.x-i, attackerTilePos.y, entity, direction)) {
+                                    if (attackerTilePos.x == damageableTilePos.x-i-1 && attackerTilePos.y == damageableTilePos.y) {
+                                        System.out.println("HitLeft");
+                                        attacked = true;
+                                    }
+                                    else {
+                                        System.out.println("Wall hit");
+                                        break;
+                                    }
+                                }
                             }
                         }
 
                         // Check if the player actually attacked
                         if (attacked) {
+                            // Apply damage
+                            damageableComponent.currentHealth -= attackerComp.baseDamage;
                             // Check to see if the damageable entity is dead and if it has anything to drop
                             DropComponent dropComponent = ECSMapper.drop.get(damageable);
                             if (damageableComponent.currentHealth <= 0 && dropComponent != null) {

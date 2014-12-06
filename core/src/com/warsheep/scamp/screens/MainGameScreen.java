@@ -121,8 +121,8 @@ public class MainGameScreen extends ScreenAdapter {
             skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
 //            int x = rand.nextInt(12) + 2;
 //            int y = rand.nextInt(12) + 2;
-            int x = 12;
-            int y = 9;
+            int x = 13;
+            int y = 5;
             ECSMapper.transform.get(skeleton).position.y = y * 24;
             ECSMapper.transform.get(skeleton).position.x = x * 24;
             ECSMapper.tilePosition.get(skeleton).y = y;
@@ -153,7 +153,7 @@ public class MainGameScreen extends ScreenAdapter {
         wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
         ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
 
-        ECSMapper.attack.get(wizard).attackRange = 2;
+        ECSMapper.attack.get(wizard).attackRange = 3;
 
         ECSMapper.tilePosition.get(wizard).x = 8;
         ECSMapper.tilePosition.get(wizard).y = 8;

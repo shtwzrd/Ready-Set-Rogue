@@ -25,6 +25,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     private CollisionProcessor collisions;
     private int simulatedX = 0;
     private int simulatedY = 0;
+    private boolean hasAttacked = false; // If player can attack more than once, change this to an int-variable inside AttackerComp
 
     public ControlProcessor() {
         actions = new ArrayDeque<>();
@@ -61,7 +62,12 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                     }
                     ECSMapper.control.get(entity).movesConsumed++;
                 }
-
+            }
+        }
+        if (pair.getLeft() == State.ATTACKING) {
+            if (!hasAttacked) {
+                actions.add(pair);
+                hasAttacked = true;
             }
         }
     }
@@ -82,6 +88,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
 
         simulatedX = 0;
         simulatedY = 0;
+        hasAttacked = false;
 
         return actionQueue;
     }
@@ -157,22 +164,22 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
             // Attacking scheme --> To be changed
             case Input.Keys.I:
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.ATTACKING, Directionality.UP));
+                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.UP));
                 }
                 return true;
             case Input.Keys.K:
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.ATTACKING, Directionality.DOWN));
+                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.DOWN));
                 }
                 return true;
             case Input.Keys.L:
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.ATTACKING, Directionality.RIGHT));
+                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.RIGHT));
                 }
                 return true;
             case Input.Keys.J:
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.ATTACKING, Directionality.LEFT));
+                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.LEFT));
                 }
                 return true;
             case Input.Keys.R:
@@ -205,22 +212,22 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
             // Move Left or Right
             if (clickPosX > 0) {
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.MOVING, Directionality.RIGHT));
+                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.RIGHT));
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.MOVING, Directionality.LEFT));
+                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.LEFT));
                 }
             }
         } else {
             // Move Up or Down
             if (clickPosY > 0) {
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.MOVING, Directionality.DOWN));
+                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.DOWN));
                 }
             } else {
                 for (int i = 0; i < entities.size(); i++) {
-                    this.actions.add(new Pair<>(State.MOVING, Directionality.UP));
+                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.UP));
                 }
             }
         }
@@ -238,22 +245,22 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 // Attack sideways
                 if (xDiff > 0) {
                     for (int i = 0; i < entities.size(); i++) {
-                        this.actions.add(new Pair<>(State.ATTACKING, Directionality.RIGHT));
+                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.RIGHT));
                     }
                 } else {
                     for (int i = 0; i < entities.size(); i++) {
-                        this.actions.add(new Pair<>(State.ATTACKING, Directionality.LEFT));
+                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.LEFT));
                     }
                 }
             } else {
                 // Attack up/down
                 if (yDiff < 0) {
                     for (int i = 0; i < entities.size(); i++) {
-                        this.actions.add(new Pair<>(State.ATTACKING, Directionality.UP));
+                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.UP));
                     }
                 } else {
                     for (int i = 0; i < entities.size(); i++) {
-                        this.actions.add(new Pair<>(State.ATTACKING, Directionality.DOWN));
+                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.DOWN));
                     }
                 }
             }

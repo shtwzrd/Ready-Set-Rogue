@@ -76,6 +76,7 @@ public class StateProcessor extends EntitySystem {
     private void pullActions() {
         Queue<Pair<Entity, Pair<State, Directionality>>> actionQueue;
         Map<Entity, Queue<Directionality>> movesMap = new HashMap<>();
+        Map<Entity, Directionality> attacksMap = new HashMap<>();
 
         for (StateListener listener : this.listeners) {
             actionQueue = listener.turnEnd();
@@ -90,7 +91,10 @@ public class StateProcessor extends EntitySystem {
                         moves.offer(action.getRight().getRight());
                         movesMap.put(e, moves);
                     }
-                    // What about attacks amirite?
+                    if (action.getRight().getLeft() == State.ATTACKING) {
+                        e = action.getLeft();
+                        attacksMap.put(e, action.getRight().getRight());
+                    }
                 }
             }
         }
@@ -98,7 +102,11 @@ public class StateProcessor extends EntitySystem {
             for (Map.Entry<Entity, Queue<Directionality>> m : movesMap.entrySet()) {
                 movers.moving(m.getKey(), m.getValue());
             }
+            for (Map.Entry<Entity, Directionality> a : attacksMap.entrySet()) {
+                movers.attacking(a.getKey(), a.getValue());
+            }
         }
+
     }
 
     private void resolveTurn() {
