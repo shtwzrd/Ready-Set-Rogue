@@ -101,7 +101,7 @@ public class MainGameScreen extends ScreenAdapter {
 
         // Skeleton blocker of doom
         Random rand = new Random();
-        for (int i = 1; i < 2; i++) {
+        for (int i = 1; i < 10; i++) {
             Entity skeleton = new Entity();
             skeleton.add(new VisibleComponent());
             skeleton.add(new TransformComponent());
@@ -119,10 +119,8 @@ public class MainGameScreen extends ScreenAdapter {
             skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
             skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
             skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
-//            int x = rand.nextInt(12) + 2;
-//            int y = rand.nextInt(12) + 2;
-            int x = 12;
-            int y = 9;
+            int x = rand.nextInt(12) + 2;
+            int y = rand.nextInt(12) + 2;
             ECSMapper.transform.get(skeleton).position.y = y * 24;
             ECSMapper.transform.get(skeleton).position.x = x * 24;
             ECSMapper.tilePosition.get(skeleton).y = y;
