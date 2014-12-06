@@ -74,6 +74,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
 
         for (StateComponent.Directionality dir : direction) {
             TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
+            System.out.print(dir);
             int x = tilePos.x;
             int y = tilePos.y;
             switch (dir) {

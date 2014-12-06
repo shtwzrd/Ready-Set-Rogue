@@ -92,12 +92,11 @@ public class StateProcessor extends EntitySystem {
                     }
                     // What about attacks amirite?
                 }
-                for (StateListener movers : this.listeners) {
-                    for (Map.Entry<Entity, Queue<Directionality>> m : movesMap.entrySet()) {
-                        movers.moving(m.getKey(), m.getValue());
-                    }
-                }
-
+            }
+        }
+        for (StateListener movers : this.listeners) {
+            for (Map.Entry<Entity, Queue<Directionality>> m : movesMap.entrySet()) {
+                movers.moving(m.getKey(), m.getValue());
             }
         }
     }
