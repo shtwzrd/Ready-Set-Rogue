@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MapGenerator {
+public class BSPMapGenerator {
 
-    private final int MAP_SIZE_X = 20;
-    private final int MAP_SIZE_Y = 20;
+    private final int MAP_SIZE_X = 60;
+    private final int MAP_SIZE_Y = 60;
     private final int MIN_SQUARE_SIZE = 6;
-    private final int N_ITERATIONS = 3;
+    private final int N_ITERATIONS = 6;
     private final BSPRectangle root = new BSPRectangle(0, 0, MAP_SIZE_X, MAP_SIZE_Y);
     private List<Room> rooms = new ArrayList<>();
 
@@ -30,14 +30,7 @@ public class MapGenerator {
         if (rect.getRightChild() == null || rect.getLeftChild() == null) {
             return map;
         } else {
-            // pathFill(rect.getRightChild(), rect.getLeftChild(), map);
-            for (int i = 0; i < map.length; i++) {
-                for (int j = 0; j < map[0].length; j++) {
-                    System.out.print((char) map[i][j]);
-                }
-                System.out.println();
-            }
-            System.out.println("----------------");
+           // map = pathFill(rect.getRightChild(), rect.getLeftChild(), map);
 
             return Compositor.union(
                     tunnelPaths(rect.getLeftChild(), map),
@@ -58,7 +51,7 @@ public class MapGenerator {
 
         growRooms();
         for (Room r : rooms) {
-            rectFill(r.x(), r.y(), r.width(), r.height(), map);
+            map = rectFill(r.x(), r.y(), r.width(), r.height(), map);
         }
 
         tunnelPaths(root, map);
@@ -68,9 +61,9 @@ public class MapGenerator {
 
 
     private byte[][] rectFill(int x, int y, int width, int height, byte[][] in) {
-        for (int i = x; i < width; i++) {
-            for (int j = y; j < height; j++) {
-                in[i][j] = 'X';
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                in[i + x][j + y] = 'X';
             }
         }
         return in;
@@ -95,24 +88,26 @@ public class MapGenerator {
             by = (int) start.center().y;
         }
 
-        for (int i = ax; i < bx; i++) {
-            for (int j = ay; j < by; j++) {
-                map[i][j] = 'X';
+        for (int i = 0; i < bx; i++) {
+            for (int j = 0; j < by; j++) {
+                map[i + ax][j + ay] = 'X';
             }
         }
         return map;
     }
 
     public static void main(String[] args) {
-        MapGenerator genny = new MapGenerator();
+        BSPMapGenerator genny = new BSPMapGenerator();
         byte[][] pretty = genny.to2DArray();
 
         for (int i = 0; i < pretty.length; i++) {
             for (int j = 0; j < pretty[0].length; j++) {
+                System.out.print(" ");
                 System.out.print((char) pretty[i][j]);
             }
             System.out.println();
         }
+
     }
 
 }

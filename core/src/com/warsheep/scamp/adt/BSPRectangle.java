@@ -19,38 +19,38 @@ public class BSPRectangle implements Container {
     private BSPRectangle leftChild;
     private BSPRectangle rightChild;
 
-    public BSPRectangle(int x, int y, int height, int width) {
+    public BSPRectangle(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.center = new Vector2(this.x + (this.width / 2), this.y + (this.height / 2));
+        this.center = new Vector2(this.width / 2, this.height / 2);
     }
 
-    public BSPRectangle[] split() {
+    public BSPRectangle[] split(int timeout) {
         if (rnd.nextBoolean()) {
             // Vertical
-            leftChild = new BSPRectangle(x, y, height, rnd.nextInt(width - 1) + 1);
-            rightChild = new BSPRectangle(x + leftChild.width, y, height, width - leftChild.width);
+            leftChild = new BSPRectangle(x, y, rnd.nextInt(width - 1) + 1, height);
+            rightChild = new BSPRectangle(x + leftChild.width, y, width - leftChild.width, height);
 
             if (DISCARD_BY_RATIO) {
                 double r1_w_ratio = (float) leftChild.width / leftChild.height;
                 double r2_w_ratio = (float) rightChild.width / rightChild.height;
 
-                if (r1_w_ratio < W_RATIO || r2_w_ratio < W_RATIO) {
-                    return split();
+                if ((r1_w_ratio < W_RATIO || r2_w_ratio < W_RATIO) && timeout > 0) {
+                    return split(timeout--);
                 }
             }
         } else {
             // Horizontal
-            leftChild = new BSPRectangle(x, y, rnd.nextInt(height - 1) + 1, width);
-            rightChild = new BSPRectangle(x, y + leftChild.height, height - leftChild.height, width);
+            leftChild = new BSPRectangle(x, y, width, rnd.nextInt(height - 1) + 1);
+            rightChild = new BSPRectangle(x, y + leftChild.height, width, height - leftChild.height);
 
             if (DISCARD_BY_RATIO) {
                 double r1_h_ratio = (float) leftChild.height / leftChild.width;
                 double r2_h_ratio = (float) rightChild.height / rightChild.width;
-                if (r1_h_ratio < H_RATIO || r2_h_ratio < H_RATIO) {
-                    return split();
+                if ((r1_h_ratio < H_RATIO || r2_h_ratio < H_RATIO) && timeout > 0) {
+                    return split(timeout--);
                 }
             }
         }
@@ -61,7 +61,7 @@ public class BSPRectangle implements Container {
 
     public BSPRectangle partition(BSPRectangle root, int iterations) {
         if (iterations != 0) {
-            BSPRectangle[] leaves = root.split();
+            BSPRectangle[] leaves = root.split(2);
             root.leftChild = partition(leaves[0], iterations - 1);
             root.rightChild = partition(leaves[1], iterations - 1);
         }

@@ -2,57 +2,54 @@ package com.warsheep.scamp.adt;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.Random;
+
 public class Room implements Container {
     private int x;
     private int y;
-    private int containerWidth;
-    private int containerHeight;
-
-    private int xOffset = 2;
-    private int yOffset = 2;
-    private int containerX;
-    private int containerY;
+    private int width;
+    private int height;
+    private Vector2 center;
+    private Random rand;
 
     public Room(Container container) {
-        this.x = container.x();
-        this.y = container.y();
-        this.containerHeight = container.height();
-        this.containerWidth = container.width();
-        this.containerX = container.x();
-        this.containerY = container.y();
-    }
+        this.rand = new Random();
+        int offsetX = rand.nextInt(container.width() / 3) + 1;
+        int offsetY = rand.nextInt(container.height() / 3) + 1;
 
-    public void setXOffset(int offset) {
-        this.xOffset = offset;
-    }
+        this.x = container.x() + offsetX;
+        this.y = container.y() + offsetY;
 
-    public void setYOffset(int offset) {
-        this.yOffset = offset;
+        this.width = container.width() - (offsetX * 2);
+        this.height = container.height() - (offsetY * 2);
+
+        this.center = container.center();
+
     }
 
     @Override
     public int x() {
-        return x + xOffset;
+        return x;
     }
 
     @Override
     public int y() {
-        return y + yOffset;
+        return y;
     }
 
     @Override
     public int width() {
-        return this.containerWidth - (this.x() - this.containerX) - xOffset;
+        return this.width;
     }
 
     @Override
     public int height() {
-        return this.containerWidth - (this.y() - this.containerY - yOffset);
+        return this.height;
     }
 
     @Override
     public Vector2 center() {
-        return new Vector2(this.width() / 2, this.height() / 2);
+        return this.center();
     }
 
 }
