@@ -49,7 +49,7 @@ public class Room implements Container {
 
     @Override
     public Vector2 center() {
-        return this.center();
+        return this.center;
     }
 
 }

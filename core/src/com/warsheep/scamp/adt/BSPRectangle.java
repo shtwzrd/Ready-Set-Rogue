@@ -18,6 +18,7 @@ public class BSPRectangle implements Container {
     private Vector2 center;
     private BSPRectangle leftChild;
     private BSPRectangle rightChild;
+    private Room room;
 
     public BSPRectangle(int x, int y, int width, int height) {
         this.x = x;
@@ -108,6 +109,14 @@ public class BSPRectangle implements Container {
             }
         }
         return list;
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public Room getRoom() {
+        return this.room;
     }
 
     @Override

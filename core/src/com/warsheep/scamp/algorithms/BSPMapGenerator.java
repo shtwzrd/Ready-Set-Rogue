@@ -4,37 +4,47 @@ import com.warsheep.scamp.adt.BSPRectangle;
 import com.warsheep.scamp.adt.Container;
 import com.warsheep.scamp.adt.Room;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BSPMapGenerator {
 
-    private final int MAP_SIZE_X = 60;
-    private final int MAP_SIZE_Y = 60;
-    private final int MIN_SQUARE_SIZE = 6;
-    private final int N_ITERATIONS = 4;
+    private final int MAP_SIZE_X = 50;
+    private final int MAP_SIZE_Y = 50;
+    private final int MIN_SQUARE_SIZE = 4;
+    private final int N_ITERATIONS = 5;
     private final BSPRectangle root = new BSPRectangle(0, 0, MAP_SIZE_X, MAP_SIZE_Y);
-    private List<Room> rooms = new ArrayList<>();
-
 
     private void growRooms() {
-        this.rooms.addAll(
-                root.getLevel(N_ITERATIONS)
-                        .stream()
-                        .map(Room::new)
-                        .collect(Collectors.toList()));
+        List<BSPRectangle> rects = root.getLevel(N_ITERATIONS);
+        for (BSPRectangle b : rects) {
+            b.setRoom(new Room(b));
+        }
     }
 
     private byte[][] tunnelPaths(BSPRectangle rect, byte[][] map) {
         if (rect.getRightChild() == null || rect.getLeftChild() == null) {
             return map;
         } else {
-            byte[][] l = tunnelPaths(rect.getLeftChild(), map);
-            byte[][] r = tunnelPaths(rect.getRightChild(), map);
-            pathFill(rect.getLeftChild(), rect.getRightChild(), map, 1);
+            tunnelPaths(rect.getLeftChild(), map);
+            tunnelPaths(rect.getRightChild(), map);
 
-            return Compositor.union(l, r);
+            Container l;
+            Container r;
+            if (rect.getLeftChild().getRoom() == null) {
+                l = rect.getLeftChild();
+            } else {
+                l = rect.getLeftChild().getRoom();
+            }
+            if (rect.getRightChild().getRoom() == null) {
+                r = rect.getRightChild();
+            } else {
+                r = rect.getRightChild().getRoom();
+            }
+            if(rect.getLeftChild().getLeftChild() == null || rect.getRightChild().getRightChild() == null) {
+                return new byte[0][0];
+            } else {
+                return pathFill(l, r, map, 3);
+            }
         }
     }
 
@@ -45,17 +55,17 @@ public class BSPMapGenerator {
 
         for (int i = 0; i < MAP_SIZE_X; i++) {
             for (int j = 0; j < MAP_SIZE_Y; j++) {
-                map[i][j] = '.';
+                map[i][j] = '#';
             }
         }
 
         growRooms();
-        for (Room r : rooms) {
-            rectFill(r.x(), r.y(), r.width(), r.height(), map);
+        List<BSPRectangle> rects = root.getLevel(N_ITERATIONS);
+        for (BSPRectangle r : rects) {
+            rectFill(r.getRoom().x(), r.getRoom().y(), r.getRoom().width(), r.getRoom().height(), map);
         }
 
         tunnelPaths(root, map);
-        System.out.println(this.rooms.size());
         return map;
     }
 
@@ -63,7 +73,7 @@ public class BSPMapGenerator {
     private byte[][] rectFill(int x, int y, int width, int height, byte[][] in) {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                in[i + x][j + y] = 'X';
+                in[i + x][j + y] = (byte)'.';
             }
         }
         return in;
@@ -88,11 +98,12 @@ public class BSPMapGenerator {
             by = (int) start.center().y;
         }
 
-        if(ax == bx) {
-            rectFill(ax, ay, bx - ax + tunnelWidth, by - ay, map);
+        if (ax == bx) {
+            rectFill(ax, ay, tunnelWidth, by - ay, map);
         } else {
-            rectFill(ax, ay, bx - ax, by - ay + tunnelWidth, map);
+            rectFill(ax, ay, bx - ax, tunnelWidth, map);
         }
+
         return map;
     }
 
