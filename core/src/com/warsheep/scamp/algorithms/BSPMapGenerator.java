@@ -13,7 +13,7 @@ public class BSPMapGenerator {
     private final int MAP_SIZE_X = 60;
     private final int MAP_SIZE_Y = 60;
     private final int MIN_SQUARE_SIZE = 6;
-    private final int N_ITERATIONS = 6;
+    private final int N_ITERATIONS = 4;
     private final BSPRectangle root = new BSPRectangle(0, 0, MAP_SIZE_X, MAP_SIZE_Y);
     private List<Room> rooms = new ArrayList<>();
 
@@ -30,11 +30,11 @@ public class BSPMapGenerator {
         if (rect.getRightChild() == null || rect.getLeftChild() == null) {
             return map;
         } else {
-           // map = pathFill(rect.getRightChild(), rect.getLeftChild(), map);
+            byte[][] l = tunnelPaths(rect.getLeftChild(), map);
+            byte[][] r = tunnelPaths(rect.getRightChild(), map);
+            pathFill(rect.getLeftChild(), rect.getRightChild(), map, 1);
 
-            return Compositor.union(
-                    tunnelPaths(rect.getLeftChild(), map),
-                    tunnelPaths(rect.getRightChild(), map));
+            return Compositor.union(l, r);
         }
     }
 
@@ -51,7 +51,7 @@ public class BSPMapGenerator {
 
         growRooms();
         for (Room r : rooms) {
-            map = rectFill(r.x(), r.y(), r.width(), r.height(), map);
+            rectFill(r.x(), r.y(), r.width(), r.height(), map);
         }
 
         tunnelPaths(root, map);
@@ -69,7 +69,7 @@ public class BSPMapGenerator {
         return in;
     }
 
-    private byte[][] pathFill(Container start, Container finish, byte[][] map) {
+    private byte[][] pathFill(Container start, Container finish, byte[][] map, int tunnelWidth) {
         int ax, ay, bx, by;
 
         if (start.center().x < finish.center().x) {
@@ -88,10 +88,10 @@ public class BSPMapGenerator {
             by = (int) start.center().y;
         }
 
-        for (int i = 0; i < bx; i++) {
-            for (int j = 0; j < by; j++) {
-                map[i + ax][j + ay] = 'X';
-            }
+        if(ax == bx) {
+            rectFill(ax, ay, bx - ax + tunnelWidth, by - ay, map);
+        } else {
+            rectFill(ax, ay, bx - ax, by - ay + tunnelWidth, map);
         }
         return map;
     }

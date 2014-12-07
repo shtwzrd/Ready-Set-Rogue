@@ -23,7 +23,7 @@ public class Room implements Container {
         this.width = container.width() - (offsetX * 2);
         this.height = container.height() - (offsetY * 2);
 
-        this.center = container.center();
+        this.center = new Vector2(container.x() + container.width() / 2, container.y() + container.height() / 2);
 
     }
 

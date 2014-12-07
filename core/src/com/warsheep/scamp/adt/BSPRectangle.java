@@ -24,7 +24,7 @@ public class BSPRectangle implements Container {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.center = new Vector2(this.width / 2, this.height / 2);
+        this.center = new Vector2(this.x + this.width / 2, this.y + this.height / 2);
     }
 
     public BSPRectangle[] split(int timeout) {
