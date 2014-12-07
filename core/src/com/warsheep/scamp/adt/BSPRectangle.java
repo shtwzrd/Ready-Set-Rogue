@@ -9,8 +9,8 @@ import java.util.Random;
 public class BSPRectangle implements Container {
 
     private final boolean DISCARD_BY_RATIO = true;
-    private final double H_RATIO = 0.45;
-    private final double W_RATIO = 0.45;
+    private final double H_RATIO = 0.35;
+    private final double W_RATIO = 0.35;
 
     private static Random rnd = new Random();
 
@@ -18,7 +18,6 @@ public class BSPRectangle implements Container {
     private Vector2 center;
     private BSPRectangle leftChild;
     private BSPRectangle rightChild;
-    private Room room;
 
     public BSPRectangle(int x, int y, int width, int height) {
         this.x = x;
@@ -109,14 +108,6 @@ public class BSPRectangle implements Container {
             }
         }
         return list;
-    }
-
-    public void setRoom(Room room) {
-        this.room = room;
-    }
-
-    public Room getRoom() {
-        return this.room;
     }
 
     @Override

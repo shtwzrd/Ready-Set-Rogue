@@ -4,22 +4,43 @@ import com.warsheep.scamp.adt.BSPRectangle;
 import com.warsheep.scamp.adt.Container;
 import com.warsheep.scamp.adt.Room;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class BSPMapGenerator {
 
-    private final int MAP_SIZE_X = 50;
-    private final int MAP_SIZE_Y = 50;
-    private final int MIN_SQUARE_SIZE = 4;
-    private final int N_ITERATIONS = 5;
-    private final BSPRectangle root = new BSPRectangle(0, 0, MAP_SIZE_X, MAP_SIZE_Y);
+    private final int MAP_SIZE_X;
+    private final int MAP_SIZE_Y;
+    private final int MIN_TUNNEL_SIZE;
+    private final int MAX_TUNNEL_SIZE;
+    private final int N_ITERATIONS;
+
+    private final BSPRectangle root;
+    private ArrayList<Room> rooms;
+    private Random rand;
+
+    public BSPMapGenerator(int width, int height, int minimumTunnelSize, int maximumTunnelSize, int iterations) {
+        this.MAP_SIZE_X = width;
+        this.MAP_SIZE_Y = height;
+        this.MIN_TUNNEL_SIZE = minimumTunnelSize;
+        this.MAX_TUNNEL_SIZE = maximumTunnelSize;
+        this.N_ITERATIONS = iterations;
+        this.rooms = new ArrayList<>();
+
+        this.root = new BSPRectangle(0, 0, MAP_SIZE_X, MAP_SIZE_Y);
+        this.rand = new Random();
+    }
+
 
     private void growRooms() {
-        List<BSPRectangle> rects = root.getLevel(N_ITERATIONS);
-        for (BSPRectangle b : rects) {
-            b.setRoom(new Room(b));
-        }
+        this.rooms.addAll(
+                root.getLevel(N_ITERATIONS)
+                        .parallelStream()
+                        .map(Room::new)
+                        .collect(Collectors.toList()));
     }
+
 
     private byte[][] tunnelPaths(BSPRectangle rect, byte[][] map) {
         if (rect.getRightChild() == null || rect.getLeftChild() == null) {
@@ -27,23 +48,11 @@ public class BSPMapGenerator {
         } else {
             tunnelPaths(rect.getLeftChild(), map);
             tunnelPaths(rect.getRightChild(), map);
-
-            Container l;
-            Container r;
-            if (rect.getLeftChild().getRoom() == null) {
-                l = rect.getLeftChild();
-            } else {
-                l = rect.getLeftChild().getRoom();
-            }
-            if (rect.getRightChild().getRoom() == null) {
-                r = rect.getRightChild();
-            } else {
-                r = rect.getRightChild().getRoom();
-            }
-            if(rect.getLeftChild().getLeftChild() == null || rect.getRightChild().getRightChild() == null) {
+            if (rect.getLeftChild().getLeftChild() == null || rect.getRightChild().getRightChild() == null) {
                 return new byte[0][0];
             } else {
-                return pathFill(l, r, map, 3);
+                return pathFill(rect.getLeftChild(), rect.getRightChild(), map,
+                        rand.nextInt(MAX_TUNNEL_SIZE - MIN_TUNNEL_SIZE + 1) + MIN_TUNNEL_SIZE);
             }
         }
     }
@@ -60,12 +69,11 @@ public class BSPMapGenerator {
         }
 
         growRooms();
-        List<BSPRectangle> rects = root.getLevel(N_ITERATIONS);
-        for (BSPRectangle r : rects) {
-            rectFill(r.getRoom().x(), r.getRoom().y(), r.getRoom().width(), r.getRoom().height(), map);
+        for (Room r : rooms) {
+            rectFill(r.x(), r.y(), r.width(), r.height(), map);
         }
-
         tunnelPaths(root, map);
+        cleanWalls(map);
         return map;
     }
 
@@ -73,7 +81,7 @@ public class BSPMapGenerator {
     private byte[][] rectFill(int x, int y, int width, int height, byte[][] in) {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                in[i + x][j + y] = (byte)'.';
+                in[i + x][j + y] = (byte) '.';
             }
         }
         return in;
@@ -107,8 +115,59 @@ public class BSPMapGenerator {
         return map;
     }
 
+    private void cleanWalls(byte[][] map) {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                boolean allWall = true;
+                if (i > 0) {
+                    if (map[i - 1][j] != '#' && map[i - 1][j] != ' ') {
+                        allWall = false;
+                    }
+                    if (j > 0) {
+                        if (map[i - 1][j - 1] != '#' && map[i - 1][j - 1] != ' ') {
+                            allWall = false;
+                        }
+                    }
+                    if (j < map[0].length - 1) {
+                        if (map[i - 1][j + 1] != '#' && map[i - 1][j + 1] != ' ') {
+                            allWall = false;
+                        }
+                    }
+                }
+                if (i < map.length - 1) {
+                    if (map[i + 1][j] != '#' && map[i + 1][j] != ' ') {
+                        allWall = false;
+                    }
+                    if (j > 0) {
+                        if (map[i + 1][j - 1] != '#' && map[i + 1][j - 1] != ' ') {
+                            allWall = false;
+                        }
+                    }
+                    if (j < map[0].length - 1) {
+                        if (map[i + 1][j + 1] != '#' && map[i + 1][j + 1] != ' ') {
+                            allWall = false;
+                        }
+                    }
+                }
+                if (j > 0) {
+                    if (map[i][j - 1] != '#' && map[i][j - 1] != ' ') {
+                        allWall = false;
+                    }
+                }
+                if (j < map.length - 1) {
+                    if (map[i][j + 1] != '#' && map[i][j + 1] != ' ') {
+                        allWall = false;
+                    }
+                }
+                if (allWall) {
+                    map[i][j] = ' ';
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        BSPMapGenerator genny = new BSPMapGenerator();
+        BSPMapGenerator genny = new BSPMapGenerator(50, 50, 1, 3, 5);
         byte[][] pretty = genny.to2DArray();
 
         for (int i = 0; i < pretty.length; i++) {
