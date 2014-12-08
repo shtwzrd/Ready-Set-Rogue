@@ -23,6 +23,8 @@ public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
     public static final float TURN_DURATION = 2;
+    public static final int MAP_WIDTH = 40;
+    public static final int MAP_HEIGHT = 40;
     VisibilityProcessor visibilityProcessor;
     MovementProcessor movementProcessor;
     CollisionProcessor collisionProcessor;
@@ -81,7 +83,7 @@ public class MainGameScreen extends ScreenAdapter {
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
-        tileProcessor = new TileProcessor();
+        tileProcessor = new TileProcessor(MAP_WIDTH, MAP_HEIGHT);
         levelProcessor = new LevelingProcessor();
 
 
@@ -238,7 +240,7 @@ public class MainGameScreen extends ScreenAdapter {
     }
 
     private void genMap() {
-        BSPMapGenerator gen = new BSPMapGenerator(40, 40, 1, 3, 4);
+        BSPMapGenerator gen = new BSPMapGenerator(MAP_WIDTH, MAP_HEIGHT, 1, 3, 4);
         byte[][] data = gen.to2DArray();
         for(int x = 0; x < data.length; x++) {
             for(int y = data[0].length - 1; y >= 0; y--) {
