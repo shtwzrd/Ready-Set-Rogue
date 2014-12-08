@@ -69,7 +69,10 @@ public class MainGameScreen extends ScreenAdapter {
         // Initialize processors and associate them with ecs engine
         visibilityProcessor = new VisibilityProcessor();
 
-        movementProcessor = new MovementProcessor();
+        tileProcessor = new TileProcessor(MAP_WIDTH, MAP_HEIGHT);
+        ArrayList<MovementProcessor.MovementListener> movementListeners = new ArrayList();
+        movementListeners.add(tileProcessor);
+        movementProcessor = new MovementProcessor(movementListeners);
         combatProcessor = new CombatProcessor();
         aiProcessor = new AIProcessor();
         controlProcessor = new ControlProcessor();
@@ -83,7 +86,7 @@ public class MainGameScreen extends ScreenAdapter {
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
-        tileProcessor = new TileProcessor(MAP_WIDTH, MAP_HEIGHT);
+
         levelProcessor = new LevelingProcessor();
 
 
@@ -165,13 +168,13 @@ public class MainGameScreen extends ScreenAdapter {
 
         createCamera(wizard);
 
-        genMap();
-        //MapImporter mapImporter = new MapImporter();
-        //mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
+       // genMap();
+        MapImporter mapImporter = new MapImporter();
+        mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
 
-        //for (Entity e : mapImporter.getEntities()) {
-        //    ecs.addEntity(e);
-        //}
+        for (Entity e : mapImporter.getEntities()) {
+            ecs.addEntity(e);
+        }
 
         //Start calculating game time
         startTime = System.currentTimeMillis();

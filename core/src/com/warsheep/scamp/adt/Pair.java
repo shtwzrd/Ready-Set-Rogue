@@ -1,4 +1,4 @@
-package com.warsheep.scamp;
+package com.warsheep.scamp.adt;
 
 import java.io.Serializable;
 

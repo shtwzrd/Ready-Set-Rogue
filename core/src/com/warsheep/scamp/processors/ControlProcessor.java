@@ -8,7 +8,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.warsheep.scamp.Pair;
+import com.warsheep.scamp.adt.Pair;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.State;
 import com.warsheep.scamp.components.StateComponent.Directionality;
