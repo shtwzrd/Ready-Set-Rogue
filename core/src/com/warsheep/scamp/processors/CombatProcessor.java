@@ -8,118 +8,77 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Color;
 import com.warsheep.scamp.components.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class CombatProcessor extends EntitySystem implements StateProcessor.StateListener {
 
     private ImmutableArray<Entity> damageableEntities;
     private CollisionProcessor collisions;
+    private TileProcessor tileProcessor;
 
     public void addedToEngine(Engine engine) {
         damageableEntities = engine.getEntitiesFor(Family.all(DamageableComponent.class, TileComponent.class, FactionComponent.class, StateComponent.class).get());
         collisions = engine.getSystem(CollisionProcessor.class);
+        tileProcessor = engine.getSystem(TileProcessor.class);
     }
 
     @Override
     public void attacking(Entity entity, StateComponent.Directionality direction) {
         Entity attacker = entity;
-        AttackerComponent attackerComp = ECSMapper.attack.get(attacker);
-        StateComponent state = ECSMapper.state.get(attacker);
+        AttackerComponent atkComp = ECSMapper.attack.get(attacker);
+        StateComponent atkState = ECSMapper.state.get(attacker);
 
-        if (state.state != StateComponent.State.DEAD) {
+        if (atkState.state != StateComponent.State.DEAD) {
             // Get attackers "position"
-            TileComponent attackerTilePos = ECSMapper.tile.get(attacker);
+            TileComponent atkPos = ECSMapper.tile.get(attacker);
 
-            for (int k = 0; k < damageableEntities.size(); k++) {
-                Entity damageable = damageableEntities.get(k);
+            int checkPosX = atkPos.x;
+            int checkPosY = atkPos.y;
 
-                if (!shareFaction(ECSMapper.faction.get(damageable), ECSMapper.faction.get(attacker))) {
-                    DamageableComponent damageableComponent = ECSMapper.damage.get(damageable);
-                    TileComponent damageableTilePos = ECSMapper.tile.get(damageable);
+            ArrayList<Entity> entitiesInPos = tileProcessor.queryByPosition(checkPosX, checkPosY);
 
-                    if (ECSMapper.state.get(damageable).state != StateComponent.State.DEAD) {
-                        boolean attacked = false;
-                        for (int i = 0; i < attackerComp.attackRange; i++) {
-
-                        }
-                        // Figure out what direction to attack in and apply damage
-                        if (direction == StateComponent.Directionality.UP) {
-                            for (int i = 0; i < attackerComp.attackRange; i++) {
-                                if (collisions.checkMove(attackerTilePos.x, attackerTilePos.y+i, entity, direction)) {
-                                    if (attackerTilePos.x == damageableTilePos.x && attackerTilePos.y+i+1 == damageableTilePos.y) {
-                                        System.out.println("HitUp");
-                                        attacked = true;
-                                    }
-                                    else {
-                                        System.out.println("Wall hit");
-                                        break;
-                                    }
-                                }
-                            }
-                        } else if (direction == StateComponent.Directionality.DOWN) {
-                            for (int i = 0; i < attackerComp.attackRange; i++) {
-                                if (collisions.checkMove(attackerTilePos.x, attackerTilePos.y-i, entity, direction)) {
-                                    if (attackerTilePos.x == damageableTilePos.x && attackerTilePos.y-i-1 == damageableTilePos.y) {
-                                        System.out.println("HitDown");
-                                        attacked = true;
-                                    }
-                                    else {
-                                        System.out.println("Wall hit");
-                                        break;
-                                    }
-                                }
-                            }
-                        } else if (direction == StateComponent.Directionality.RIGHT) {
-                            for (int i = 0; i < attackerComp.attackRange; i++) {
-                                if (collisions.checkMove(attackerTilePos.x+i, attackerTilePos.y, entity, direction)) {
-                                    if (attackerTilePos.x+i+1 == damageableTilePos.x && attackerTilePos.y == damageableTilePos.y) {
-                                        System.out.println("HitRight");
-                                        attacked = true;
-                                    }
-                                    else {
-                                        System.out.println("Wall hit");
-                                        break;
-                                    }
-                                }
-                            }
-                        } else if (direction == StateComponent.Directionality.LEFT) {
-                            for (int i = 0; i < attackerComp.attackRange; i++) {
-                                if (collisions.checkMove(attackerTilePos.x-i, attackerTilePos.y, entity, direction)) {
-                                    if (attackerTilePos.x == damageableTilePos.x-i-1 && attackerTilePos.y == damageableTilePos.y) {
-                                        System.out.println("HitLeft");
-                                        attacked = true;
-                                    }
-                                    else {
-                                        System.out.println("Wall hit");
-                                        break;
-                                    }
+            if (entitiesInPos != null) {
+                for (Entity damageable : entitiesInPos) {
+                    DamageableComponent dmgComp = ECSMapper.damage.get(damageable);
+                    if (dmgComp != null) {
+                        // Apply damage
+                        dmgComp.currentHealth -= atkComp.baseDamage;
+                        // Check to see if the damageable entity is dead and if it has anything to drop
+                        DropComponent dropComponent = ECSMapper.drop.get(damageable);
+                        if (dmgComp.currentHealth <= 0 && dropComponent != null) {
+                            // Check to see if exp points can be applied to attacker entity
+                            LevelComponent levelComp = ECSMapper.level.get(entity);
+                            if (levelComp != null) {
+                                levelComp.experiencePoints += dropComponent.experienceDrop;
+                                if (dropComponent.itemDrop != null) {
+                                    // TODO: Drop item
                                 }
                             }
                         }
-
-                        // Check if the player actually attacked
-                        if (attacked) {
-                            // Apply damage
-                            damageableComponent.currentHealth -= attackerComp.baseDamage;
-                            // Check to see if the damageable entity is dead and if it has anything to drop
-                            DropComponent dropComponent = ECSMapper.drop.get(damageable);
-                            if (damageableComponent.currentHealth <= 0 && dropComponent != null) {
-                                // Check to see if exp points can be applied to attacker entity
-                                LevelComponent levelComp = ECSMapper.level.get(entity);
-                                if (levelComp != null) {
-                                    levelComp.experiencePoints += dropComponent.experienceDrop;
-                                    if (dropComponent.itemDrop != null) {
-                                        // TODO: Drop item
-                                    }
-                                }
-                            }
-                        }
-
                     }
                 }
-
-                state.state = StateComponent.State.IDLE;
-                state.inProgress = false;
             }
+
+            switch (direction) {
+                case UP:
+                    checkPosY++;
+                    break;
+                case DOWN:
+                    checkPosY--;
+                    break;
+                case RIGHT:
+                    checkPosX++;
+                    break;
+                case LEFT:
+                    checkPosX--;
+                    break;
+            }
+
+            atkState.state = StateComponent.State.IDLE;
+            atkState.inProgress = false;
         }
+
 
     }
 

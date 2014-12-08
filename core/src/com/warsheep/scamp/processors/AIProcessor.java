@@ -102,7 +102,7 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
         boolean wantsUp = false;
         boolean wantsRight = false;
         for (int i = 0; i < Directionality.values().length - 1; i++) {
-            blocked[i] = collisions.checkMove(ai.x, ai.y, entity, Directionality.values()[i]);
+            blocked[i] = collisions.checkMove(ai.x, ai.y, entity, Directionality.values()[i], false);
         }
 
         if (enemy.x > ai.x) {

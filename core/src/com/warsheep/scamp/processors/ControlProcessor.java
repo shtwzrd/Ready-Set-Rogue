@@ -43,6 +43,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 if (collisions.checkMove(tilePos.x + simulatedX,
                         tilePos.y + simulatedY,
                         entity, pair.getRight())) {
+                    System.out.println("Blocked");
                     // Some visual feedback
                 } else {
                     actions.add(pair);

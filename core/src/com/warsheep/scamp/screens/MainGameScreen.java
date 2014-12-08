@@ -69,6 +69,7 @@ public class MainGameScreen extends ScreenAdapter {
         // Initialize processors and associate them with ecs engine
         visibilityProcessor = new VisibilityProcessor();
 
+        tileProcessor = new TileProcessor(MAP_WIDTH, MAP_HEIGHT);
         movementProcessor = new MovementProcessor();
         combatProcessor = new CombatProcessor();
         aiProcessor = new AIProcessor();
@@ -83,13 +84,12 @@ public class MainGameScreen extends ScreenAdapter {
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
-        tileProcessor = new TileProcessor(MAP_WIDTH, MAP_HEIGHT);
         levelProcessor = new LevelingProcessor();
 
 
+        ecs.addSystem(tileProcessor);
         ecs.addSystem(visibilityProcessor);
         ecs.addSystem(collisionProcessor);
-        ecs.addSystem(tileProcessor);
         ecs.addSystem(movementProcessor);
         ecs.addSystem(cameraProcessor);
         ecs.addSystem(deathProcessor);
