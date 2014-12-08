@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
 import com.warsheep.scamp.Scamp;
+import com.warsheep.scamp.algorithms.BSPMapGenerator;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
@@ -162,12 +163,13 @@ public class MainGameScreen extends ScreenAdapter {
 
         createCamera(wizard);
 
-        MapImporter mapImporter = new MapImporter();
-        mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
+        genMap();
+        //MapImporter mapImporter = new MapImporter();
+        //mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
 
-        for (Entity e : mapImporter.getEntities()) {
-            ecs.addEntity(e);
-        }
+        //for (Entity e : mapImporter.getEntities()) {
+        //    ecs.addEntity(e);
+        //}
 
         //Start calculating game time
         startTime = System.currentTimeMillis();
@@ -233,5 +235,47 @@ public class MainGameScreen extends ScreenAdapter {
         entity.add(camera);
 
         ecs.addEntity(entity);
+    }
+
+    private void genMap() {
+        BSPMapGenerator gen = new BSPMapGenerator(40, 40, 1, 3, 4);
+        byte[][] data = gen.to2DArray();
+        for(int x = 0; x < data.length; x++) {
+            for(int y = data[0].length - 1; y >= 0; y--) {
+                if(data[x][y] != ' ') {
+                    buildTile(x, data.length - y - 1, 1, (char)data[x][y]);
+                }
+            }
+        }
+    }
+
+    private void buildTile(int x, int y, int z, char type) {
+               Entity e = new Entity();
+
+        TileComponent tc = new TileComponent();
+        tc.x = x;
+        tc.y = y;
+        tc.z = z;
+
+        VisibleComponent vc = new VisibleComponent();
+
+        AssetDepot assets = AssetDepot.getInstance();
+
+        vc.originX = 12;
+        vc.originY = 12;
+
+
+        if (type == '#') {
+            CollidableComponent cc = new CollidableComponent();
+            e.add(cc);
+            vc.image = assets.fetch("world_24x24", "oryx_wall_island_stone" , 1);
+        } else {
+            vc.image = assets.fetch("world_24x24", "oryx_floor_darkgrey_stone", 1);
+        }
+
+        e.add(tc);
+        e.add(vc);
+        e.add(new TransformComponent());
+        ecs.addEntity(e);
     }
 }
