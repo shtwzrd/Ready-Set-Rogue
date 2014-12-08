@@ -70,7 +70,8 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 //                                new Pair<>(State.ATTACKING, approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions));
 //                        this.actions.add(new Pair(aiEntity, action));
                         // TODO: Make good
-                        Pair<State, Directionality> action = new Pair<>(State.ATTACKING, Directionality.RIGHT);
+                        System.out.println(faceEnemy(simulatedAiPos, closestDmgTilePos));
+                        Pair<State, Directionality> action = new Pair<>(State.ATTACKING, faceEnemy(simulatedAiPos, closestDmgTilePos));
                         this.actions.add(new Pair(aiEntity, action));
                     }
                 }
@@ -97,6 +98,32 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
             }
         }
         return closestDamageableEntity;
+    }
+
+    private static Directionality faceEnemy(TileComponent ai, TileComponent enemy) {
+        int distX = enemy.x - ai.x;
+        int distY = enemy.y - ai.y;
+
+        System.out.println("x: " +distX +", y: " + distY);
+        if(distX == 0) {
+            return distY > 0 ? Directionality.UP : Directionality.DOWN;
+        } else if(distY == 0) {
+             return distX > 0 ? Directionality.RIGHT : Directionality.LEFT;
+        } else {
+            if (Math.abs(distX) <= Math.abs(distY)) {
+                if (distX > 0) {
+                    return Directionality.RIGHT;
+                } else {
+                    return Directionality.LEFT;
+                }
+            } else {
+                if (distY > 0) {
+                    return Directionality.UP;
+                } else {
+                    return Directionality.DOWN;
+                }
+            }
+        }
     }
 
     // Figure out whether to fire an action horizontally or vertically
