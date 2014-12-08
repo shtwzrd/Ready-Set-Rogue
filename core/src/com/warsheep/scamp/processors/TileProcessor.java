@@ -8,7 +8,7 @@ import com.warsheep.scamp.components.TransformComponent;
 
 import java.util.ArrayList;
 
-public class TileProcessor extends EntitySystem implements EntityListener {
+public class TileProcessor extends EntitySystem implements EntityListener, MovementProcessor.MovementListener {
 
     private ImmutableArray<Entity> tileEntities;
     private TransformComponent trans;
@@ -45,7 +45,7 @@ public class TileProcessor extends EntitySystem implements EntityListener {
         trans.position.y = tile.y * TILE_SIZE;
         trans.position.z = tile.z;
 
-        if(map[tile.x][tile.y] == null) {
+        if (map[tile.x][tile.y] == null) {
             map[tile.x][tile.y] = new ArrayList<>();
         }
 
@@ -56,5 +56,14 @@ public class TileProcessor extends EntitySystem implements EntityListener {
     public void entityRemoved(Entity entity) {
         tile = ECSMapper.tile.get(entity);
         map[tile.x][tile.y].remove(entity);
+    }
+
+    @Override
+    public void tileMove(Entity entity, int oldX, int oldY) {
+        tile = ECSMapper.tile.get(entity);
+        if(tile != null) {
+            this.map[oldX][oldY].remove(entity);
+            this.map[tile.x][tile.y].add(entity);
+        }
     }
 }

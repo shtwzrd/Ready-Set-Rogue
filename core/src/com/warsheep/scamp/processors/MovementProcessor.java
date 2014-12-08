@@ -7,13 +7,27 @@ import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.StateProcessor.StateListener;
 
+import java.util.ArrayList;
 import java.util.Queue;
 
 public class MovementProcessor extends IteratingSystem implements StateListener {
     private boolean pause = false;
+    private ArrayList<MovementListener> listeners;
 
-    public MovementProcessor() {
+    public static interface MovementListener {
+
+        default public void tileMove(Entity mover, int oldX, int oldY) {
+            // Do nothing
+        }
+
+        default public void transformMove(Entity mover) {
+            // Do nothing
+        }
+    }
+
+    public MovementProcessor(ArrayList<MovementListener> listeners) {
         super(Family.all(MovementComponent.class).get());
+        this.listeners = listeners;
     }
 
     @Override
@@ -21,7 +35,6 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         TransformComponent trans = ECSMapper.transform.get(entity);
         MovementComponent mov = ECSMapper.movement.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
-        TileComponent possy = ECSMapper.tile.get(entity);
 //        TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
 
 /*        // Don't do anything if we're already at our target
@@ -71,10 +84,11 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             mov = ECSMapper.movement.get(entity);
         }
 
-
         for (StateComponent.Directionality dir : direction) {
             TileComponent tilePos = ECSMapper.tile.get(entity);
             System.out.print(dir);
+            int oldX = tilePos.x;
+            int oldY = tilePos.y;
             int x = tilePos.x;
             int y = tilePos.y;
             switch (dir) {
@@ -96,7 +110,15 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             mov.target.add(new Vector3(x * 24.0f, y * 24.0f, 10.0f));
             ECSMapper.tile.get(entity).x = x;
             ECSMapper.tile.get(entity).y = y;
+
+            for (MovementListener listener : listeners) {
+                listener.tileMove(entity, oldX, oldY);
+            }
         }
         entity.add(mov);
+    }
+
+    public void listen(MovementListener listener) {
+        this.listeners.add(listener);
     }
 }

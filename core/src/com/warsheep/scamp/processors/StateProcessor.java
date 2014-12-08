@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.warsheep.scamp.Pair;
+import com.warsheep.scamp.adt.Pair;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.*;

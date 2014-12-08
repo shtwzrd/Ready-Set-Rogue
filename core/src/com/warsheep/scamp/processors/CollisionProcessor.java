@@ -81,5 +81,5 @@ public class CollisionProcessor extends EntitySystem {
 
         return blocked;
     }
-    
+
 }

@@ -70,7 +70,9 @@ public class MainGameScreen extends ScreenAdapter {
         visibilityProcessor = new VisibilityProcessor();
 
         tileProcessor = new TileProcessor(MAP_WIDTH, MAP_HEIGHT);
-        movementProcessor = new MovementProcessor();
+        ArrayList<MovementProcessor.MovementListener> movementListeners = new ArrayList();
+        movementListeners.add(tileProcessor);
+        movementProcessor = new MovementProcessor(movementListeners);
         combatProcessor = new CombatProcessor();
         aiProcessor = new AIProcessor();
         controlProcessor = new ControlProcessor();
@@ -165,13 +167,13 @@ public class MainGameScreen extends ScreenAdapter {
 
         createCamera(wizard);
 
-        genMap();
-        //MapImporter mapImporter = new MapImporter();
-        //mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
+       // genMap();
+        MapImporter mapImporter = new MapImporter();
+        mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
 
-        //for (Entity e : mapImporter.getEntities()) {
-        //    ecs.addEntity(e);
-        //}
+        for (Entity e : mapImporter.getEntities()) {
+            ecs.addEntity(e);
+        }
 
         //Start calculating game time
         startTime = System.currentTimeMillis();
