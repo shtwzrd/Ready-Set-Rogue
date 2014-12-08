@@ -21,7 +21,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         TransformComponent trans = ECSMapper.transform.get(entity);
         MovementComponent mov = ECSMapper.movement.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
-        TilePositionComponent possy = ECSMapper.tilePosition.get(entity);
+        TileComponent possy = ECSMapper.tile.get(entity);
 //        TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
 
 /*        // Don't do anything if we're already at our target
@@ -73,7 +73,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
 
 
         for (StateComponent.Directionality dir : direction) {
-            TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
+            TileComponent tilePos = ECSMapper.tile.get(entity);
             System.out.print(dir);
             int x = tilePos.x;
             int y = tilePos.y;
@@ -94,8 +94,8 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
                     break;
             }
             mov.target.add(new Vector3(x * 24.0f, y * 24.0f, 10.0f));
-            ECSMapper.tilePosition.get(entity).x = x;
-            ECSMapper.tilePosition.get(entity).y = y;
+            ECSMapper.tile.get(entity).x = x;
+            ECSMapper.tile.get(entity).y = y;
         }
         entity.add(mov);
     }

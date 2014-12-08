@@ -14,7 +14,7 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
     private CollisionProcessor collisions;
 
     public void addedToEngine(Engine engine) {
-        damageableEntities = engine.getEntitiesFor(Family.all(DamageableComponent.class, TilePositionComponent.class, FactionComponent.class, StateComponent.class).get());
+        damageableEntities = engine.getEntitiesFor(Family.all(DamageableComponent.class, TileComponent.class, FactionComponent.class, StateComponent.class).get());
         collisions = engine.getSystem(CollisionProcessor.class);
     }
 
@@ -26,14 +26,14 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
 
         if (state.state != StateComponent.State.DEAD) {
             // Get attackers "position"
-            TilePositionComponent attackerTilePos = ECSMapper.tilePosition.get(attacker);
+            TileComponent attackerTilePos = ECSMapper.tile.get(attacker);
 
             for (int k = 0; k < damageableEntities.size(); k++) {
                 Entity damageable = damageableEntities.get(k);
 
                 if (!shareFaction(ECSMapper.faction.get(damageable), ECSMapper.faction.get(attacker))) {
                     DamageableComponent damageableComponent = ECSMapper.damage.get(damageable);
-                    TilePositionComponent damageableTilePos = ECSMapper.tilePosition.get(damageable);
+                    TileComponent damageableTilePos = ECSMapper.tile.get(damageable);
 
                     if (ECSMapper.state.get(damageable).state != StateComponent.State.DEAD) {
                         boolean attacked = false;

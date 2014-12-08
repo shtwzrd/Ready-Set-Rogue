@@ -108,7 +108,7 @@ public class MainGameScreen extends ScreenAdapter {
             skeleton.add(new TransformComponent());
             skeleton.add(new CollidableComponent());
             skeleton.add(new DamageableComponent());
-            skeleton.add(new TilePositionComponent());
+            skeleton.add(new TileComponent());
             skeleton.add(new AIControllableComponent());
             skeleton.add(new AttackerComponent());
             skeleton.add(new StateComponent());
@@ -126,8 +126,8 @@ public class MainGameScreen extends ScreenAdapter {
             int y = rand.nextInt(12) + 2;
             ECSMapper.transform.get(skeleton).position.y = y * 24;
             ECSMapper.transform.get(skeleton).position.x = x * 24;
-            ECSMapper.tilePosition.get(skeleton).y = y;
-            ECSMapper.tilePosition.get(skeleton).x = x;
+            ECSMapper.tile.get(skeleton).y = y;
+            ECSMapper.tile.get(skeleton).x = x;
         }
 
         // Crappy Debug Wizard mans
@@ -138,7 +138,7 @@ public class MainGameScreen extends ScreenAdapter {
         wizard.add(new ControllableComponent());
         wizard.add(new AttackerComponent());
         wizard.add(new DamageableComponent());
-        wizard.add(new TilePositionComponent());
+        wizard.add(new TileComponent());
         wizard.add(new StateComponent());
         wizard.add(new FactionComponent());
         wizard.add(new LevelComponent());
@@ -156,8 +156,8 @@ public class MainGameScreen extends ScreenAdapter {
 
         ECSMapper.attack.get(wizard).attackRange = 3;
 
-        ECSMapper.tilePosition.get(wizard).x = 8;
-        ECSMapper.tilePosition.get(wizard).y = 8;
+        ECSMapper.tile.get(wizard).x = 8;
+        ECSMapper.tile.get(wizard).y = 8;
         ECSMapper.transform.get(wizard).position.x = 8 * 24;
         ECSMapper.transform.get(wizard).position.y = 8 * 24;
 

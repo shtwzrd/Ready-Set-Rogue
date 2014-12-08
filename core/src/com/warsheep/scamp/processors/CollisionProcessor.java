@@ -7,13 +7,11 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.Directionality;
-import com.warsheep.scamp.processors.TileProcessor.TileBound;
 
 import java.util.List;
 
 public class CollisionProcessor extends EntitySystem {
 
-    private ImmutableArray<Entity> collidableTilePosEntities;
     private ImmutableArray<Entity> collidableTileEntities;
     private List<CollisionListener> listeners;
 
@@ -32,7 +30,6 @@ public class CollisionProcessor extends EntitySystem {
     }
 
     public void addedToEngine(Engine engine) {
-        collidableTilePosEntities = engine.getEntitiesFor(Family.all(CollidableComponent.class, TilePositionComponent.class).get());
         collidableTileEntities = engine.getEntitiesFor(Family.all(CollidableComponent.class, TileComponent.class).get());
     }
 
@@ -42,16 +39,16 @@ public class CollisionProcessor extends EntitySystem {
         boolean blocked = false;
 
         // Iterate over all collidable components to check for a collision
-        for (int i = 0; i < collidableTileEntities.size() + collidableTilePosEntities.size(); i++) {
+        for (int i = 0; i < collidableTileEntities.size(); i++) {
             Entity entityCheck;
-            TileBound tileCheck;
+            TileComponent tileCheck;
 
             if (i < collidableTileEntities.size()) {
                 entityCheck = collidableTileEntities.get(i);
                 tileCheck = ECSMapper.tile.get(entityCheck);
             } else {
-                entityCheck = collidableTilePosEntities.get(i - collidableTileEntities.size());
-                tileCheck = ECSMapper.tilePosition.get(entityCheck);
+                entityCheck = collidableTileEntities.get(i - collidableTileEntities.size());
+                tileCheck = ECSMapper.tile.get(entityCheck);
             }
 
             if (entity.getId() != entityCheck.getId()) {
@@ -72,25 +69,25 @@ public class CollisionProcessor extends EntitySystem {
         return blocked;
     }
 
-    private boolean hasCollision(int x, int y, TileBound b, Directionality dir) {
+    private boolean hasCollision(int x, int y, TileComponent b, Directionality dir) {
         switch (dir) {
             case UP:
-                if (x == b.x() && y + 1 == b.y()) {
+                if (x == b.x && y + 1 == b.y) {
                     return true;
                 }
                 break;
             case DOWN:
-                if (x == b.x() && y - 1 == b.y()) {
+                if (x == b.x && y - 1 == b.y) {
                     return true;
                 }
                 break;
             case LEFT:
-                if (x - 1 == b.x() && y == b.y()) {
+                if (x - 1 == b.x && y == b.y) {
                     return true;
                 }
                 break;
             case RIGHT:
-                if (x + 1 == b.x() && y == b.y()) {
+                if (x + 1 == b.x && y == b.y) {
                     return true;
                 }
                 break;

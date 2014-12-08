@@ -37,11 +37,11 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     }
 
     private void addAction(Entity entity, Pair<State, Directionality> pair) {
-        TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
+        TileComponent tilePos = ECSMapper.tile.get(entity);
         if (pair.getLeft() == State.MOVING) {
             if (ECSMapper.control.get(entity).movesConsumed <= ECSMapper.control.get(entity).movementBonus) {
-                if (collisions.checkMove(tilePos.x() + simulatedX,
-                        tilePos.y() + simulatedY,
+                if (collisions.checkMove(tilePos.x + simulatedX,
+                        tilePos.y + simulatedY,
                         entity, pair.getRight())) {
                     // Some visual feedback
                 } else {
