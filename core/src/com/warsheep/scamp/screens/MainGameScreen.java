@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
 import com.warsheep.scamp.Scamp;
+import com.warsheep.scamp.algorithms.BSPMapGenerator;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
@@ -21,6 +22,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
+    public static final float TURN_DURATION = 2;
     VisibilityProcessor visibilityProcessor;
     MovementProcessor movementProcessor;
     CollisionProcessor collisionProcessor;
@@ -36,6 +38,7 @@ public class MainGameScreen extends ScreenAdapter {
     Entity wizard;
     Scamp game;
     public static GameState gameState;
+    private float accumulator = 0;
 
     // Temp UI Values
     public static int damage = 0;
@@ -63,20 +66,25 @@ public class MainGameScreen extends ScreenAdapter {
         ArrayList<CollisionProcessor.CollisionListener> collisionListeners = new ArrayList();
         // Initialize processors and associate them with ecs engine
         visibilityProcessor = new VisibilityProcessor();
+
         movementProcessor = new MovementProcessor();
         combatProcessor = new CombatProcessor();
-        collisionListeners.add(movementProcessor);
-        collisionProcessor = new CollisionProcessor(collisionListeners);
-        ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
-        stateListeners.add(collisionProcessor);
-        stateListeners.add(combatProcessor);
-        stateProcessor = new StateProcessor(stateListeners);
+        aiProcessor = new AIProcessor();
         controlProcessor = new ControlProcessor();
+        ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
+        stateListeners.add(movementProcessor);
+        stateListeners.add(combatProcessor);
+        stateListeners.add(aiProcessor);
+        stateListeners.add(controlProcessor);
+        stateProcessor = new StateProcessor(stateListeners, TURN_DURATION);
+
+        collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
         tileProcessor = new TileProcessor();
-        aiProcessor = new AIProcessor();
         levelProcessor = new LevelingProcessor();
+
+
         ecs.addSystem(visibilityProcessor);
         ecs.addSystem(collisionProcessor);
         ecs.addSystem(tileProcessor);
@@ -112,9 +120,10 @@ public class MainGameScreen extends ScreenAdapter {
             skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
             skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
             skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
-            int x = rand.nextInt(12)+2;
-            int y = rand.nextInt(12)+2;
-
+//            int x = rand.nextInt(12) + 2;
+//            int y = rand.nextInt(12) + 2;
+            int x = rand.nextInt(12) + 2;
+            int y = rand.nextInt(12) + 2;
             ECSMapper.transform.get(skeleton).position.y = y * 24;
             ECSMapper.transform.get(skeleton).position.x = x * 24;
             ECSMapper.tilePosition.get(skeleton).y = y;
@@ -145,21 +154,22 @@ public class MainGameScreen extends ScreenAdapter {
         wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
         ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
 
-        ECSMapper.attack.get(wizard).attackRange = 2;
+        ECSMapper.attack.get(wizard).attackRange = 3;
 
         ECSMapper.tilePosition.get(wizard).x = 8;
         ECSMapper.tilePosition.get(wizard).y = 8;
-        ECSMapper.transform.get(wizard).position.x = 8*24;
-        ECSMapper.transform.get(wizard).position.y = 8*24;
+        ECSMapper.transform.get(wizard).position.x = 8 * 24;
+        ECSMapper.transform.get(wizard).position.y = 8 * 24;
 
         createCamera(wizard);
 
-        MapImporter mapImporter = new MapImporter();
-        mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
+        genMap();
+        //MapImporter mapImporter = new MapImporter();
+        //mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
 
-        for (Entity e : mapImporter.getEntities()) {
-            ecs.addEntity(e);
-        }
+        //for (Entity e : mapImporter.getEntities()) {
+        //    ecs.addEntity(e);
+        //}
 
         //Start calculating game time
         startTime = System.currentTimeMillis();
@@ -171,7 +181,7 @@ public class MainGameScreen extends ScreenAdapter {
         switch (gameState) {
             case GAME_RUNNING:
                 visibilityProcessor.startBatch();
-                delta = (System.currentTimeMillis() - startTime);
+                delta = ((System.currentTimeMillis() - startTime) / 1000);
                 ecs.update(delta);
                 visibilityProcessor.endBatch();
                 addPlayerStats();
@@ -188,7 +198,10 @@ public class MainGameScreen extends ScreenAdapter {
     private void addTimeCircle(float delta) {
         ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-        int size = (int) (10 - ((delta % 1000) / 100.0f));
+        if (delta - accumulator > TURN_DURATION) {
+            accumulator = delta;
+        }
+        int size = (int) (10 - (delta % 3 * 3)) - 1;
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -222,5 +235,47 @@ public class MainGameScreen extends ScreenAdapter {
         entity.add(camera);
 
         ecs.addEntity(entity);
+    }
+
+    private void genMap() {
+        BSPMapGenerator gen = new BSPMapGenerator(40, 40, 1, 3, 4);
+        byte[][] data = gen.to2DArray();
+        for(int x = 0; x < data.length; x++) {
+            for(int y = data[0].length - 1; y >= 0; y--) {
+                if(data[x][y] != ' ') {
+                    buildTile(x, data.length - y - 1, 1, (char)data[x][y]);
+                }
+            }
+        }
+    }
+
+    private void buildTile(int x, int y, int z, char type) {
+               Entity e = new Entity();
+
+        TileComponent tc = new TileComponent();
+        tc.x = x;
+        tc.y = y;
+        tc.z = z;
+
+        VisibleComponent vc = new VisibleComponent();
+
+        AssetDepot assets = AssetDepot.getInstance();
+
+        vc.originX = 12;
+        vc.originY = 12;
+
+
+        if (type == '#') {
+            CollidableComponent cc = new CollidableComponent();
+            e.add(cc);
+            vc.image = assets.fetch("world_24x24", "oryx_wall_island_stone" , 1);
+        } else {
+            vc.image = assets.fetch("world_24x24", "oryx_floor_darkgrey_stone", 1);
+        }
+
+        e.add(tc);
+        e.add(vc);
+        e.add(new TransformComponent());
+        ecs.addEntity(e);
     }
 }

@@ -2,12 +2,10 @@ package com.warsheep.scamp;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import com.warsheep.scamp.components.CollidableComponent;
-import com.warsheep.scamp.components.TileComponent;
-import com.warsheep.scamp.components.TransformComponent;
-import com.warsheep.scamp.components.VisibleComponent;
+import com.warsheep.scamp.components.*;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -65,7 +63,6 @@ public class MapImporter {
 
                 if (tilePathHandle != null && !tilePathHandle[1].equals(MAGIC_BLANK_TILE)) {
                     boolean walls = name.equals("Walls") ? true : false;
-                    System.out.println(name);
                     this.buildTile(x, y, layerLevel, tilePathHandle, walls);
                 }
 
@@ -146,7 +143,6 @@ public class MapImporter {
         this.visibleComponents.add(vc);
 
         if (wall) {
-            System.out.println("Adding collidable");
             CollidableComponent cc = new CollidableComponent();
             e.add(cc);
             this.collidableComponents.add(cc);

@@ -10,12 +10,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.Scamp;
 
+import java.util.Random;
+
 public class MainMenuScreen extends ScreenAdapter {
 
     Scamp game;
     OrthographicCamera guiCam;
     Rectangle playBounds;
     Vector3 touchPoint;
+
+    private static Random rnd = new Random();
 
     public MainMenuScreen(Scamp game) {
         this.game = game;
