@@ -66,8 +66,11 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 
                     // Attack if possible
                     if (isInAttackRange(simulatedAiPos, closestDmgTilePos, attackerComponent.attackRange)) {
-                        Pair<State, Directionality> action =
-                                new Pair<>(State.ATTACKING, approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions));
+//                        Pair<State, Directionality> action =
+//                                new Pair<>(State.ATTACKING, approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions));
+//                        this.actions.add(new Pair(aiEntity, action));
+                        // TODO: Make good
+                        Pair<State, Directionality> action = new Pair<>(State.ATTACKING, Directionality.RIGHT);
                         this.actions.add(new Pair(aiEntity, action));
                     }
                 }

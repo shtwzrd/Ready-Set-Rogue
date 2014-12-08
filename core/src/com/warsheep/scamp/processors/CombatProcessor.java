@@ -25,54 +25,73 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
 
     @Override
     public void attacking(Entity entity, StateComponent.Directionality direction) {
-        Entity attacker = entity;
-        AttackerComponent atkComp = ECSMapper.attack.get(attacker);
-        StateComponent atkState = ECSMapper.state.get(attacker);
+        StateComponent atkState = ECSMapper.state.get(entity);
 
         if (atkState.state != StateComponent.State.DEAD) {
-            // Get attackers "position"
-            TileComponent atkPos = ECSMapper.tile.get(attacker);
+            AttackerComponent atkComp = ECSMapper.attack.get(entity);
+            TileComponent atkPos = ECSMapper.tile.get(entity);
+            FactionComponent atkFaction = ECSMapper.faction.get(entity);
 
             int checkPosX = atkPos.x;
             int checkPosY = atkPos.y;
 
-            ArrayList<Entity> entitiesInPos = tileProcessor.queryByPosition(checkPosX, checkPosY);
+            for (int i = 0; i < atkComp.attackRange; i++) {
+                if (collisions.checkMove(checkPosX, checkPosY, null, direction, true)) {
+                    switch (direction) {
+                        case UP:
+                            checkPosY++;
+                            break;
+                        case DOWN:
+                            checkPosY--;
+                            break;
+                        case RIGHT:
+                            checkPosX++;
+                            break;
+                        case LEFT:
+                            checkPosX--;
+                            break;
+                    }
 
-            if (entitiesInPos != null) {
-                for (Entity damageable : entitiesInPos) {
-                    DamageableComponent dmgComp = ECSMapper.damage.get(damageable);
-                    if (dmgComp != null) {
-                        // Apply damage
-                        dmgComp.currentHealth -= atkComp.baseDamage;
-                        // Check to see if the damageable entity is dead and if it has anything to drop
-                        DropComponent dropComponent = ECSMapper.drop.get(damageable);
-                        if (dmgComp.currentHealth <= 0 && dropComponent != null) {
-                            // Check to see if exp points can be applied to attacker entity
-                            LevelComponent levelComp = ECSMapper.level.get(entity);
-                            if (levelComp != null) {
-                                levelComp.experiencePoints += dropComponent.experienceDrop;
-                                if (dropComponent.itemDrop != null) {
-                                    // TODO: Drop item
+                    ArrayList<Entity> entitiesInPos = tileProcessor.queryByPosition(checkPosX, checkPosY);
+
+                    if (entitiesInPos != null) {
+                        boolean hadDamageable = false;
+
+                        for (Entity damageable : entitiesInPos) {
+                            DamageableComponent dmgComp = ECSMapper.damage.get(damageable);
+                            FactionComponent dmgFaction = ECSMapper.faction.get(damageable);
+
+                            if (dmgComp != null && dmgFaction != null) {
+                                hadDamageable = true;
+                                if (!shareFaction(atkFaction, dmgFaction)) {
+
+                                    // Apply damage
+                                    System.out.println("Hit! ");
+                                    dmgComp.currentHealth -= atkComp.baseDamage;
+
+                                    // Check to see if the damageable entity is dead and if it has anything to drop
+                                    DropComponent dropComponent = ECSMapper.drop.get(damageable);
+                                    if (dmgComp.currentHealth <= 0 && dropComponent != null) {
+
+                                        // Check to see if exp points can be applied to attacker entity
+                                        LevelComponent levelComp = ECSMapper.level.get(entity);
+                                        if (levelComp != null) {
+                                            levelComp.experiencePoints += dropComponent.experienceDrop;
+                                            if (dropComponent.itemDrop != null) {
+                                                // TODO: Drop item
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
+
+                        // If the attack collided with something that was not damageable, stop the attack
+                        if (!hadDamageable) {
+                            break;
+                        }
                     }
                 }
-            }
-
-            switch (direction) {
-                case UP:
-                    checkPosY++;
-                    break;
-                case DOWN:
-                    checkPosY--;
-                    break;
-                case RIGHT:
-                    checkPosX++;
-                    break;
-                case LEFT:
-                    checkPosX--;
-                    break;
             }
 
             atkState.state = StateComponent.State.IDLE;

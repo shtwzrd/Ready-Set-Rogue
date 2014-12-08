@@ -34,7 +34,7 @@ public class CollisionProcessor extends EntitySystem {
         tileProcessor = engine.getSystem(TileProcessor.class);
     }
 
-    public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction) {
+    public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction, boolean attack) {
         boolean blocked = false;
 
         int checkTileX = x;
@@ -70,12 +70,14 @@ public class CollisionProcessor extends EntitySystem {
             }
         }
 
-        // Notify all Collision Listeners of the result
-        for (CollisionListener listener : this.listeners) {
-            if (blocked) {
-                listener.collidedMove(entity, direction);
-            } else {
-                listener.successfulMove(entity, direction);
+        if (!attack) {
+            // Notify all Collision Listeners of the result
+            for (CollisionListener listener : this.listeners) {
+                if (blocked) {
+                    listener.collidedMove(entity, direction);
+                } else {
+                    listener.successfulMove(entity, direction);
+                }
             }
         }
 

@@ -22,7 +22,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
-    public static final float TURN_DURATION = 2;
+    public static final float TURN_DURATION = 0.5f;
     public static final int MAP_WIDTH = 40;
     public static final int MAP_HEIGHT = 40;
     VisibilityProcessor visibilityProcessor;
@@ -158,7 +158,7 @@ public class MainGameScreen extends ScreenAdapter {
         wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
         ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
 
-        ECSMapper.attack.get(wizard).attackRange = 3;
+        ECSMapper.attack.get(wizard).attackRange = 2;
 
         ECSMapper.tile.get(wizard).x = 8;
         ECSMapper.tile.get(wizard).y = 8;

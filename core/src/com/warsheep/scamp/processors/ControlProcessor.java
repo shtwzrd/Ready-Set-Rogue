@@ -42,7 +42,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
             if (ECSMapper.control.get(entity).movesConsumed <= ECSMapper.control.get(entity).movementBonus) {
                 if (collisions.checkMove(tilePos.x + simulatedX,
                         tilePos.y + simulatedY,
-                        entity, pair.getRight())) {
+                        entity, pair.getRight(), false)) {
                     System.out.println("Blocked");
                     // Some visual feedback
                 } else {
