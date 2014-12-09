@@ -16,6 +16,7 @@ public class PrefabFactory {
     private Json json = new Json();
     private Map<String, ArrayList<Component>> prefabs = new HashMap<>();
     private Cloner cloner = new Cloner();
+    private CollidableComponent collidable = new CollidableComponent();
 
     public Entity buildEntity(String handle) {
         if (!this.prefabs.containsKey(handle)) {
@@ -47,7 +48,7 @@ public class PrefabFactory {
             case CameraComponent:
                 return new CameraComponent();
             case CollidableComponent:
-                return new CollidableComponent();
+                return collidable;
             case ControllableComponent:
                 return cloner.shallowClone(c);
             case DamageableComponent:
@@ -65,7 +66,7 @@ public class PrefabFactory {
             case StateComponent:
                 return new StateComponent();
             case TileComponent:
-                return new TileComponent();
+                return cloner.deepClone(c);
             case TransformComponent:
                 return cloner.deepClone(c);
             case VisibleComponent:
