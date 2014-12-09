@@ -23,7 +23,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
-    public static final float TURN_DURATION = 2;
+    public static final float TURN_DURATION = 0.5f;
     public static final int MAP_WIDTH = 40;
     public static final int MAP_HEIGHT = 40;
     VisibilityProcessor visibilityProcessor;
@@ -38,7 +38,6 @@ public class MainGameScreen extends ScreenAdapter {
     AIProcessor aiProcessor;
     LevelingProcessor levelProcessor;
 
-    Entity wizard;
     Scamp game;
     public static GameState gameState;
     private float accumulator = 0;
@@ -87,13 +86,12 @@ public class MainGameScreen extends ScreenAdapter {
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
-
         levelProcessor = new LevelingProcessor();
 
 
+        ecs.addSystem(tileProcessor);
         ecs.addSystem(visibilityProcessor);
         ecs.addSystem(collisionProcessor);
-        ecs.addSystem(tileProcessor);
         ecs.addSystem(movementProcessor);
         ecs.addSystem(cameraProcessor);
         ecs.addSystem(deathProcessor);
@@ -104,10 +102,9 @@ public class MainGameScreen extends ScreenAdapter {
         ecs.addSystem(levelProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
 
-        AssetDepot assets = AssetDepot.getInstance();
-
         PrefabFactory fab = new PrefabFactory();
         fab.buildEntity("creatures/skeleton");
+
         // Skeleton blocker of doom
         Random rand = new Random();
         for (int i = 1; i < 9; i++) {
@@ -118,35 +115,13 @@ public class MainGameScreen extends ScreenAdapter {
         }
 
         // Crappy Debug Wizard mans
-        wizard = new Entity();
-        wizard.add(new VisibleComponent());
-        wizard.add(new TransformComponent());
-        wizard.add(new CollidableComponent());
-        wizard.add(new ControllableComponent());
-        wizard.add(new AttackerComponent());
-        wizard.add(new DamageableComponent());
-        wizard.add(new TileComponent());
-        wizard.add(new StateComponent());
-        wizard.add(new FactionComponent());
-        wizard.add(new LevelComponent());
-        wizard.add(new InventoryComponent());
+        Entity wizard = fab.buildEntity("creatures/debugwizard");
         ecs.addEntity(wizard);
-
-        DamageableComponent dmgComp = ECSMapper.damage.get(wizard);
-        dmgComp.essential = true;
-
-        VisibleComponent wizardVisComp = ECSMapper.visible.get(wizard);
-        wizardVisComp.image = assets.fetchImage("creatures_24x24", "oryx_m_wizard");
-        wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
-        wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
-        ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
-
-        ECSMapper.attack.get(wizard).attackRange = 3;
 
         ECSMapper.tile.get(wizard).x = 8;
         ECSMapper.tile.get(wizard).y = 8;
-        //ECSMapper.transform.get(wizard).position.x = 8 * 24;
-        //ECSMapper.transform.get(wizard).position.y = 8 * 24;
+        ECSMapper.transform.get(wizard).position.x = 8 * 24;
+        ECSMapper.transform.get(wizard).position.y = 8 * 24;
 
         createCamera(wizard);
 
@@ -161,7 +136,6 @@ public class MainGameScreen extends ScreenAdapter {
 
         //Start calculating game time
         startTime = System.currentTimeMillis();
-
     }
 
     @Override

@@ -3,17 +3,18 @@ package com.warsheep.scamp.processors;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.Directionality;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CollisionProcessor extends EntitySystem {
 
-    private ImmutableArray<Entity> collidableTileEntities;
     private List<CollisionListener> listeners;
+    private TileProcessor tileProcessor;
+
 
     public static interface CollisionListener {
         default public void successfulMove(Entity entity, Directionality direction) {
@@ -30,71 +31,57 @@ public class CollisionProcessor extends EntitySystem {
     }
 
     public void addedToEngine(Engine engine) {
-        collidableTileEntities = engine.getEntitiesFor(Family.all(CollidableComponent.class, TileComponent.class).get());
+        tileProcessor = engine.getSystem(TileProcessor.class);
     }
 
-    public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction) {
-        Directionality dir = direction;
-
+    public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction, boolean attack) {
         boolean blocked = false;
 
-        // Iterate over all collidable components to check for a collision
-        for (int i = 0; i < collidableTileEntities.size(); i++) {
-            Entity entityCheck;
-            TileComponent tileCheck;
+        int checkTileX = x;
+        int checkTileY = y;
 
-            if (i < collidableTileEntities.size()) {
-                entityCheck = collidableTileEntities.get(i);
-                tileCheck = ECSMapper.tile.get(entityCheck);
-            } else {
-                entityCheck = collidableTileEntities.get(i - collidableTileEntities.size());
-                tileCheck = ECSMapper.tile.get(entityCheck);
-            }
+        // Figure out what tile position to check for collision
+        switch (direction) {
+            case UP:
+                checkTileY++;
+                break;
+            case DOWN:
+                checkTileY--;
+                break;
+            case LEFT:
+                checkTileX--;
+                break;
+            case RIGHT:
+                checkTileX++;
+                break;
+            default:
+                break;
+        }
 
-            if (entity.getId() != entityCheck.getId()) {
-                if (hasCollision(x, y, tileCheck, dir)) {
+        // Get all entities on Tile
+        ArrayList<Entity> entitiesInPos = tileProcessor.queryByPosition(checkTileX, checkTileY);
+
+        // Check for collidable component in tile
+        if (entitiesInPos != null) {
+            for (Entity e : entitiesInPos) {
+                if (ECSMapper.collide.get(e) != null) {
                     blocked = true;
                 }
             }
         }
 
-        // Notify all Collision Listeners of the result
-        for (CollisionListener listener : this.listeners) {
-            if (blocked) {
-                listener.collidedMove(entity, direction);
-            } else {
-                listener.successfulMove(entity, direction);
+        if (!attack) {
+            // Notify all Collision Listeners of the result
+            for (CollisionListener listener : this.listeners) {
+                if (blocked) {
+                    listener.collidedMove(entity, direction);
+                } else {
+                    listener.successfulMove(entity, direction);
+                }
             }
         }
-        return blocked;
-    }
 
-    private boolean hasCollision(int x, int y, TileComponent b, Directionality dir) {
-        switch (dir) {
-            case UP:
-                if (x == b.x && y + 1 == b.y) {
-                    return true;
-                }
-                break;
-            case DOWN:
-                if (x == b.x && y - 1 == b.y) {
-                    return true;
-                }
-                break;
-            case LEFT:
-                if (x - 1 == b.x && y == b.y) {
-                    return true;
-                }
-                break;
-            case RIGHT:
-                if (x + 1 == b.x && y == b.y) {
-                    return true;
-                }
-                break;
-            default:
-                break;
-        }
-        return false;
+        return blocked;
     }
 
 }
