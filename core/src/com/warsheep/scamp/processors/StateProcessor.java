@@ -9,6 +9,7 @@ import com.warsheep.scamp.adt.Pair;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.*;
+import com.warsheep.scamp.screens.MainGameScreen;
 
 import java.util.*;
 
@@ -111,6 +112,10 @@ public class StateProcessor extends EntitySystem {
     }
 
     private void resolveTurn() {
+        MainGameScreen.moveToPos.x = 0;
+        MainGameScreen.moveToPos.y = 0;
+        MainGameScreen.attackPos.x = 0;
+        MainGameScreen.attackPos.y = 0;
         for (Entity stateful : this.statefuls) {
             State state = ECSMapper.state.get(stateful).state;
             boolean inProgress = ECSMapper.state.get(stateful).inProgress;

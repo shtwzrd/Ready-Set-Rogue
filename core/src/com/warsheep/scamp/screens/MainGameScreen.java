@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
 import com.warsheep.scamp.PrefabFactory;
@@ -17,15 +18,16 @@ import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
-    public static final float TURN_DURATION = 0.9f;
+    public static final float TURN_DURATION = 2.0f;
     public static final int MAP_WIDTH = 40;
     public static final int MAP_HEIGHT = 40;
+    public static Vector3 moveToPos = new Vector3();
+    public static Vector3 attackPos = new Vector3();
     VisibilityProcessor visibilityProcessor;
     MovementProcessor movementProcessor;
     CollisionProcessor collisionProcessor;
@@ -155,12 +157,32 @@ public class MainGameScreen extends ScreenAdapter {
                 visibilityProcessor.endBatch();
                 addPlayerStats();
                 addTimeCircle(delta);
+                addMoveToPos();
                 break;
             case GAME_OVER:
                 game.setScreen(new MainMenuScreen(game));
                 break;
             default:
                 break;
+        }
+    }
+
+    private void addMoveToPos() {
+        boolean attackHappened = attackPos.x != 0 || attackPos.y != 0;
+        boolean moveHappened = moveToPos.x != 0 || moveToPos.y != 0;
+        if (attackHappened || moveHappened) {
+            SpriteBatch spriteBatch = new SpriteBatch();
+            BitmapFont font = new BitmapFont();
+
+            spriteBatch.enableBlending();
+            spriteBatch.begin();
+            if (moveHappened) {
+                font.draw(spriteBatch, "X", moveToPos.x * 24 + Gdx.graphics.getWidth() / 2 - 5, moveToPos.y * 24 + Gdx.graphics.getHeight() / 2);
+            }
+            if (attackHappened) {
+                font.draw(spriteBatch, "O", attackPos.x * 24 + Gdx.graphics.getWidth() / 2 - 5, attackPos.y * 24 + Gdx.graphics.getHeight() / 2);
+            }
+            spriteBatch.end();
         }
     }
 

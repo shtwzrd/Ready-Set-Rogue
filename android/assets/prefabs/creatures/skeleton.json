@@ -9,7 +9,8 @@
         "originY": 12
       },
       {
-       "class": "com.warsheep.scamp.components.DamageableComponent"
+       "class": "com.warsheep.scamp.components.DamageableComponent",
+        "currentHealth": 1
       },
       {
        "class": "com.warsheep.scamp.components.AttackerComponent"

@@ -49,24 +49,47 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                     actions.add(pair);
                     switch (pair.getRight()) {
                         case UP:
+                            if (hasAttacked) MainGameScreen.attackPos.y++;
                             simulatedY++;
                             break;
                         case DOWN:
+                            if (hasAttacked) MainGameScreen.attackPos.y--;
                             simulatedY--;
                             break;
                         case LEFT:
+                            if (hasAttacked) MainGameScreen.attackPos.x--;
                             simulatedX--;
                             break;
                         case RIGHT:
+                            if (hasAttacked) MainGameScreen.attackPos.x++;
                             simulatedX++;
                             break;
                     }
+                    MainGameScreen.moveToPos.x = simulatedX;
+                    MainGameScreen.moveToPos.y = simulatedY;
                     ECSMapper.control.get(entity).movesConsumed++;
                 }
             }
         }
         if (pair.getLeft() == State.ATTACKING) {
             if (!hasAttacked) {
+                MainGameScreen.attackPos.x = simulatedX;
+                MainGameScreen.attackPos.y = simulatedY;
+                switch (pair.getRight()) {
+                    case UP:
+                        MainGameScreen.attackPos.y++;
+                        break;
+                    case DOWN:
+                        MainGameScreen.attackPos.y--;
+                        break;
+                    case LEFT:
+                        MainGameScreen.attackPos.x--;
+                        break;
+                    case RIGHT:
+                        MainGameScreen.attackPos.x++;
+                        break;
+                }
+
                 actions.add(pair);
                 hasAttacked = true;
             }
