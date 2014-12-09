@@ -52,7 +52,7 @@ public class VisibilityProcessor extends SortedIteratingSystem {
                 v.originX, v.originY,
                 v.image.originalWidth, v.image.originalHeight,
                 trans.scale.x, trans.scale.y,
-                trans.rotation, true);
+                trans.rotation);
 
     }
 

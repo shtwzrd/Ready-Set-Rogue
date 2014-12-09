@@ -67,7 +67,7 @@ public class PrefabFactory {
             case TileComponent:
                 return new TileComponent();
             case TransformComponent:
-                return new TransformComponent();
+                return cloner.deepClone(c);
             case VisibleComponent:
                 return cloner.shallowClone(c);
             default:

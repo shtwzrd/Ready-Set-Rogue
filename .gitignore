@@ -63,4 +63,5 @@ build/
 .DS_Store
 
 ## Can't push our assets to a public repo due to licensing
-android/assets
+android/assets/world_24x24
+android/assets/creatures_24x24

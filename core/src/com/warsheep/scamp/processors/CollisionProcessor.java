@@ -35,6 +35,9 @@ public class CollisionProcessor extends EntitySystem {
     }
 
     public boolean checkMove(int x, int y, Entity entity, StateComponent.Directionality direction, boolean attack) {
+        if(!attack && !ECSMapper.collide.has(entity)) {
+            return false;
+        }
         boolean blocked = false;
 
         int checkTileX = x;

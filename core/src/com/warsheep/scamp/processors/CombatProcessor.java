@@ -36,7 +36,7 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
             int checkPosY = atkPos.y;
 
             for (int i = 0; i < atkComp.attackRange; i++) {
-                if (collisions.checkMove(checkPosX, checkPosY, null, direction, true)) {
+                if (collisions.checkMove(checkPosX, checkPosY, entity, direction, true)) {
                     switch (direction) {
                         case UP:
                             checkPosY++;

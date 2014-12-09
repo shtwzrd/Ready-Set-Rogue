@@ -60,8 +60,8 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         }
         */
         for (Vector3 pos : mov.target) {
-            trans.position.x = pos.x;
-            trans.position.y = pos.y;
+            trans.position.x = pos.x + trans.xOffset;
+            trans.position.y = pos.y + trans.yOffset;
         }
         entity.remove(MovementComponent.class);
         state.state = StateComponent.State.IDLE;

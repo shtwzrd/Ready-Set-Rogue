@@ -23,7 +23,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
-    public static final float TURN_DURATION = 0.5f;
+    public static final float TURN_DURATION = 0.9f;
     public static final int MAP_WIDTH = 40;
     public static final int MAP_HEIGHT = 40;
     VisibilityProcessor visibilityProcessor;
@@ -107,8 +107,15 @@ public class MainGameScreen extends ScreenAdapter {
 
         // Skeleton blocker of doom
         Random rand = new Random();
-        for (int i = 1; i < 9; i++) {
+        for (int i = 1; i < 4; i++) {
             Entity skeleton = fab.buildEntity("creatures/skeleton");
+            ECSMapper.tile.get(skeleton).x = rand.nextInt(12 - 6) + 1;
+            ECSMapper.tile.get(skeleton).y = rand.nextInt(12 - 6) + 1;
+            ecs.addEntity(skeleton);
+        }
+
+        for (int i = 1; i < 2; i++) {
+            Entity skeleton = fab.buildEntity("creatures/ghost");
             ECSMapper.tile.get(skeleton).x = rand.nextInt(12 - 6) + 1;
             ECSMapper.tile.get(skeleton).y = rand.nextInt(12 - 6) + 1;
             ecs.addEntity(skeleton);
