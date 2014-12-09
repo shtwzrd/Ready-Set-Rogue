@@ -31,6 +31,9 @@
       ]
     },
     {
+      "class": "com.warsheep.scamp.components.LevelComponent"
+    },
+    {
       "class": "com.warsheep.scamp.components.CollidableComponent"
     },
     {
