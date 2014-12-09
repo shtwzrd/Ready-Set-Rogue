@@ -9,6 +9,9 @@
       "originY": 0
     },
     {
+      "class": "com.warsheep.scamp.components.AnimatableComponent"
+    },
+    {
       "class": "com.warsheep.scamp.components.ControllableComponent",
       "movementBonus": 5
     },

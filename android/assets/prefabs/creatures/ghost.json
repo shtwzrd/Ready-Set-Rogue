@@ -12,6 +12,9 @@
       "class": "com.warsheep.scamp.components.DamageableComponent"
     },
     {
+      "class": "com.warsheep.scamp.components.AnimatableComponent"
+    },
+    {
       "class": "com.warsheep.scamp.components.AttackerComponent"
     },
     {

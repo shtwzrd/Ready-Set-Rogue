@@ -78,6 +78,7 @@ public class PrefabFactory {
 
     private enum CLASS {
         AIControllableComponent,
+        AnimatableComponent,
         AttackerComponent,
         CameraComponent,
         CollidableComponent,

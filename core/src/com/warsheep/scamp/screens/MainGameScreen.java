@@ -39,6 +39,7 @@ public class MainGameScreen extends ScreenAdapter {
     TileProcessor tileProcessor;
     AIProcessor aiProcessor;
     LevelingProcessor levelProcessor;
+    AnimationProcessor animationProcessor;
 
     Scamp game;
     public static GameState gameState;
@@ -89,6 +90,7 @@ public class MainGameScreen extends ScreenAdapter {
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
         levelProcessor = new LevelingProcessor();
+        animationProcessor = new AnimationProcessor();
 
 
         ecs.addSystem(tileProcessor);
@@ -102,6 +104,7 @@ public class MainGameScreen extends ScreenAdapter {
         ecs.addSystem(aiProcessor);
         ecs.addSystem(controlProcessor);
         ecs.addSystem(levelProcessor);
+        ecs.addSystem(animationProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
 
         PrefabFactory fab = new PrefabFactory();

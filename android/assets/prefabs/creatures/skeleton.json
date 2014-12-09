@@ -1,42 +1,45 @@
 {
   "name": "skeleton",
   "components": [
-      {
-        "class": "com.warsheep.scamp.components.VisibleComponent",
-        "dir": "creatures_24x24",
-        "file": "oryx_n_skeleton",
-        "originX": 12,
-        "originY": 12
-      },
-      {
-       "class": "com.warsheep.scamp.components.DamageableComponent",
-        "currentHealth": 1
-      },
-      {
-       "class": "com.warsheep.scamp.components.AttackerComponent"
-      },
-      {
-       "class": "com.warsheep.scamp.components.DropComponent",
-       "experience": 100
-      },
-      {
-       "class": "com.warsheep.scamp.components.FactionComponent"
-      },
-      {
-       "class": "com.warsheep.scamp.components.CollidableComponent"
-      },
-      {
-       "class": "com.warsheep.scamp.components.AIControllableComponent"
-      },
-      {
-       "class": "com.warsheep.scamp.components.StateComponent"
-      },
-      {
-       "class": "com.warsheep.scamp.components.TileComponent"
-      },
-      {
-       "class": "com.warsheep.scamp.components.TransformComponent",
-       "yOffset": 5
-      }
-    ]
+    {
+      "class": "com.warsheep.scamp.components.VisibleComponent",
+      "dir": "creatures_24x24",
+      "file": "oryx_n_skeleton",
+      "originX": 12,
+      "originY": 12
+    },
+    {
+      "class": "com.warsheep.scamp.components.DamageableComponent",
+      "currentHealth": 1
+    },
+    {
+      "class": "com.warsheep.scamp.components.AnimatableComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.AttackerComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.DropComponent",
+      "experience": 100
+    },
+    {
+      "class": "com.warsheep.scamp.components.FactionComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.CollidableComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.AIControllableComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.StateComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.TileComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.TransformComponent",
+      "yOffset": 5
+    }
+  ]
 }

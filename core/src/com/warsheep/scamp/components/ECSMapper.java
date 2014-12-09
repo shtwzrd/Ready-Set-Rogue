@@ -12,6 +12,9 @@ public class ECSMapper {
     public static final ComponentMapper<VisibleComponent> visible =
             ComponentMapper.getFor(VisibleComponent.class);
 
+    public static final ComponentMapper<AnimatableComponent> animatable =
+            ComponentMapper.getFor(AnimatableComponent.class);
+
     public static final ComponentMapper<TransformComponent> transform =
             ComponentMapper.getFor(TransformComponent.class);
 

@@ -47,6 +47,7 @@ public class VisibilityProcessor extends SortedIteratingSystem {
         }
         // TODO: Transform world coords to screen coords
         trans = ECSMapper.transform.get(entity);
+
         batch.draw(v.image,
                 trans.position.x, trans.position.y,
                 v.originX, v.originY,
