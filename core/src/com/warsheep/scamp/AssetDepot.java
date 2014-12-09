@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AssetDepot {
-    public static final String MAP_PATH = "prefabs/maps/chamber-of-secrets.json";
+    public static final String MAP_PATH = "prefabs/maps/test_level.json";
 
     private static final String[] LOAD_ON_START = {"creatures_24x24", "world_24x24"};
     private Map<String, TextureAtlas> textures;
