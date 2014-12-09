@@ -1,6 +1,7 @@
 package com.warsheep.scamp.processors;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.Scamp;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.TransformComponent;
@@ -20,6 +22,7 @@ public class VisibilityProcessor extends SortedIteratingSystem {
     private OrthographicCamera camera;
     private TransformComponent trans;
     private SpriteBatch batch;
+    private AssetDepot assets;
 
     public VisibilityProcessor() {
         super(Family.all(VisibleComponent.class).get(), new ZComparator());
@@ -27,12 +30,16 @@ public class VisibilityProcessor extends SortedIteratingSystem {
 
         this.camera = new OrthographicCamera(Scamp.V_WIDTH, Scamp.V_HEIGHT);
         this.camera.position.set(Scamp.V_WIDTH / 2, Scamp.V_HEIGHT / 2, 0);
+        this.assets = AssetDepot.getInstance();
     }
 
     @Override
     public void processEntity(Entity entity, float deltaTime) {
 
         VisibleComponent v = ECSMapper.visible.get(entity);
+        if (v.image == null) {
+            v.image = assets.fetchImage(v.dir, v.file);
+        }
         if (v.color != Color.WHITE) {
             batch.setColor(v.color);
         } else {

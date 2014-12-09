@@ -7,6 +7,8 @@ public class VisibleComponent extends Component {
 
     public TextureAtlas.AtlasRegion image;
     public Color color = Color.WHITE;
+    public String dir;
+    public String file;
 
     // origin dictates where the image is anchored,
     // for the purposes of rotation and scaling

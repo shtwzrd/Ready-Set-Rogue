@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
+import com.warsheep.scamp.PrefabFactory;
 import com.warsheep.scamp.Scamp;
 import com.warsheep.scamp.algorithms.BSPMapGenerator;
 import com.warsheep.scamp.components.*;
@@ -105,34 +106,15 @@ public class MainGameScreen extends ScreenAdapter {
 
         AssetDepot assets = AssetDepot.getInstance();
 
+        PrefabFactory fab = new PrefabFactory();
+        fab.buildEntity("creatures/skeleton");
         // Skeleton blocker of doom
         Random rand = new Random();
-        for (int i = 1; i < 10; i++) {
-            Entity skeleton = new Entity();
-            skeleton.add(new VisibleComponent());
-            skeleton.add(new TransformComponent());
-            skeleton.add(new CollidableComponent());
-            skeleton.add(new DamageableComponent());
-            skeleton.add(new TileComponent());
-            skeleton.add(new AIControllableComponent());
-            skeleton.add(new AttackerComponent());
-            skeleton.add(new StateComponent());
-            skeleton.add(new FactionComponent());
-            skeleton.add(new DropComponent());
-            ECSMapper.drop.get(skeleton).experienceDrop = 100;
+        for (int i = 1; i < 9; i++) {
+            Entity skeleton = fab.buildEntity("creatures/skeleton");
+            ECSMapper.tile.get(skeleton).x = rand.nextInt(12 - 6) + 1;
+            ECSMapper.tile.get(skeleton).y = rand.nextInt(12 - 6) + 1;
             ecs.addEntity(skeleton);
-            VisibleComponent skeletonVisComp = ECSMapper.visible.get(skeleton);
-            skeletonVisComp.image = assets.fetch("creatures_24x24", "oryx_n_skeleton");
-            skeletonVisComp.originY = skeletonVisComp.image.getRegionHeight() / 2;
-            skeletonVisComp.originX = skeletonVisComp.image.getRegionWidth() / 2;
-//            int x = rand.nextInt(12) + 2;
-//            int y = rand.nextInt(12) + 2;
-            int x = rand.nextInt(12) + 2;
-            int y = rand.nextInt(12) + 2;
-            ECSMapper.transform.get(skeleton).position.y = y * 24;
-            ECSMapper.transform.get(skeleton).position.x = x * 24;
-            ECSMapper.tile.get(skeleton).y = y;
-            ECSMapper.tile.get(skeleton).x = x;
         }
 
         // Crappy Debug Wizard mans
@@ -154,7 +136,7 @@ public class MainGameScreen extends ScreenAdapter {
         dmgComp.essential = true;
 
         VisibleComponent wizardVisComp = ECSMapper.visible.get(wizard);
-        wizardVisComp.image = assets.fetch("creatures_24x24", "oryx_m_wizard");
+        wizardVisComp.image = assets.fetchImage("creatures_24x24", "oryx_m_wizard");
         wizardVisComp.originX = wizardVisComp.image.getRegionWidth() / 2;
         wizardVisComp.originY = wizardVisComp.image.getRegionHeight() / 2;
         ECSMapper.faction.get(wizard).factions = Arrays.asList(FactionComponent.Faction.GOOD);
@@ -163,12 +145,13 @@ public class MainGameScreen extends ScreenAdapter {
 
         ECSMapper.tile.get(wizard).x = 8;
         ECSMapper.tile.get(wizard).y = 8;
-        ECSMapper.transform.get(wizard).position.x = 8 * 24;
-        ECSMapper.transform.get(wizard).position.y = 8 * 24;
+        //ECSMapper.transform.get(wizard).position.x = 8 * 24;
+        //ECSMapper.transform.get(wizard).position.y = 8 * 24;
 
         createCamera(wizard);
 
-       // genMap();
+
+        // genMap();
         MapImporter mapImporter = new MapImporter();
         mapImporter.loadTiledMapJson(AssetDepot.MAP_PATH);
 
@@ -245,17 +228,17 @@ public class MainGameScreen extends ScreenAdapter {
     private void genMap() {
         BSPMapGenerator gen = new BSPMapGenerator(MAP_WIDTH, MAP_HEIGHT, 1, 3, 4);
         byte[][] data = gen.to2DArray();
-        for(int x = 0; x < data.length; x++) {
-            for(int y = data[0].length - 1; y >= 0; y--) {
-                if(data[x][y] != ' ') {
-                    buildTile(x, data.length - y - 1, 1, (char)data[x][y]);
+        for (int x = 0; x < data.length; x++) {
+            for (int y = data[0].length - 1; y >= 0; y--) {
+                if (data[x][y] != ' ') {
+                    buildTile(x, data.length - y - 1, 1, (char) data[x][y]);
                 }
             }
         }
     }
 
     private void buildTile(int x, int y, int z, char type) {
-               Entity e = new Entity();
+        Entity e = new Entity();
 
         TileComponent tc = new TileComponent();
         tc.x = x;
@@ -269,13 +252,12 @@ public class MainGameScreen extends ScreenAdapter {
         vc.originX = 12;
         vc.originY = 12;
 
-
         if (type == '#') {
             CollidableComponent cc = new CollidableComponent();
             e.add(cc);
-            vc.image = assets.fetch("world_24x24", "oryx_wall_island_stone" , 1);
+            vc.image = assets.fetchImage("world_24x24", "oryx_wall_island_stone", 1);
         } else {
-            vc.image = assets.fetch("world_24x24", "oryx_floor_darkgrey_stone", 1);
+            vc.image = assets.fetchImage("world_24x24", "oryx_floor_darkgrey_stone", 1);
         }
 
         e.add(tc);

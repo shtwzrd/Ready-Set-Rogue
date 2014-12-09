@@ -136,7 +136,7 @@ public class MapImporter {
 
         AssetDepot assets = AssetDepot.getInstance();
 
-        vc.image = assets.fetch(tilePathHandle[0], imageHandle, Integer.parseInt(imageIndex));
+        vc.image = assets.fetchImage(tilePathHandle[0], imageHandle, Integer.parseInt(imageIndex));
         vc.originX = this.tileSize / 2;
         vc.originY = this.tileSize / 2;
 

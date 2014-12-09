@@ -105,7 +105,7 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
                                 // Check to see if exp points can be applied to attacker entity
                                 LevelComponent levelComp = ECSMapper.level.get(entity);
                                 if (levelComp != null) {
-                                    levelComp.experiencePoints += dropComponent.experienceDrop;
+                                    levelComp.experiencePoints += dropComponent.experience;
                                     if (dropComponent.itemDrop != null) {
                                         // TODO: Drop item
                                     }

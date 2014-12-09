@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 
 public class DropComponent extends Component {
 
-    public int experienceDrop = 0;
+    public int experience = 0;
     public Entity itemDrop;
 
 }

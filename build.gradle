@@ -96,6 +96,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
+        compile 'uk.com.robust-it:cloning:1.9.1'
     }
 }
 

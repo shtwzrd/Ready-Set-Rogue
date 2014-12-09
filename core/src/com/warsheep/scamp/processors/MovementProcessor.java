@@ -114,6 +114,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             for (MovementListener listener : listeners) {
                 listener.tileMove(entity, oldX, oldY);
             }
+            System.out.println(entity.getId() + " moved from " + oldX + ", " + oldY + " to " + x + ", " + y);
         }
         entity.add(mov);
     }
