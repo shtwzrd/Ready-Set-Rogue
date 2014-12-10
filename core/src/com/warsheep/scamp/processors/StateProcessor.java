@@ -5,6 +5,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Sort;
+import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.adt.Pair;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
@@ -19,39 +23,41 @@ public class StateProcessor extends EntitySystem {
     private ImmutableArray<Entity> statefuls;
     private float interval;
     private float accumulator = interval;
+    private Array<StateSignal> actionQueue;
+    private Array<StateSignal> moves;
+    private Array<StateSignal> attacks;
+    private MovementActionComparator actionSorter = new MovementActionComparator();
 
 
     public static interface StateListener {
 
         // Do nothing defaults
         default public void idle(Entity entity) {
-            ECSMapper.state.get(entity).inProgress = false;
         }
 
         default public void dead(Entity entity) {
-            ECSMapper.state.get(entity).inProgress = false;
         }
 
         default public void hurt(Entity entity) {
-            ECSMapper.state.get(entity).inProgress = false;
         }
 
-        default public void attacking(Entity entity, Directionality direction) {
-            ECSMapper.state.get(entity).inProgress = false;
+        default public void attacking(Array<StateSignal> actions) {
         }
 
-        default public void moving(Entity entity, Queue<Directionality> direction) {
-            ECSMapper.state.get(entity).inProgress = false;
+        default public void moving(Array<StateSignal> actions) {
         }
 
-        default public Queue<Pair<Entity, Pair<State, Directionality>>> turnEnd() {
-            return new ArrayDeque<>();
+        default public Array<StateSignal> turnEnd() {
+            return new Array<>();
         }
     }
 
     public StateProcessor(List<StateListener> listeners, float interval) {
         this.listeners = listeners;
         this.interval = interval;
+        this.actionQueue = new Array<>();
+        this.moves = new Array<>();
+        this.attacks = new Array<>();
     }
 
     @Override
@@ -75,38 +81,28 @@ public class StateProcessor extends EntitySystem {
     }
 
     private void pullActions() {
-        Queue<Pair<Entity, Pair<State, Directionality>>> actionQueue;
-        Map<Entity, Queue<Directionality>> movesMap = new HashMap<>();
-        Map<Entity, Directionality> attacksMap = new HashMap<>();
+        moves = new Array();
+        attacks = new Array();
+        actionQueue = new Array();
 
         for (StateListener listener : this.listeners) {
-            actionQueue = listener.turnEnd();
+            actionQueue.addAll(listener.turnEnd());
+        }
 
-            if (actionQueue != null) {
-                Entity e = null;
-
-                for (Pair<Entity, Pair<State, Directionality>> action : actionQueue) {
-                    if (action.getRight().getLeft() == State.MOVING) {
-                        e = action.getLeft();
-                        if(!movesMap.containsKey(e)) {
-                            movesMap.put(e, new ArrayDeque<>());
-                        }
-                        movesMap.get(e).add(action.getRight().getRight());
-                    }
-                    if (action.getRight().getLeft() == State.ATTACKING) {
-                        e = action.getLeft();
-                        attacksMap.put(e, action.getRight().getRight());
-                    }
-                }
+        for (StateSignal action : actionQueue) {
+            if (action.state == State.MOVING) {
+                moves.add(action);
+            } else if (action.state == State.ATTACKING) {
+                attacks.add(action);
             }
         }
+
+        Sort sort = Sort.instance();
+        sort.sort(moves, this.actionSorter);
+
         for (StateListener movers : this.listeners) {
-            for (Map.Entry<Entity, Queue<Directionality>> m : movesMap.entrySet()) {
-                movers.moving(m.getKey(), m.getValue());
-            }
-            for (Map.Entry<Entity, Directionality> a : attacksMap.entrySet()) {
-                movers.attacking(a.getKey(), a.getValue());
-            }
+            movers.moving(moves);
+            movers.attacking(attacks);
         }
 
     }
@@ -118,35 +114,47 @@ public class StateProcessor extends EntitySystem {
         MainGameScreen.attackPos.y = 0;
         for (Entity stateful : this.statefuls) {
             State state = ECSMapper.state.get(stateful).state;
-            boolean inProgress = ECSMapper.state.get(stateful).inProgress;
-            if (!inProgress) {
-                ECSMapper.state.get(stateful).inProgress = true;
-                Directionality direction = ECSMapper.state.get(stateful).direction;
-                switch (state) {
-                    case ATTACKING:
-                        for (StateListener listener : this.listeners) {
-                            listener.attacking(stateful, direction);
-                        }
-                        break;
-                    case DEAD:
-                        for (StateListener listener : this.listeners) {
-                            listener.dead(stateful);
-                        }
-                        break;
-                    case IDLE:
-                        for (StateListener listener : this.listeners) {
-                            listener.idle(stateful);
-                        }
-                        break;
-                    case HURT:
-                        for (StateListener listener : this.listeners) {
-                            listener.hurt(stateful);
-                        }
-                        break;
-                    default:
-                        break;
-                }
+            switch (state) {
+                case ATTACKING:
+                    for (StateListener listener : this.listeners) {
+                        listener.attacking(attacks);
+                    }
+                    break;
+                case DEAD:
+                    for (StateListener listener : this.listeners) {
+                        listener.dead(stateful);
+                    }
+                    break;
+                case IDLE:
+                    for (StateListener listener : this.listeners) {
+                        listener.idle(stateful);
+                    }
+                    break;
+                case HURT:
+                    for (StateListener listener : this.listeners) {
+                        listener.hurt(stateful);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
+    }
+
+
+
+    private static class MovementActionComparator implements Comparator<StateSignal> {
+        @Override
+        public int compare(StateSignal a, StateSignal b) {
+            long entityA = a.entity.getId();
+            long entityB = b.entity.getId();
+            return (int) Math.signum(entityA - entityB);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return false;
+        }
+
     }
 }

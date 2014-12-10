@@ -5,24 +5,21 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.warsheep.scamp.adt.Pair;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.Directionality;
 import com.warsheep.scamp.components.StateComponent.State;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
 public class AIProcessor extends EntitySystem implements StateProcessor.StateListener {
 
     private ImmutableArray<Entity> aiControllableEntities;
     private ImmutableArray<Entity> damageableEntities;
-    private Queue<Pair<Entity, Pair<State, Directionality>>> actions;
     private CollisionProcessor collisions;
 
     public AIProcessor() {
-        this.actions = new ArrayDeque<>();
     }
 
     public void addedToEngine(Engine engine) {
@@ -32,8 +29,9 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
     }
 
     @Override
-    public Queue<Pair<Entity, Pair<State, Directionality>>> turnEnd() {
-        this.actions.removeAll(this.actions); // clear
+    public Array<StateSignal> turnEnd() {
+        // Pools.get(StateSignal.class).freeAll(this.actions);
+        Array<StateSignal> actions = new Array();
         for (Entity aiEntity : aiControllableEntities) {
 
             if (ECSMapper.state.get(aiEntity).state != State.DEAD) {
@@ -56,9 +54,11 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
                         Directionality direction = approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions);
 
                         if (direction != Directionality.NONE) {
-                            Pair<State, Directionality> action =
-                                    new Pair<>(State.MOVING, direction);
-                            this.actions.add(new Pair(aiEntity, action));
+                            StateSignal signal = new StateSignal();
+                            signal.entity = aiEntity;
+                            signal.direction = direction;
+                            signal.state = State.MOVING;
+                            actions.add(signal);
                             simulatedAiPos = simulateAIMovement(simulatedAiPos, direction);
                         }
                         moveCount++;
@@ -66,18 +66,16 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 
                     // Attack if possible
                     if (isInAttackRange(simulatedAiPos, closestDmgTilePos, attackerComponent.attackRange)) {
-//                        Pair<State, Directionality> action =
-//                                new Pair<>(State.ATTACKING, approachEnemy(simulatedAiPos, closestDmgTilePos, aiEntity, collisions));
-//                        this.actions.add(new Pair(aiEntity, action));
-                        // TODO: Make good
-                        System.out.println(faceEnemy(simulatedAiPos, closestDmgTilePos));
-                        Pair<State, Directionality> action = new Pair<>(State.ATTACKING, faceEnemy(simulatedAiPos, closestDmgTilePos));
-                        this.actions.add(new Pair(aiEntity, action));
+                        StateSignal signal = Pools.get(StateSignal.class).obtain();
+                        signal.direction = faceEnemy(simulatedAiPos, closestDmgTilePos);
+                        signal.entity = aiEntity;
+                        signal.state = State.ATTACKING;
+                        actions.add(signal);
                     }
                 }
             }
         }
-        return this.actions;
+        return actions;
     }
 
 
@@ -104,11 +102,10 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
         int distX = enemy.x - ai.x;
         int distY = enemy.y - ai.y;
 
-        System.out.println("x: " +distX +", y: " + distY);
-        if(distX == 0) {
+        if (distX == 0) {
             return distY > 0 ? Directionality.UP : Directionality.DOWN;
-        } else if(distY == 0) {
-             return distX > 0 ? Directionality.RIGHT : Directionality.LEFT;
+        } else if (distY == 0) {
+            return distX > 0 ? Directionality.RIGHT : Directionality.LEFT;
         } else {
             if (Math.abs(distX) <= Math.abs(distY)) {
                 if (distX > 0) {

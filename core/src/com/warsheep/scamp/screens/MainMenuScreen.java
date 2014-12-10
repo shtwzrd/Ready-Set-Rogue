@@ -18,6 +18,8 @@ public class MainMenuScreen extends ScreenAdapter {
     OrthographicCamera guiCam;
     Rectangle playBounds;
     Vector3 touchPoint;
+    SpriteBatch spriteBatch;
+    BitmapFont font;
 
     private static Random rnd = new Random();
 
@@ -26,8 +28,10 @@ public class MainMenuScreen extends ScreenAdapter {
 
         guiCam = new OrthographicCamera(Scamp.V_WIDTH, Scamp.V_HEIGHT);
         guiCam.position.set(Scamp.V_WIDTH / 2, Scamp.V_HEIGHT / 2, 0);
-        playBounds = new Rectangle(Gdx.graphics.getWidth()/4, Gdx.graphics.getHeight()/4, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+        playBounds = new Rectangle(Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 4, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         touchPoint = new Vector3();
+        spriteBatch = new SpriteBatch();
+        font = new BitmapFont();
     }
 
     public void update() {
@@ -42,7 +46,7 @@ public class MainMenuScreen extends ScreenAdapter {
         }
     }
 
-    public void draw () {
+    public void draw() {
         GL20 gl = Gdx.gl;
         gl.glClearColor(0, 0, 0, 1);
         gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -50,16 +54,15 @@ public class MainMenuScreen extends ScreenAdapter {
         game.batcher.setProjectionMatrix(guiCam.combined);
 
         CharSequence str = "Play";
-        SpriteBatch spriteBatch = new SpriteBatch();
-        BitmapFont font = new BitmapFont();
+
 
         spriteBatch.begin();
-        font.draw(spriteBatch, str, Gdx.graphics.getWidth()/2 - 12, Gdx.graphics.getHeight()/2);
+        font.draw(spriteBatch, str, Gdx.graphics.getWidth() / 2 - 12, Gdx.graphics.getHeight() / 2);
         spriteBatch.end();
     }
 
     @Override
-    public void render (float delta) {
+    public void render(float delta) {
         update();
         draw();
     }

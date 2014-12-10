@@ -108,9 +108,9 @@ public class MainGameScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(controlProcessor);
 
         PrefabFactory fab = new PrefabFactory();
-        fab.buildEntity("creatures/skeleton");
 
         // Skeleton blocker of doom
+
         Random rand = new Random();
         for (int i = 1; i < 4; i++) {
             Entity skeleton = fab.buildEntity("creatures/skeleton");
@@ -126,7 +126,7 @@ public class MainGameScreen extends ScreenAdapter {
             ecs.addEntity(skeleton);
         }
 
-        // Crappy Debug Wizard mans
+         // Crappy Debug Wizard mans
         Entity wizard = fab.buildEntity("creatures/debugwizard");
         ecs.addEntity(wizard);
 
@@ -189,6 +189,8 @@ public class MainGameScreen extends ScreenAdapter {
                 font.draw(spriteBatch, "O", attackPos.x * 24 + Gdx.graphics.getWidth() / 2 - 5, attackPos.y * 24 + Gdx.graphics.getHeight() / 2);
             }
             spriteBatch.end();
+            font.dispose();
+            spriteBatch.dispose();
         }
     }
 
@@ -206,6 +208,7 @@ public class MainGameScreen extends ScreenAdapter {
         shapeRenderer.setColor(1, 1, 1, 0.5f);
         shapeRenderer.circle(Gdx.graphics.getWidth() - 15, Gdx.graphics.getHeight() - 15, size);
         shapeRenderer.end();
+        shapeRenderer.dispose();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
     }
@@ -220,6 +223,8 @@ public class MainGameScreen extends ScreenAdapter {
         spriteBatch.begin();
         font.draw(spriteBatch, str, 10, Gdx.graphics.getHeight() - 10);
         spriteBatch.end();
+        spriteBatch.dispose();
+        font.dispose();
     }
 
     private void createCamera(Entity target) {
