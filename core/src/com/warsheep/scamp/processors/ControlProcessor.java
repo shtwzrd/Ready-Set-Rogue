@@ -94,6 +94,12 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 hasAttacked = true;
             }
         }
+        if (pair.getLeft() == State.CASTING) {
+            if (!hasAttacked) {
+                actions.add(pair);
+                hasAttacked = true;
+            }
+        }
     }
 
     @Override
@@ -185,7 +191,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 }
                 return true;
 
-            // Attacking scheme --> To be changed
+            // Attacking scheme
             case Input.Keys.I:
                 for (int i = 0; i < entities.size(); i++) {
                     this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.UP));
@@ -206,12 +212,62 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                     this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.LEFT));
                 }
                 return true;
+
+            // Spell casting scheme
+            case Input.Keys.NUM_6:
+                tryCastingSpell(0);
+                return true;
+            case Input.Keys.NUM_7:
+                tryCastingSpell(1);
+                return true;
+            case Input.Keys.NUM_8:
+                tryCastingSpell(2);
+                return true;
+            case Input.Keys.NUM_9:
+                tryCastingSpell(3);
+                return true;
+            case Input.Keys.NUM_0:
+                tryCastingSpell(4);
+                return true;
+
+            // Misc
             case Input.Keys.R:
                 MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER;
                 return true;
         }
 
         return false;
+    }
+
+    private void tryCastingSpell(int spellNum) {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity e = entities.get(i);
+            SpellbookComponent spellBook = ECSMapper.spellBook.get(e);
+            if (spellBook != null) {
+                // Check if spell i has been added to spellbook
+                if (spellBook.spellbook.size() >= spellNum+1) { // +1 cause zero-indexed
+                    // Set lastCastSpell to the spell cast
+                    Entity lastCastSpell = spellBook.spellbook.get(spellNum);
+                    if (lastCastSpell != null) {
+                        // Check if the spell has a cooldown, if yes, check if current cooldown = 0, else fire
+                        CooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
+                        if (cooldown != null) {
+                            if (cooldown.currentCooldown == 0) {
+                                spellBook.lastSpellCast = lastCastSpell;
+                                this.addAction(e, new Pair<>(State.CASTING, Directionality.NONE));
+                            }
+                        } else {
+                            spellBook.lastSpellCast = lastCastSpell;
+                            this.addAction(e, new Pair<>(State.CASTING, Directionality.NONE));
+                        }
+                    }
+                }
+                else {
+                    System.out.println("Spell not unlocked");
+                }
+            }
+        }
+
     }
 
     @Override
@@ -232,7 +288,19 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         int clickPosX = screenX - Gdx.graphics.getWidth() / 2;
         int clickPosY = screenY - Gdx.graphics.getHeight() / 2;
 
-        if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
+        if (screenX > Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7) {
+            if (screenY > Gdx.graphics.getHeight() / 7 && screenY <= Gdx.graphics.getHeight() / 7 * 2) {
+                tryCastingSpell(0);
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 3) {
+                tryCastingSpell(1);
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 4) {
+                tryCastingSpell(2);
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 5) {
+                tryCastingSpell(3);
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 6) {
+                tryCastingSpell(4);
+            }
+        } else if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
             // Move Left or Right
             if (clickPosX > 0) {
                 for (int i = 0; i < entities.size(); i++) {

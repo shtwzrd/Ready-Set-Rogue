@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.warsheep.scamp.adt.Pair;
+import com.warsheep.scamp.components.CooldownComponent;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.*;
@@ -17,6 +18,7 @@ public class StateProcessor extends EntitySystem {
 
     private List<StateListener> listeners;
     private ImmutableArray<Entity> statefuls;
+    private ImmutableArray<Entity> cooldowners;
     private float interval;
     private float accumulator = interval;
 
@@ -40,6 +42,10 @@ public class StateProcessor extends EntitySystem {
             ECSMapper.state.get(entity).inProgress = false;
         }
 
+        default public void spellCasting(Entity entity, Directionality direction) {
+            ECSMapper.state.get(entity).inProgress = false;
+        }
+
         default public void moving(Entity entity, Queue<Directionality> direction) {
             ECSMapper.state.get(entity).inProgress = false;
         }
@@ -57,6 +63,7 @@ public class StateProcessor extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         statefuls = engine.getEntitiesFor(Family.all(StateComponent.class).get());
+        cooldowners = engine.getEntitiesFor(Family.all(CooldownComponent.class).get());
     }
 
     @Override
@@ -70,14 +77,27 @@ public class StateProcessor extends EntitySystem {
     }
 
     protected void updateInterval() {
+        this.updateCooldowns();
         this.pullActions();
         this.resolveTurn();
+    }
+
+    private void updateCooldowns() {
+        // Update all cooldowns
+        for (Entity c : this.cooldowners) {
+            CooldownComponent cooldown = ECSMapper.cooldown.get(c);
+            if (cooldown.currentCooldown > 0) {
+                cooldown.currentCooldown--;
+                System.out.println("Cooldown: " + cooldown.currentCooldown + "/" + cooldown.maxCooldown);
+            }
+        }
     }
 
     private void pullActions() {
         Queue<Pair<Entity, Pair<State, Directionality>>> actionQueue;
         Map<Entity, Queue<Directionality>> movesMap = new HashMap<>();
         Map<Entity, Directionality> attacksMap = new HashMap<>();
+        Map<Entity, Directionality> castsMap = new HashMap<>();
 
         for (StateListener listener : this.listeners) {
             actionQueue = listener.turnEnd();
@@ -97,6 +117,10 @@ public class StateProcessor extends EntitySystem {
                         e = action.getLeft();
                         attacksMap.put(e, action.getRight().getRight());
                     }
+                    if (action.getRight().getLeft() == State.CASTING) {
+                        e = action.getLeft();
+                        castsMap.put(e, action.getRight().getRight());
+                    }
                 }
             }
         }
@@ -107,6 +131,9 @@ public class StateProcessor extends EntitySystem {
             for (Map.Entry<Entity, Directionality> a : attacksMap.entrySet()) {
                 movers.attacking(a.getKey(), a.getValue());
             }
+            for (Map.Entry<Entity, Directionality> a : castsMap.entrySet()) {
+                movers.spellCasting(a.getKey(), a.getValue());
+            }
         }
 
     }
@@ -116,6 +143,7 @@ public class StateProcessor extends EntitySystem {
         MainGameScreen.moveToPos.y = 0;
         MainGameScreen.attackPos.x = 0;
         MainGameScreen.attackPos.y = 0;
+
         for (Entity stateful : this.statefuls) {
             State state = ECSMapper.state.get(stateful).state;
             boolean inProgress = ECSMapper.state.get(stateful).inProgress;

@@ -48,6 +48,9 @@
     {
       "class": "com.warsheep.scamp.components.TransformComponent",
       "yOffset": 5
+    },
+    {
+      "class": "com.warsheep.scamp.components.SpellbookComponent",
     }
   ]
 }

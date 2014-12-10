@@ -112,10 +112,10 @@ public class MainGameScreen extends ScreenAdapter {
 
         // Skeleton blocker of doom
         Random rand = new Random();
-        for (int i = 1; i < 4; i++) {
+        for (int i = 1; i < 40; i++) {
             Entity skeleton = fab.buildEntity("creatures/skeleton");
-            ECSMapper.tile.get(skeleton).x = rand.nextInt(12 - 6) + 1;
-            ECSMapper.tile.get(skeleton).y = rand.nextInt(12 - 6) + 1;
+            ECSMapper.tile.get(skeleton).x = rand.nextInt(30) + 1;
+            ECSMapper.tile.get(skeleton).y = rand.nextInt(30) + 1;
             ecs.addEntity(skeleton);
         }
 
@@ -164,6 +164,7 @@ public class MainGameScreen extends ScreenAdapter {
                 addPlayerStats();
                 addTimeCircle(delta);
                 addMoveToPos();
+                addSpellGrid();
                 break;
             case GAME_OVER:
                 game.setScreen(new MainMenuScreen(game));
@@ -192,6 +193,22 @@ public class MainGameScreen extends ScreenAdapter {
         }
     }
 
+    private void addSpellGrid() {
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 1, 1, 0.5f);
+
+        for (int i = 1; i < 6; i++) {
+            shapeRenderer.rect(Gdx.graphics.getWidth() - Gdx.graphics.getHeight()/7, Gdx.graphics.getHeight() / 7 * i, Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7);
+        }
+        shapeRenderer.end();
+
+        Gdx.gl.glDisable(GL20.GL_BLEND);
+    }
+
     private void addTimeCircle(float delta) {
         ShapeRenderer shapeRenderer = new ShapeRenderer();
 
@@ -207,7 +224,6 @@ public class MainGameScreen extends ScreenAdapter {
         shapeRenderer.circle(Gdx.graphics.getWidth() - 15, Gdx.graphics.getHeight() - 15, size);
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
-
     }
 
     private void addPlayerStats() {

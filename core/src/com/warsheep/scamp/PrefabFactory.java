@@ -71,6 +71,8 @@ public class PrefabFactory {
                 return cloner.deepClone(c);
             case VisibleComponent:
                 return cloner.shallowClone(c);
+            case SpellbookComponent:
+                return cloner.shallowClone(c);
             default:
                 return cloner.shallowClone(c);
         }
@@ -92,6 +94,7 @@ public class PrefabFactory {
         StateComponent,
         TileComponent,
         TransformComponent,
-        VisibleComponent
+        VisibleComponent,
+        SpellbookComponent
     }
 }

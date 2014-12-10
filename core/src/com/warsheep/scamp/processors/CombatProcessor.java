@@ -24,6 +24,16 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
     }
 
     @Override
+    public void spellCasting(Entity entity, StateComponent.Directionality direction) {
+        System.out.println("Spell fired");
+        SpellbookComponent spellbook = ECSMapper.spellBook.get(entity);
+        CooldownComponent cooldown = ECSMapper.cooldown.get(spellbook.lastSpellCast);
+        if (cooldown != null) {
+            cooldown.currentCooldown = cooldown.maxCooldown;
+        }
+    }
+
+    @Override
     public void attacking(Entity entity, StateComponent.Directionality direction) {
         StateComponent atkState = ECSMapper.state.get(entity);
 
