@@ -205,6 +205,7 @@ public class MainGameScreen extends ScreenAdapter {
             shapeRenderer.rect(Gdx.graphics.getWidth() - Gdx.graphics.getHeight()/7, Gdx.graphics.getHeight() / 7 * i, Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7);
         }
         shapeRenderer.end();
+        shapeRenderer.dispose();
 
         Gdx.gl.glDisable(GL20.GL_BLEND);
     }
