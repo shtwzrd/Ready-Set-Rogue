@@ -4,6 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.StateProcessor.StateListener;
 
@@ -65,7 +68,6 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         }
         entity.remove(MovementComponent.class);
         state.state = StateComponent.State.IDLE;
-        state.inProgress = false;
     }
 
 
@@ -78,8 +80,32 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         this.pause = pause;
     }
 
-    public void moving(Entity entity, Queue<StateComponent.Directionality> direction) {
+    @Override
+    public void moving(Array<StateSignal> actions) {
+        Array<StateComponent.Directionality> moveQueue = new Array<>();
+        Entity currentEntity = null;
+        if (actions.size > 0) {
+            currentEntity = actions.get(0).entity;
+        }
+        for (StateSignal action : actions) {
+            if (currentEntity.getId() == action.entity.getId()) {
+                moveQueue.add(action.direction);
+            } else {
+                processMoves(currentEntity, moveQueue);
+                moveQueue = new Array();
+                currentEntity = action.entity;
+                moveQueue.add(action.direction);
+            }
+        }
+
+        if(moveQueue != null && currentEntity != null) {
+            processMoves(currentEntity, moveQueue);
+        }
+    }
+
+    private void processMoves(Entity entity, Array<StateComponent.Directionality> direction) {
         MovementComponent mov = new MovementComponent();
+
         if (ECSMapper.movement.get(entity) != null) {
             mov = ECSMapper.movement.get(entity);
         }
@@ -115,7 +141,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             for (MovementListener listener : listeners) {
                 listener.tileMove(entity, oldX, oldY);
             }
-            if(dir == StateComponent.Directionality.LEFT || dir == StateComponent.Directionality.RIGHT) {
+            if (dir == StateComponent.Directionality.LEFT || dir == StateComponent.Directionality.RIGHT) {
                 state.direction = dir;
             }
         }

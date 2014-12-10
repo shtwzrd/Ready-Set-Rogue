@@ -8,27 +8,31 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.warsheep.scamp.adt.Pair;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.Pools;
+import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.State;
 import com.warsheep.scamp.components.StateComponent.Directionality;
 import com.warsheep.scamp.screens.MainGameScreen;
 
 import java.awt.*;
-import java.util.*;
 
 public class ControlProcessor extends EntitySystem implements InputProcessor, StateProcessor.StateListener {
 
     private ImmutableArray<Entity> entities;
     private Point touchStartPosition = new Point();
-    private Queue<Pair<State, Directionality>> actions;
+    private Array<StateSignal> actions;
     private CollisionProcessor collisions;
     private int simulatedX = 0;
     private int simulatedY = 0;
+    private int selectedSpell = 0;
     private boolean hasAttacked = false; // If player can attack more than once, change this to an int-variable inside AttackerComp
+    private final Pool<StateSignal> pool = Pools.get(StateSignal.class);
 
     public ControlProcessor() {
-        actions = new ArrayDeque<>();
+        actions = new Array<>();
     }
 
     public void addedToEngine(Engine engine) {
@@ -36,91 +40,91 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         collisions = engine.getSystem(CollisionProcessor.class);
     }
 
-    private void addAction(Entity entity, Pair<State, Directionality> pair) {
-        TileComponent tilePos = ECSMapper.tile.get(entity);
-        if (pair.getLeft() == State.MOVING) {
-            if (ECSMapper.control.get(entity).movesConsumed <= ECSMapper.control.get(entity).movementBonus) {
-                if (collisions.checkMove(tilePos.x + simulatedX,
-                        tilePos.y + simulatedY,
-                        entity, pair.getRight(), false)) {
-                    System.out.println("Blocked");
-                    // Some visual feedback
-                } else {
-                    actions.add(pair);
-                    switch (pair.getRight()) {
+    private void addAction(StateSignal signal) {
+        for (Entity entity : this.entities) {
+            signal.entity = entity;
+            TileComponent tilePos = ECSMapper.tile.get(signal.entity);
+            if (signal.state == State.MOVING) {
+                if (ECSMapper.control.get(signal.entity).movesConsumed <= ECSMapper.control.get(signal.entity).movementBonus) {
+                    if (collisions.checkMove(tilePos.x + simulatedX,
+                            tilePos.y + simulatedY,
+                            signal.entity, signal.direction, false)) {
+                        System.out.println("Blocked");
+                        // Some visual feedback
+                    } else {
+                        actions.add(signal);
+                        switch (signal.direction) {
+                            case UP:
+                                if (hasAttacked) MainGameScreen.attackPos.y++;
+                                simulatedY++;
+                                break;
+                            case DOWN:
+                                if (hasAttacked) MainGameScreen.attackPos.y--;
+                                simulatedY--;
+                                break;
+                            case LEFT:
+                                if (hasAttacked) MainGameScreen.attackPos.x--;
+                                simulatedX--;
+                                break;
+                            case RIGHT:
+                                if (hasAttacked) MainGameScreen.attackPos.x++;
+                                simulatedX++;
+                                break;
+                        }
+                        MainGameScreen.moveToPos.x = simulatedX;
+                        MainGameScreen.moveToPos.y = simulatedY;
+                        ECSMapper.control.get(signal.entity).movesConsumed++;
+                    }
+                }
+            }
+            if (signal.state == State.ATTACKING) {
+                if (!hasAttacked) {
+                    MainGameScreen.attackPos.x = simulatedX;
+                    MainGameScreen.attackPos.y = simulatedY;
+                    switch (signal.direction) {
                         case UP:
-                            if (hasAttacked) MainGameScreen.attackPos.y++;
-                            simulatedY++;
+                            MainGameScreen.attackPos.y++;
                             break;
                         case DOWN:
-                            if (hasAttacked) MainGameScreen.attackPos.y--;
-                            simulatedY--;
+                            MainGameScreen.attackPos.y--;
                             break;
                         case LEFT:
-                            if (hasAttacked) MainGameScreen.attackPos.x--;
-                            simulatedX--;
+                            MainGameScreen.attackPos.x--;
                             break;
                         case RIGHT:
-                            if (hasAttacked) MainGameScreen.attackPos.x++;
-                            simulatedX++;
+                            MainGameScreen.attackPos.x++;
                             break;
                     }
-                    MainGameScreen.moveToPos.x = simulatedX;
-                    MainGameScreen.moveToPos.y = simulatedY;
-                    ECSMapper.control.get(entity).movesConsumed++;
-                }
-            }
-        }
-        if (pair.getLeft() == State.ATTACKING) {
-            if (!hasAttacked) {
-                MainGameScreen.attackPos.x = simulatedX;
-                MainGameScreen.attackPos.y = simulatedY;
-                switch (pair.getRight()) {
-                    case UP:
-                        MainGameScreen.attackPos.y++;
-                        break;
-                    case DOWN:
-                        MainGameScreen.attackPos.y--;
-                        break;
-                    case LEFT:
-                        MainGameScreen.attackPos.x--;
-                        break;
-                    case RIGHT:
-                        MainGameScreen.attackPos.x++;
-                        break;
-                }
 
-                actions.add(pair);
-                hasAttacked = true;
+                    actions.add(signal);
+                    hasAttacked = true;
+                }
             }
-        }
-        if (pair.getLeft() == State.CASTING) {
-            if (!hasAttacked) {
-                actions.add(pair);
-                hasAttacked = true;
+
+            if (signal.state == State.CASTING) {
+                if (!hasAttacked) {
+                    if (tryCastingSpell(selectedSpell)) {
+                        actions.add(signal);
+                    }
+
+                }
             }
         }
     }
 
     @Override
-    public Queue<Pair<Entity, Pair<State, Directionality>>> turnEnd() {
-        Queue<Pair<Entity, Pair<State, Directionality>>> actionQueue = new ArrayDeque<>();
+    public Array<StateSignal> turnEnd() {
         for (int i = 0; i < entities.size(); i++) {
-            for (Pair<State, Directionality> action : this.actions) {
-                actionQueue.add(new Pair(entities.get(i), action));
-            }
             ECSMapper.control.get(entities.get(i)).movesConsumed = 0;
-        }
-
-        while (!this.actions.isEmpty()) {
-            this.actions.poll();
         }
 
         simulatedX = 0;
         simulatedY = 0;
         hasAttacked = false;
 
-        return actionQueue;
+        Array<StateSignal> out = this.actions;
+        this.actions = new Array();
+        return out;
     }
 
     public void update(float deltaTime) {
@@ -149,125 +153,125 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
 
     @Override
     public boolean keyDown(int keycode) {
+        StateSignal input = new StateSignal();
         switch (keycode) {
             case Input.Keys.UP:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.UP));
-                }
-                return true;
+                input.direction = Directionality.UP;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.DOWN:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.DOWN));
-                }
-                return true;
+                input.direction = Directionality.DOWN;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.RIGHT:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.RIGHT));
-                }
-                return true;
+                input.direction = Directionality.RIGHT;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.LEFT:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.LEFT));
-                }
-                return true;
+                input.direction = Directionality.LEFT;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.W:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.UP));
-                }
-                return true;
+                input.direction = Directionality.UP;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.S:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.DOWN));
-                }
-                return true;
+                input.direction = Directionality.DOWN;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.D:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.RIGHT));
-                }
-                return true;
+                input.direction = Directionality.RIGHT;
+                input.state = State.MOVING;
+                break;
             case Input.Keys.A:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.LEFT));
-                }
-                return true;
+                input.direction = Directionality.LEFT;
+                input.state = State.MOVING;
+                break;
 
             // Attacking scheme
             case Input.Keys.I:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.UP));
-                }
-                return true;
+                input.direction = Directionality.UP;
+                input.state = State.ATTACKING;
+                break;
             case Input.Keys.K:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.DOWN));
-                }
-                return true;
+                input.direction = Directionality.DOWN;
+                input.state = State.ATTACKING;
+                break;
             case Input.Keys.L:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.RIGHT));
-                }
-                return true;
+                input.direction = Directionality.RIGHT;
+                input.state = State.ATTACKING;
+                break;
             case Input.Keys.J:
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.LEFT));
-                }
-                return true;
+                input.direction = Directionality.LEFT;
+                input.state = State.ATTACKING;
+                break;
 
             // Spell casting scheme
             case Input.Keys.NUM_6:
-                tryCastingSpell(0);
-                return true;
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 0;
+                break;
             case Input.Keys.NUM_7:
-                tryCastingSpell(1);
-                return true;
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 1;
+                break;
             case Input.Keys.NUM_8:
-                tryCastingSpell(2);
-                return true;
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 2;
+                break;
             case Input.Keys.NUM_9:
-                tryCastingSpell(3);
-                return true;
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 3;
+                break;
             case Input.Keys.NUM_0:
-                tryCastingSpell(4);
-                return true;
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 4;
+                break;
 
             // Misc
             case Input.Keys.R:
                 MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER;
-                return true;
+                break;
+        }
+
+        if (input.state != null) {
+            this.addAction(input);
+            return true;
         }
 
         return false;
     }
 
-    private void tryCastingSpell(int spellNum) {
-        for (int i = 0; i < entities.size(); i++) {
-            Entity e = entities.get(i);
-            SpellbookComponent spellBook = ECSMapper.spellBook.get(e);
-            if (spellBook != null) {
-                // Check if spell i has been added to spellbook
-                if (spellBook.spellbook.size() >= spellNum+1) { // +1 cause zero-indexed
-                    // Set lastCastSpell to the spell cast
-                    Entity lastCastSpell = spellBook.spellbook.get(spellNum);
-                    if (lastCastSpell != null) {
-                        // Check if the spell has a cooldown, if yes, check if current cooldown = 0, else fire
-                        CooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
-                        if (cooldown != null) {
-                            if (cooldown.currentCooldown == 0) {
-                                spellBook.lastSpellCast = lastCastSpell;
-                                this.addAction(e, new Pair<>(State.CASTING, Directionality.NONE));
-                            }
-                        } else {
+    private boolean tryCastingSpell(int spellNum) {
+        SpellbookComponent spellBook = ECSMapper.spellBook.get(entities.get(0));
+        if (spellBook != null) {
+            // Check if spell i has been added to spellbook
+            if (spellBook.spellbook.size() >= spellNum + 1) { // +1 cause zero-indexed
+                // Set lastCastSpell to the spell cast
+                Entity lastCastSpell = spellBook.spellbook.get(spellNum);
+                if (lastCastSpell != null) {
+                    // Check if the spell has a cooldown, if yes, check if current cooldown = 0, else fire
+                    CooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
+                    if (cooldown != null) {
+                        if (cooldown.currentCooldown == 0) {
                             spellBook.lastSpellCast = lastCastSpell;
-                            this.addAction(e, new Pair<>(State.CASTING, Directionality.NONE));
+                            return true;
                         }
+                    } else {
+                        spellBook.lastSpellCast = lastCastSpell;
+                        return true;
                     }
                 }
-                else {
-                    System.out.println("Spell not unlocked");
-                }
+            } else {
+                System.out.println("Spell not unlocked");
             }
         }
-
+        return false;
     }
 
     @Override
@@ -288,39 +292,53 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         int clickPosX = screenX - Gdx.graphics.getWidth() / 2;
         int clickPosY = screenY - Gdx.graphics.getHeight() / 2;
 
+        StateSignal input = pool.obtain();
         if (screenX > Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7) {
             if (screenY > Gdx.graphics.getHeight() / 7 && screenY <= Gdx.graphics.getHeight() / 7 * 2) {
-                tryCastingSpell(0);
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 0;
             } else if (screenY <= Gdx.graphics.getHeight() / 7 * 3) {
-                tryCastingSpell(1);
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 1;
             } else if (screenY <= Gdx.graphics.getHeight() / 7 * 4) {
-                tryCastingSpell(2);
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 2;
             } else if (screenY <= Gdx.graphics.getHeight() / 7 * 5) {
-                tryCastingSpell(3);
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 3;
             } else if (screenY <= Gdx.graphics.getHeight() / 7 * 6) {
-                tryCastingSpell(4);
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 4;
             }
         } else if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
-            // Move Left or Right
-            if (clickPosX > 0) {
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.RIGHT));
+            if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
+                // Move Left or Right
+                if (clickPosX > 0) {
+                    input.direction = Directionality.RIGHT;
+                    input.state = State.MOVING;
+                } else {
+                    input.direction = Directionality.LEFT;
+                    input.state = State.MOVING;
                 }
             } else {
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.LEFT));
+                // Move Up or Down
+                if (clickPosY > 0) {
+                    input.direction = Directionality.DOWN;
+                    input.state = State.MOVING;
+                } else {
+                    input.direction = Directionality.UP;
+                    input.state = State.MOVING;
                 }
             }
-        } else {
-            // Move Up or Down
-            if (clickPosY > 0) {
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.DOWN));
-                }
-            } else {
-                for (int i = 0; i < entities.size(); i++) {
-                    this.addAction(entities.get(i), new Pair<>(State.MOVING, Directionality.UP));
-                }
+
+            if(input.state != null) {
+                this.addAction(input);
+                return true;
             }
         }
 
@@ -332,32 +350,33 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         int xDiff = screenX - touchStartPosition.x;
         int yDiff = screenY - touchStartPosition.y;
 
+
+        StateSignal input = new StateSignal();
         if (Math.abs(xDiff) > 50 || Math.abs(yDiff) > 50) {
             if (Math.abs(xDiff) > Math.abs(yDiff)) {
                 // Attack sideways
                 if (xDiff > 0) {
-                    for (int i = 0; i < entities.size(); i++) {
-                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.RIGHT));
-                    }
+                    input.direction = Directionality.RIGHT;
+                    input.state = State.ATTACKING;
                 } else {
-                    for (int i = 0; i < entities.size(); i++) {
-                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.LEFT));
-                    }
+                    input.direction = Directionality.LEFT;
+                    input.state = State.ATTACKING;
                 }
             } else {
                 // Attack up/down
                 if (yDiff < 0) {
-                    for (int i = 0; i < entities.size(); i++) {
-                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.UP));
-                    }
+                    input.direction = Directionality.UP;
+                    input.state = State.ATTACKING;
                 } else {
-                    for (int i = 0; i < entities.size(); i++) {
-                        this.addAction(entities.get(i), new Pair<>(State.ATTACKING, Directionality.DOWN));
-                    }
+                    input.direction = Directionality.DOWN;
+                    input.state = State.ATTACKING;
                 }
             }
         }
-
+        if(input.state != null) {
+            this.addAction(input);
+            return true;
+        }
         return false;
     }
 

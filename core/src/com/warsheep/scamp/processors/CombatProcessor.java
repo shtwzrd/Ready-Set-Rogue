@@ -6,9 +6,11 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
+import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.components.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class CombatProcessor extends EntitySystem implements StateProcessor.StateListener {
@@ -24,17 +26,26 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
     }
 
     @Override
-    public void spellCasting(Entity entity, StateComponent.Directionality direction) {
-        System.out.println("Spell fired");
-        SpellbookComponent spellbook = ECSMapper.spellBook.get(entity);
-        CooldownComponent cooldown = ECSMapper.cooldown.get(spellbook.lastSpellCast);
-        if (cooldown != null) {
-            cooldown.currentCooldown = cooldown.maxCooldown;
+    public void spellCasting(Array<StateSignal> signals) {
+        for(StateSignal signal : signals) {
+            System.out.println("Spell fired");
+            SpellbookComponent spellbook = ECSMapper.spellBook.get(signal.entity);
+            CooldownComponent cooldown = ECSMapper.cooldown.get(spellbook.lastSpellCast);
+            if (cooldown != null) {
+                cooldown.currentCooldown = cooldown.maxCooldown;
+            }
         }
     }
 
     @Override
-    public void attacking(Entity entity, StateComponent.Directionality direction) {
+    public void attacking(Array<StateSignal> actions) {
+        for(StateSignal a: actions) {
+            this.processAttack(a.entity, a.direction);
+        }
+
+    }
+
+    public void processAttack(Entity entity, StateComponent.Directionality direction) {
         StateComponent atkState = ECSMapper.state.get(entity);
 
         if (atkState.state != StateComponent.State.DEAD) {
@@ -105,7 +116,6 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
             }
 
             atkState.state = StateComponent.State.IDLE;
-            atkState.inProgress = false;
         }
 
 

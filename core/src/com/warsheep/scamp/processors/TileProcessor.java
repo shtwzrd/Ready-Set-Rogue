@@ -61,9 +61,16 @@ public class TileProcessor extends EntitySystem implements EntityListener, Movem
     @Override
     public void tileMove(Entity entity, int oldX, int oldY) {
         tile = ECSMapper.tile.get(entity);
-        if(tile != null) {
-            this.map[oldX][oldY].remove(entity);
-            this.map[tile.x][tile.y].add(entity);
+        if (tile != null && tile.x > -1 && tile.y > -1
+                && oldX > -1 && oldY > -1
+                && tile.x < this.MAP_WIDTH && tile.y < this.MAP_HEIGHT
+                && oldX < this.MAP_WIDTH && oldY < this.MAP_HEIGHT) {
+            if (this.map[oldX][oldY] != null) {
+                this.map[oldX][oldY].remove(entity);
+            }
+            if (this.map[tile.x][tile.y] != null) {
+                this.map[tile.x][tile.y].add(entity);
+            }
         }
     }
 }
