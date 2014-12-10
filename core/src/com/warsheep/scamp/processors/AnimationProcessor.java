@@ -31,7 +31,7 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
                 TextureAtlas.AtlasRegion[] frames = new TextureAtlas.AtlasRegion[2];
                 frames[0] = oneStep;
                 frames[1] = twoStep;
-                Animation ani = new Animation(1.9f, frames);
+                Animation ani = new Animation(.7f, frames);
                 ani.setPlayMode(Animation.PlayMode.LOOP);
                 anim.animations.put(StateComponent.State.values()[i].ordinal(), ani);
             }

@@ -152,10 +152,13 @@ public class MainGameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        if(delta > 0.1f) {
+            delta = 0.1f;
+        }
         switch (gameState) {
             case GAME_RUNNING:
                 visibilityProcessor.startBatch();
-                delta = ((System.currentTimeMillis() - startTime) / 1000);
+                // delta = ((System.currentTimeMillis() - startTime) / 1000);
                 ecs.update(delta);
                 visibilityProcessor.endBatch();
                 addPlayerStats();

@@ -18,7 +18,7 @@ public class StateProcessor extends EntitySystem {
     private List<StateListener> listeners;
     private ImmutableArray<Entity> statefuls;
     private float interval;
-    private float accumulator = 0;
+    private float accumulator = interval;
 
 
     public static interface StateListener {
@@ -62,11 +62,11 @@ public class StateProcessor extends EntitySystem {
     @Override
     public void update(float deltaTime) {
 
-        if (deltaTime - accumulator > this.interval) {
-            this.accumulator = deltaTime;
+        accumulator -= deltaTime;
+        if (accumulator <= 0) {
+            this.accumulator = interval;
             this.updateInterval();
         }
-
     }
 
     protected void updateInterval() {
