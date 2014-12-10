@@ -115,7 +115,9 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             for (MovementListener listener : listeners) {
                 listener.tileMove(entity, oldX, oldY);
             }
-            state.direction = dir;
+            if(dir == StateComponent.Directionality.LEFT || dir == StateComponent.Directionality.RIGHT) {
+                state.direction = dir;
+            }
         }
         entity.add(mov);
     }

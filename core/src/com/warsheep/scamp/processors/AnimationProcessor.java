@@ -39,6 +39,7 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
         }
         Animation animation = anim.animations.get(state.state.ordinal());
         if (animation != null) {
+            tex.image = (TextureAtlas.AtlasRegion) animation.getKeyFrame(state.time);
             if (state.direction == Directionality.RIGHT) {
                 if (!tex.image.isFlipX()) {
                     tex.image.flip(true, false);
@@ -49,7 +50,6 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
                     tex.image.flip(true, false);
                 }
             }
-            tex.image = (TextureAtlas.AtlasRegion) animation.getKeyFrame(state.time);
         }
         state.time += deltaTime;
     }
