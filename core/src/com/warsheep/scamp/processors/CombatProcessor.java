@@ -69,8 +69,9 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
                         for (Entity damageable : entitiesInPos) {
                             DamageableComponent dmgComp = ECSMapper.damage.get(damageable);
                             FactionComponent dmgFaction = ECSMapper.faction.get(damageable);
+                            CollidableComponent collidable = ECSMapper.collide.get(damageable);
 
-                            if (dmgComp != null && dmgFaction != null) {
+                            if (dmgComp != null && dmgFaction != null && collidable != null) {
                                 hadDamageable = true;
                                 if (!shareFaction(atkFaction, dmgFaction)) {
                                     if (!dmgComp.shieldOn) {
