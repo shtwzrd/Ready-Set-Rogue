@@ -15,6 +15,7 @@ public class StateComponent extends Component{
         HURT,
         MOVING,
         ATTACKING,
+        CASTING,
     }
 
     public enum Directionality {

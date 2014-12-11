@@ -14,5 +14,6 @@ public class MovementComponent extends Component {
 	public Vector3 previousTranslation;
 	public float timeSinceMove = 0.0f;
 	public Vector3 activeTranslation;
+	public Vector3 currentTarget;
 
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Sort;
 import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.adt.Pair;
+import com.warsheep.scamp.components.CooldownComponent;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.*;
@@ -21,11 +22,13 @@ public class StateProcessor extends EntitySystem {
 
     private List<StateListener> listeners;
     private ImmutableArray<Entity> statefuls;
+    private ImmutableArray<Entity> cooldowners;
     private float interval;
     private float accumulator = interval;
     private Array<StateSignal> actionQueue;
     private Array<StateSignal> moves;
     private Array<StateSignal> attacks;
+    private Array<StateSignal> casts;
     private MovementActionComparator actionSorter = new MovementActionComparator();
 
 
@@ -42,6 +45,9 @@ public class StateProcessor extends EntitySystem {
         }
 
         default public void attacking(Array<StateSignal> actions) {
+        }
+
+        default public void spellCasting(Array<StateSignal> signal) {
         }
 
         default public void moving(Array<StateSignal> actions) {
@@ -63,6 +69,7 @@ public class StateProcessor extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         statefuls = engine.getEntitiesFor(Family.all(StateComponent.class).get());
+        cooldowners = engine.getEntitiesFor(Family.all(CooldownComponent.class).get());
     }
 
     @Override
@@ -76,24 +83,40 @@ public class StateProcessor extends EntitySystem {
     }
 
     protected void updateInterval() {
+        this.updateCooldowns();
         this.pullActions();
         this.resolveTurn();
+    }
+
+    private void updateCooldowns() {
+        // Update all cooldowns
+        for (Entity c : this.cooldowners) {
+            CooldownComponent cooldown = ECSMapper.cooldown.get(c);
+            if (cooldown.currentCooldown > 0) {
+                cooldown.currentCooldown--;
+                System.out.println("Cooldown: " + cooldown.currentCooldown + "/" + cooldown.maxCooldown);
+            }
+        }
     }
 
     private void pullActions() {
         moves = new Array();
         attacks = new Array();
+        casts = new Array();
         actionQueue = new Array();
 
         for (StateListener listener : this.listeners) {
             actionQueue.addAll(listener.turnEnd());
         }
 
+        System.out.println(actionQueue.size);
         for (StateSignal action : actionQueue) {
             if (action.state == State.MOVING) {
                 moves.add(action);
             } else if (action.state == State.ATTACKING) {
                 attacks.add(action);
+            } else if (action.state == State.CASTING) {
+                casts.add(action);
             }
         }
 
@@ -103,6 +126,7 @@ public class StateProcessor extends EntitySystem {
         for (StateListener movers : this.listeners) {
             movers.moving(moves);
             movers.attacking(attacks);
+            movers.spellCasting(casts);
         }
 
     }
@@ -112,6 +136,7 @@ public class StateProcessor extends EntitySystem {
         MainGameScreen.moveToPos.y = 0;
         MainGameScreen.attackPos.x = 0;
         MainGameScreen.attackPos.y = 0;
+
         for (Entity stateful : this.statefuls) {
             State state = ECSMapper.state.get(stateful).state;
             switch (state) {
@@ -140,8 +165,6 @@ public class StateProcessor extends EntitySystem {
             }
         }
     }
-
-
 
     private static class MovementActionComparator implements Comparator<StateSignal> {
         @Override

@@ -27,6 +27,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     private CollisionProcessor collisions;
     private int simulatedX = 0;
     private int simulatedY = 0;
+    private int selectedSpell = 0;
     private boolean hasAttacked = false; // If player can attack more than once, change this to an int-variable inside AttackerComp
     private final Pool<StateSignal> pool = Pools.get(StateSignal.class);
 
@@ -40,7 +41,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     }
 
     private void addAction(StateSignal signal) {
-        for(Entity entity : this.entities) {
+        for (Entity entity : this.entities) {
             signal.entity = entity;
             TileComponent tilePos = ECSMapper.tile.get(signal.entity);
             if (signal.state == State.MOVING) {
@@ -97,6 +98,15 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
 
                     actions.add(signal);
                     hasAttacked = true;
+                }
+            }
+
+            if (signal.state == State.CASTING) {
+                if (!hasAttacked) {
+                    if (tryCastingSpell(selectedSpell)) {
+                        actions.add(signal);
+                    }
+
                 }
             }
         }
@@ -178,7 +188,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 input.state = State.MOVING;
                 break;
 
-            // Attacking scheme --> To be changed
+            // Attacking scheme
             case Input.Keys.I:
                 input.direction = Directionality.UP;
                 input.state = State.ATTACKING;
@@ -195,16 +205,72 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 input.direction = Directionality.LEFT;
                 input.state = State.ATTACKING;
                 break;
+
+            // Spell casting scheme
+            case Input.Keys.NUM_6:
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 0;
+                break;
+            case Input.Keys.NUM_7:
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 1;
+                break;
+            case Input.Keys.NUM_8:
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 2;
+                break;
+            case Input.Keys.NUM_9:
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 3;
+                break;
+            case Input.Keys.NUM_0:
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 4;
+                break;
+
+            // Misc
             case Input.Keys.R:
                 MainGameScreen.gameState = MainGameScreen.GameState.GAME_OVER;
                 break;
         }
 
-        if(input.state != State.IDLE) {
+        if (input.state != null) {
             this.addAction(input);
             return true;
         }
 
+        return false;
+    }
+
+    private boolean tryCastingSpell(int spellNum) {
+        SpellbookComponent spellBook = ECSMapper.spellBook.get(entities.get(0));
+        if (spellBook != null) {
+            // Check if spell i has been added to spellbook
+            if (spellBook.spellbook.size() >= spellNum + 1) { // +1 cause zero-indexed
+                // Set lastCastSpell to the spell cast
+                Entity lastCastSpell = spellBook.spellbook.get(spellNum);
+                if (lastCastSpell != null) {
+                    // Check if the spell has a cooldown, if yes, check if current cooldown = 0, else fire
+                    CooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
+                    if (cooldown != null) {
+                        if (cooldown.currentCooldown == 0) {
+                            spellBook.lastSpellCast = lastCastSpell;
+                            return true;
+                        }
+                    } else {
+                        spellBook.lastSpellCast = lastCastSpell;
+                        return true;
+                    }
+                }
+            } else {
+                System.out.println("Spell not unlocked");
+            }
+        }
         return false;
     }
 
@@ -226,30 +292,55 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         int clickPosX = screenX - Gdx.graphics.getWidth() / 2;
         int clickPosY = screenY - Gdx.graphics.getHeight() / 2;
 
-
         StateSignal input = pool.obtain();
-        if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
-            // Move Left or Right
-            if (clickPosX > 0) {
-                input.direction = Directionality.RIGHT;
-                input.state = State.MOVING;
-            } else {
-                input.direction = Directionality.LEFT;
-                input.state = State.MOVING;
+        if (screenX > Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7) {
+            if (screenY > Gdx.graphics.getHeight() / 7 && screenY <= Gdx.graphics.getHeight() / 7 * 2) {
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 0;
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 3) {
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 1;
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 4) {
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 2;
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 5) {
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 3;
+            } else if (screenY <= Gdx.graphics.getHeight() / 7 * 6) {
+                input.direction = Directionality.NONE;
+                input.state = State.CASTING;
+                this.selectedSpell = 4;
             }
-        } else {
-            // Move Up or Down
-            if (clickPosY > 0) {
-                input.direction = Directionality.DOWN;
-                input.state = State.MOVING;
+        } else if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
+            if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
+                // Move Left or Right
+                if (clickPosX > 0) {
+                    input.direction = Directionality.RIGHT;
+                    input.state = State.MOVING;
+                } else {
+                    input.direction = Directionality.LEFT;
+                    input.state = State.MOVING;
+                }
             } else {
-                input.direction = Directionality.UP;
-                input.state = State.MOVING;
+                // Move Up or Down
+                if (clickPosY > 0) {
+                    input.direction = Directionality.DOWN;
+                    input.state = State.MOVING;
+                } else {
+                    input.direction = Directionality.UP;
+                    input.state = State.MOVING;
+                }
+            }
+
+            if(input.state != null) {
+                this.addAction(input);
+                return true;
             }
         }
-
-        this.addAction(input);
-
 
         return false;
     }
@@ -260,30 +351,32 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         int yDiff = screenY - touchStartPosition.y;
 
 
-        StateSignal input = pool.obtain();
+        StateSignal input = new StateSignal();
         if (Math.abs(xDiff) > 50 || Math.abs(yDiff) > 50) {
             if (Math.abs(xDiff) > Math.abs(yDiff)) {
                 // Attack sideways
                 if (xDiff > 0) {
-                input.direction = Directionality.RIGHT;
-                input.state = State.ATTACKING;
+                    input.direction = Directionality.RIGHT;
+                    input.state = State.ATTACKING;
                 } else {
-                input.direction = Directionality.LEFT;
-                input.state = State.ATTACKING;
+                    input.direction = Directionality.LEFT;
+                    input.state = State.ATTACKING;
                 }
             } else {
                 // Attack up/down
                 if (yDiff < 0) {
-                input.direction = Directionality.UP;
-                input.state = State.ATTACKING;
+                    input.direction = Directionality.UP;
+                    input.state = State.ATTACKING;
                 } else {
-                input.direction = Directionality.DOWN;
-                input.state = State.ATTACKING;
+                    input.direction = Directionality.DOWN;
+                    input.state = State.ATTACKING;
                 }
             }
         }
-        this.addAction(input);
-
+        if(input.state != null) {
+            this.addAction(input);
+            return true;
+        }
         return false;
     }
 

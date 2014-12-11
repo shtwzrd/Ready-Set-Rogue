@@ -39,63 +39,35 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
         TransformComponent trans = ECSMapper.transform.get(entity);
         MovementComponent mov = ECSMapper.movement.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
-//        TilePositionComponent tilePos = ECSMapper.tilePosition.get(entity);
+        state.state = StateComponent.State.MOVING;
 
-/*        // Don't do anything if we're already at our target
-        System.out.println(trans.position.y - mov.target.y);
-        if ((Math.abs(trans.position.x - mov.target.x) < 5 &&
-                Math.abs(trans.position.y - mov.target.y) < 5)
-                || (Math.abs(trans.position.x - mov.target.x) > 24 ||
-                Math.abs(trans.position.y - mov.target.y) > 24 )) {
-            System.out.println("time to stop");
-            entity.remove(MovementComponent.class);
-            state.inProgress = false;
-            state.previousState = state.state;
-            state.state = StateComponent.State.IDLE;
-        } else {
-            mov.timeSinceMove += deltaTime; // Update how long we've been moving ...
-            mov.alpha += MOVE_SPEED / mov.timeSinceMove; // ... And how far we've come
-
-            if (mov.alpha > .80) {
-                //    mov.alpha = 1.0f;
-            }
-            trans.position.interpolate(mov.target, mov.alpha, mov.interpolation);
-
-        }
-        */
         if (mov.previousTranslation == null) {
-            mov.previousTranslation = trans.position;
+            mov.previousTranslation = new Vector3();
+            mov.previousTranslation.x = trans.position.x - trans.xOffset;
+            mov.previousTranslation.y = trans.position.y - trans.yOffset;
         }
 
-        if (mov.activeTranslation == null && mov.target.peek() != null) {
-            mov.activeTranslation = mov.target.poll();
+        if (mov.currentTarget == null && mov.target.peek() != null) {
+            mov.currentTarget = mov.target.poll();
         }
 
-        if (mov.activeTranslation != null) {
-            System.out.println("Our targets: " + mov.target.toString());
-
-
+        if (mov.currentTarget != null) {
             mov.timeSinceMove += deltaTime;
 
-            System.out.println(mov.previousTranslation + " " + mov.activeTranslation);
-
-            trans.position.x = mov.previousTranslation
+            mov.activeTranslation = mov.previousTranslation
                     .interpolate(
-                            mov.activeTranslation,
-                            mov.timeSinceMove / MOVE_SPEED, mov.interpolation).x;
-            trans.position.y = mov.previousTranslation
-                    .interpolate(
-                            mov.activeTranslation,
-                            mov.timeSinceMove / MOVE_SPEED, mov.interpolation).y;
+                            mov.currentTarget,
+                            mov.timeSinceMove / MOVE_SPEED, mov.interpolation);
 
-            if (Math.abs(trans.position.x - mov.activeTranslation.x) < .2 && Math.abs(trans.position.y - mov.activeTranslation.y) < .2) {
-                System.out.println("Do I even happen fuck shit damn");
-                trans.position = mov.activeTranslation;
-                mov.previousTranslation = mov.activeTranslation;
-                trans.position.x += trans.xOffset;
-                trans.position.y += trans.yOffset;
+            trans.position.x = mov.activeTranslation.x + trans.xOffset;
+            trans.position.y = mov.activeTranslation.y + trans.yOffset;
+
+            if (Math.abs(mov.activeTranslation.x - mov.currentTarget.x) < .2 && Math.abs(mov.activeTranslation.y - mov.currentTarget.y) < .2) {
+                mov.activeTranslation = mov.currentTarget;
+                mov.previousTranslation = mov.currentTarget;
+
                 if (mov.target.peek() != null) {
-                    mov.activeTranslation = mov.target.poll();
+                    mov.currentTarget = mov.target.poll();
                 } else {
                     entity.remove(MovementComponent.class);
                     state.state = StateComponent.State.IDLE;
@@ -130,9 +102,9 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             } else {
                 processMoves(currentEntity, moveQueue);
                 moveQueue = new Array();
-                //Pools.get(StateSignal.class).free(action);
+                currentEntity = action.entity;
+                moveQueue.add(action.direction);
             }
-            currentEntity = action.entity;
         }
 
         if (moveQueue != null && currentEntity != null) {
@@ -142,6 +114,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
 
     private void processMoves(Entity entity, Array<StateComponent.Directionality> direction) {
         MovementComponent mov = new MovementComponent();
+
         if (ECSMapper.movement.get(entity) != null) {
             mov = ECSMapper.movement.get(entity);
         }

@@ -66,7 +66,7 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
 
                     // Attack if possible
                     if (isInAttackRange(simulatedAiPos, closestDmgTilePos, attackerComponent.attackRange)) {
-                        StateSignal signal = Pools.get(StateSignal.class).obtain();
+                        StateSignal signal = new StateSignal();
                         signal.direction = faceEnemy(simulatedAiPos, closestDmgTilePos);
                         signal.entity = aiEntity;
                         signal.state = State.ATTACKING;

@@ -56,5 +56,12 @@ public class ECSMapper {
 
     public static final ComponentMapper<AIControllableComponent> aiControllable =
             ComponentMapper.getFor(AIControllableComponent.class);
+
+    public static final ComponentMapper<SpellbookComponent> spellBook =
+            ComponentMapper.getFor(SpellbookComponent.class);
+
+    public static final ComponentMapper<CooldownComponent> cooldown =
+            ComponentMapper.getFor(CooldownComponent.class);
+
 }
 

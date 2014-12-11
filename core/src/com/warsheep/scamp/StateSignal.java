@@ -12,7 +12,12 @@ public class StateSignal implements Pool.Poolable {
     @Override
     public void reset() {
         entity = null;
-        state = StateComponent.State.IDLE;
-        direction = StateComponent.Directionality.NONE;
+        state = null;
+        direction = null;
+    }
+
+    @Override
+    public String toString() {
+        return entity.getId() + ": " + state + ", " + direction;
     }
 }

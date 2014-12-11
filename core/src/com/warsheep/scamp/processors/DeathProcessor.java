@@ -34,6 +34,10 @@ public class DeathProcessor extends IteratingSystem {
             if (ECSMapper.control.get(entity) != null) {
                 entity.remove(ControllableComponent.class);
             }
+
+            if (ECSMapper.animatable.get(entity) != null) {
+                entity.remove(AnimatableComponent.class);
+            }
         }
     }
 

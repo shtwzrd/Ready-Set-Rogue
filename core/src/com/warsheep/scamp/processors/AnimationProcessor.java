@@ -37,6 +37,7 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
             }
 
         }
+
         Animation animation = anim.animations.get(state.state.ordinal());
         if (animation != null) {
             tex.image = (TextureAtlas.AtlasRegion) animation.getKeyFrame(state.time);

@@ -24,11 +24,23 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
         collisions = engine.getSystem(CollisionProcessor.class);
         tileProcessor = engine.getSystem(TileProcessor.class);
     }
+
+    @Override
+    public void spellCasting(Array<StateSignal> signals) {
+        for(StateSignal signal : signals) {
+            System.out.println("Spell fired");
+            SpellbookComponent spellbook = ECSMapper.spellBook.get(signal.entity);
+            CooldownComponent cooldown = ECSMapper.cooldown.get(spellbook.lastSpellCast);
+            if (cooldown != null) {
+                cooldown.currentCooldown = cooldown.maxCooldown;
+            }
+        }
+    }
+
     @Override
     public void attacking(Array<StateSignal> actions) {
         for(StateSignal a: actions) {
             this.processAttack(a.entity, a.direction);
-            Pools.get(StateSignal.class).free(a);
         }
 
     }
