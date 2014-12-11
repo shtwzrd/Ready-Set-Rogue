@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 public class EffectTargetingComponent extends Component {
 
     public Effect effect = Effect.SELF_TARGETING; // Targeting self
-    public int range = 5; // Used for HOMING
+    public int range = 3; // 3 tiles away
     public int x;
     public int y;
 

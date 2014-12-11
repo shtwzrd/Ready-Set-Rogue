@@ -103,8 +103,6 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
                 this.updateCooldowns();
                 this.updateDamageables();
                 turn = Turn.PLANNING;
-                this.updateCooldowns();
-                this.updateDamageables();
             } else {
                 turn = Turn.values()[turn.ordinal() + 1];
             }
@@ -209,10 +207,6 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
         MainGameScreen.attackPos.x = 0;
         MainGameScreen.attackPos.y = 0;
 
-        System.out.println(turn);
-        System.out.println(moves);
-        System.out.println(attacks);
-        System.out.println(casts);
         for (StateListener listener : this.listeners) {
             listener.moving(moves);
             listener.attacking(attacks);

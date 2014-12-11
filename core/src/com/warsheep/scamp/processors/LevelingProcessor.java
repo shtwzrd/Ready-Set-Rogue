@@ -79,6 +79,7 @@ public class LevelingProcessor extends IteratingSystem {
                 System.out.println("\n++ Healing spell gained\n");
                 cooldownComponent.maxCooldown = 7;
                 spell.add(cooldownComponent);
+                effectHealingComponent.healAmount = 3;
                 spell.add(effectHealingComponent);
                 spell.add(effectAreaComponent);
                 spell.add(effectTargetingComponent);
@@ -95,7 +96,7 @@ public class LevelingProcessor extends IteratingSystem {
                 System.out.println("\n++ Meteor spell gained\n");
                 cooldownComponent.maxCooldown = 10;
                 spell.add(cooldownComponent);
-                effectDamagingComponent.damage = 3;
+                effectDamagingComponent.damage = 5;
                 spell.add(effectDamagingComponent);
                 effectAreaComponent.radius = 3; // 1 + 8 + 16 = 25 blocks
                 spell.add(effectAreaComponent);

@@ -118,15 +118,22 @@ public class MainGameScreen extends ScreenAdapter {
         // Skeleton blocker of doom
 
         Random rand = new Random();
-        for (int i = 1; i < 40; i++) {
+        for (int i = 1; i < 20; i++) {
             Entity skeleton = fab.buildEntity("creatures/skeleton");
             ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
             ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
             ecs.addEntity(skeleton);
         }
 
-        for (int i = 1; i < 20; i++) {
+        for (int i = 1; i < 5; i++) {
             Entity skeleton = fab.buildEntity("creatures/ghost");
+            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
+            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
+            ecs.addEntity(skeleton);
+        }
+
+        for (int i = 1; i < 10; i++) {
+            Entity skeleton = fab.buildEntity("creatures/skeleton_archer");
             ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
             ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
             ecs.addEntity(skeleton);

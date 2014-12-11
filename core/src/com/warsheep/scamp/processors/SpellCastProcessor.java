@@ -14,6 +14,10 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
     private CollisionProcessor collisions;
     private TileProcessor tileProcessor;
     private Entity casterEntity;
+    private Entity spell;
+    private EffectHealingComponent healing;
+    private EffectShieldingComponent shielding;
+    private EffectDamagingComponent damaging;
 
     public void addedToEngine(Engine engine) {
         damageableEntities = engine.getEntitiesFor(Family.all(DamageableComponent.class, TileComponent.class, FactionComponent.class, StateComponent.class).get());
@@ -30,7 +34,7 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
             // Get spellbook from entity
             SpellbookComponent spellbook = ECSMapper.spellBook.get(casterEntity);
             // Get spell that was cast
-            Entity spell = spellbook.lastSpellCast;
+            spell = spellbook.lastSpellCast;
 
             if (spell != null) {
                 processSpell(spell);
@@ -39,16 +43,17 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
     }
 
     private void processSpell(Entity spell) {
-        // Get target and area for spell (all spells must have these two)
+        // Get faction, target and area for spell
         FactionComponent factionCaster = ECSMapper.faction.get(casterEntity);
         EffectTargetingComponent target = ECSMapper.effectTargeting.get(spell);
-        setTargetPosition(target);
         EffectAreaComponent area = ECSMapper.effectArea.get(spell);
 
-        if (area != null && target != null) {
-            EffectHealingComponent healing = ECSMapper.effectHealing.get(spell);
-            EffectShieldingComponent shielding = ECSMapper.effectShielding.get(spell);
-            EffectDamagingComponent damaging = ECSMapper.effectDamaging.get(spell);
+        if (area != null && target != null && factionCaster != null) {
+            setTargetPosition(target);
+
+            healing = ECSMapper.effectHealing.get(spell);
+            shielding = ECSMapper.effectShielding.get(spell);
+            damaging = ECSMapper.effectDamaging.get(spell);
 
             int radius = area.radius;
             int x = target.x;
@@ -106,15 +111,20 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
     }
 
     private void setTargetPosition(EffectTargetingComponent target) {
-        if (target.effect == EffectTargetingComponent.Effect.SELF_TARGETING) {
+        if (target.effect == EffectTargetingComponent.Effect.SPECIFIC_TARGET) {
+            // Do nothing, target should have been set elsewhere...
+        }
+
+        else {
             TileComponent tile = ECSMapper.tile.get(casterEntity);
             if (tile != null) {
                 target.x = tile.x;
                 target.y = tile.y;
+
+                if (target.effect == EffectTargetingComponent.Effect.HOMING) {
+                    // TODO: Use A* to find the nearest ally/enemy within range and change target.x, target.y to be this
+                }
             }
-        }
-        else if (target.effect == EffectTargetingComponent.Effect.HOMING) {
-            // TODO: Find enemy within range, if any --> Snail-pattern outwards
         }
     }
 
@@ -125,7 +135,7 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
                 if (damageable.currentHealth == damageable.maxHealth) {
                     break;
                 } else {
-                    System.out.println("Healed by 1.");
+                    System.out.println("Healed by 1");
                     damageable.currentHealth++;
                 }
             }
@@ -145,8 +155,20 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
         DamageableComponent damageable = ECSMapper.damage.get(entity);
         if (damageable != null) {
             damageable.currentHealth -= damageEffect.damage;
-            System.out.println("Dmg spell hit!");
-            // TODO: GRANT EXP AND DROPS
+
+            // Check to see if the damageable entity is dead and if it has anything to drop
+            DropComponent dropComponent = ECSMapper.drop.get(entity);
+            if (damageable.currentHealth <= 0 && dropComponent != null) {
+
+                // Check to see if exp points can be applied to attacker entity
+                LevelComponent levelComp = ECSMapper.level.get(casterEntity);
+                if (levelComp != null) {
+                    levelComp.experiencePoints += dropComponent.experience;
+                    if (dropComponent.itemDrop != null) {
+                        // TODO: Drop item
+                    }
+                }
+            }
         }
     }
 

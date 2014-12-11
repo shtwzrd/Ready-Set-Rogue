@@ -103,6 +103,22 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
                         }
                     }
                 }
+                else {
+                    switch (direction) {
+                        case UP:
+                            checkPosY++;
+                            break;
+                        case DOWN:
+                            checkPosY--;
+                            break;
+                        case RIGHT:
+                            checkPosX++;
+                            break;
+                        case LEFT:
+                            checkPosX--;
+                            break;
+                    }
+                }
             }
 
             atkState.state = StateComponent.State.IDLE;
