@@ -11,7 +11,8 @@ public class MovementComponent extends Component {
 
 	public Queue<Vector3> target = new ArrayDeque<>();
 	public final Interpolation interpolation = Interpolation.linear;
-	public float alpha = 0.0f;
+	public Vector3 previousTranslation;
 	public float timeSinceMove = 0.0f;
+	public Vector3 activeTranslation;
 
 }

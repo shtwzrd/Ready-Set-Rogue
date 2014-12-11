@@ -16,6 +16,7 @@ import java.util.Queue;
 public class MovementProcessor extends IteratingSystem implements StateListener {
     private boolean pause = false;
     private ArrayList<MovementListener> listeners;
+    public static final float MOVE_SPEED = 1.0f;
 
     public static interface MovementListener {
 
@@ -62,12 +63,48 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
 
         }
         */
-        for (Vector3 pos : mov.target) {
-            trans.position.x = pos.x + trans.xOffset;
-            trans.position.y = pos.y + trans.yOffset;
+        if (mov.previousTranslation == null) {
+            mov.previousTranslation = trans.position;
         }
-        entity.remove(MovementComponent.class);
-        state.state = StateComponent.State.IDLE;
+
+        if (mov.activeTranslation == null && mov.target.peek() != null) {
+            mov.activeTranslation = mov.target.poll();
+        }
+
+        if (mov.activeTranslation != null) {
+            System.out.println("Our targets: " + mov.target.toString());
+
+
+            mov.timeSinceMove += deltaTime;
+
+            System.out.println(mov.previousTranslation + " " + mov.activeTranslation);
+
+            trans.position.x = mov.previousTranslation
+                    .interpolate(
+                            mov.activeTranslation,
+                            mov.timeSinceMove / MOVE_SPEED, mov.interpolation).x;
+            trans.position.y = mov.previousTranslation
+                    .interpolate(
+                            mov.activeTranslation,
+                            mov.timeSinceMove / MOVE_SPEED, mov.interpolation).y;
+
+            if (Math.abs(trans.position.x - mov.activeTranslation.x) < .2 && Math.abs(trans.position.y - mov.activeTranslation.y) < .2) {
+                System.out.println("Do I even happen fuck shit damn");
+                trans.position = mov.activeTranslation;
+                mov.previousTranslation = mov.activeTranslation;
+                trans.position.x += trans.xOffset;
+                trans.position.y += trans.yOffset;
+                if (mov.target.peek() != null) {
+                    mov.activeTranslation = mov.target.poll();
+                } else {
+                    entity.remove(MovementComponent.class);
+                    state.state = StateComponent.State.IDLE;
+                }
+            }
+        } else {
+            entity.remove(MovementComponent.class);
+            state.state = StateComponent.State.IDLE;
+        }
     }
 
 
@@ -98,7 +135,7 @@ public class MovementProcessor extends IteratingSystem implements StateListener 
             currentEntity = action.entity;
         }
 
-        if(moveQueue != null && currentEntity != null) {
+        if (moveQueue != null && currentEntity != null) {
             processMoves(currentEntity, moveQueue);
         }
     }
