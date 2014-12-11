@@ -23,7 +23,7 @@ import java.util.Random;
 public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
-    public static final float TURN_DURATION = 2.0f;
+    public static final float TURN_DURATION = 2.2f;
     public static final int MAP_WIDTH = 40;
     public static final int MAP_HEIGHT = 40;
     public static Vector3 moveToPos = new Vector3();
@@ -79,15 +79,17 @@ public class MainGameScreen extends ScreenAdapter {
         movementProcessor = new MovementProcessor(movementListeners);
         combatProcessor = new CombatProcessor();
         aiProcessor = new AIProcessor();
-        controlProcessor = new ControlProcessor();
         spellCastProcessor = new SpellCastProcessor();
+
         ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
         stateListeners.add(movementProcessor);
         stateListeners.add(combatProcessor);
         stateListeners.add(aiProcessor);
-        stateListeners.add(controlProcessor);
         stateListeners.add(spellCastProcessor);
         stateProcessor = new StateProcessor(stateListeners, TURN_DURATION);
+        controlProcessor = new ControlProcessor(stateProcessor);
+        stateListeners.add(controlProcessor);
+        stateProcessor.addListener(controlProcessor);
 
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
@@ -224,7 +226,11 @@ public class MainGameScreen extends ScreenAdapter {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(1, 1, 1, 0.5f);
+        if(stateProcessor.isPlanningTurn()) {
+            shapeRenderer.setColor(0, 1, 0, 0.5f);
+        } else {
+            shapeRenderer.setColor(1, 0, 0, 0.5f);
+        }
         shapeRenderer.circle(Gdx.graphics.getWidth() - 15, Gdx.graphics.getHeight() - 15, size);
         shapeRenderer.end();
         shapeRenderer.dispose();

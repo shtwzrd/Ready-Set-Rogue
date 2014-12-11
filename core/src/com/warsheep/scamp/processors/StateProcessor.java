@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Sort;
 import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.components.DamageableComponent;
 import com.warsheep.scamp.components.EffectCooldownComponent;
+import com.warsheep.scamp.TurnSystem;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.*;
@@ -17,7 +18,7 @@ import com.warsheep.scamp.screens.MainGameScreen;
 
 import java.util.*;
 
-public class StateProcessor extends EntitySystem {
+public class StateProcessor extends EntitySystem implements TurnSystem {
 
     private List<StateListener> listeners;
     private ImmutableArray<Entity> statefuls;
@@ -25,11 +26,18 @@ public class StateProcessor extends EntitySystem {
     private ImmutableArray<Entity> damageables;
     private float interval;
     private float accumulator = interval;
-    private Array<StateSignal> actionQueue;
-    private Array<StateSignal> moves;
-    private Array<StateSignal> attacks;
-    private Array<StateSignal> casts;
+    private Array<StateSignal> playerQueue;
+    private Array<StateSignal> aiQueue;
+    private Array<StateSignal> playerMoves;
+    private Array<StateSignal> playerAttacks;
+    private Array<StateSignal> playerCasts;
+    private Array<StateSignal> aiMoves;
+    private Array<StateSignal> aiAttacks;
+    private Array<StateSignal> aiCasts;
+    private static final Array<StateSignal> empty = new Array();
     private MovementActionComparator actionSorter = new MovementActionComparator();
+    private static final int TURNS_PER_ROUND = 4;
+    private Turn turn = Turn.PLANNING;
 
 
     public static interface StateListener {
@@ -53,7 +61,11 @@ public class StateProcessor extends EntitySystem {
         default public void moving(Array<StateSignal> actions) {
         }
 
-        default public Array<StateSignal> turnEnd() {
+        default public Array<StateSignal> aiTurnEnd() {
+            return new Array<>();
+        }
+
+        default public Array<StateSignal> playerTurnEnd() {
             return new Array<>();
         }
     }
@@ -61,9 +73,14 @@ public class StateProcessor extends EntitySystem {
     public StateProcessor(List<StateListener> listeners, float interval) {
         this.listeners = listeners;
         this.interval = interval;
-        this.actionQueue = new Array<>();
-        this.moves = new Array<>();
-        this.attacks = new Array<>();
+        this.playerQueue = new Array<>();
+        this.playerMoves = new Array<>();
+        this.playerAttacks = new Array<>();
+        this.playerCasts = new Array<>();
+        this.aiQueue = new Array<>();
+        this.aiMoves = new Array<>();
+        this.aiAttacks = new Array<>();
+        this.aiCasts = new Array<>();
     }
 
     @Override
@@ -76,18 +93,49 @@ public class StateProcessor extends EntitySystem {
     @Override
     public void update(float deltaTime) {
 
+        if (turn != Turn.PLANNING) { // triple deincrement if not Planning Turn
+            accumulator -= deltaTime * 2;
+        }
         accumulator -= deltaTime;
         if (accumulator <= 0) {
+            this.updateInterval(turn);
+            if (turn == Turn.AI_COMBAT) {
+                turn = Turn.PLANNING;
+            } else {
+                turn = Turn.values()[turn.ordinal() + 1];
+            }
             this.accumulator = interval;
-            this.updateInterval();
         }
     }
 
-    protected void updateInterval() {
+    protected void updateInterval(Turn currentTurn) {
         this.updateCooldowns();
         this.updateDamageables();
-        this.pullActions();
-        this.resolveTurn();
+        switch (currentTurn) {
+            case PLANNING:
+
+                break;
+            case PLAYER_MOVE:
+                pullPlayerActions();
+                this.resolveTurn(playerMoves, empty, empty);
+                playerMoves = new Array();
+                break;
+            case AI_MOVE:
+                pullAiActions();
+                this.resolveTurn(aiMoves, empty, empty);
+                aiMoves = new Array();
+                break;
+            case PLAYER_COMBAT:
+                this.resolveTurn(empty, playerAttacks, playerCasts);
+                playerAttacks = new Array();
+                playerCasts = new Array();
+                break;
+            case AI_COMBAT:
+                this.resolveTurn(empty, aiAttacks, aiCasts);
+                aiAttacks = new Array();
+                aiCasts = new Array();
+                break;
+        }
     }
 
     private void updateDamageables() {
@@ -114,17 +162,32 @@ public class StateProcessor extends EntitySystem {
         }
     }
 
-    private void pullActions() {
-        moves = new Array();
-        attacks = new Array();
-        casts = new Array();
-        actionQueue = new Array();
+    private void pullAiActions() {
+        aiQueue = new Array();
 
         for (StateListener listener : this.listeners) {
-            actionQueue.addAll(listener.turnEnd());
+            aiQueue.addAll(listener.aiTurnEnd());
         }
 
-        for (StateSignal action : actionQueue) {
+        sortActions(aiQueue, aiMoves, aiAttacks, aiCasts);
+    }
+
+    private void pullPlayerActions() {
+        playerQueue = new Array();
+
+        for (StateListener listener : this.listeners) {
+            playerQueue.addAll(listener.playerTurnEnd());
+        }
+
+        sortActions(playerQueue, playerMoves, playerAttacks, playerCasts);
+    }
+
+    private void sortActions(Array<StateSignal> main,
+                             Array<StateSignal> moves,
+                             Array<StateSignal> attacks,
+                             Array<StateSignal> casts) {
+
+        for (StateSignal action : main) {
             if (action.state == State.MOVING) {
                 moves.add(action);
             } else if (action.state == State.ATTACKING) {
@@ -136,29 +199,27 @@ public class StateProcessor extends EntitySystem {
 
         Sort sort = Sort.instance();
         sort.sort(moves, this.actionSorter);
-
-        for (StateListener movers : this.listeners) {
-            movers.moving(moves);
-            movers.attacking(attacks);
-            movers.spellCasting(casts);
-        }
-
     }
 
-    private void resolveTurn() {
+    private void resolveTurn(Array<StateSignal> moves, Array<StateSignal> attacks, Array<StateSignal> casts) {
         MainGameScreen.moveToPos.x = 0;
         MainGameScreen.moveToPos.y = 0;
         MainGameScreen.attackPos.x = 0;
         MainGameScreen.attackPos.y = 0;
 
+        System.out.println(turn);
+        System.out.println(moves);
+        System.out.println(attacks);
+        System.out.println(casts);
+        for (StateListener listener : this.listeners) {
+            listener.moving(moves);
+            listener.attacking(attacks);
+            listener.spellCasting(casts);
+        }
+
         for (Entity stateful : this.statefuls) {
             State state = ECSMapper.state.get(stateful).state;
             switch (state) {
-                case ATTACKING:
-                    for (StateListener listener : this.listeners) {
-                        listener.attacking(attacks);
-                    }
-                    break;
                 case DEAD:
                     for (StateListener listener : this.listeners) {
                         listener.dead(stateful);
@@ -178,6 +239,25 @@ public class StateProcessor extends EntitySystem {
                     break;
             }
         }
+    }
+
+    @Override
+    public boolean isPlanningTurn() {
+        return turn == Turn.PLANNING;
+    }
+
+    @Override
+    public float getTurnLength() {
+        return interval;
+    }
+
+    @Override
+    public int getTurnsPerRound() {
+        return TURNS_PER_ROUND;
+    }
+
+    public void addListener(StateListener listener) {
+        this.listeners.add(listener);
     }
 
     private static class MovementActionComparator implements Comparator<StateSignal> {
