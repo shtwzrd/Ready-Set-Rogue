@@ -29,7 +29,7 @@ public class AIProcessor extends EntitySystem implements StateProcessor.StateLis
     }
 
     @Override
-    public Array<StateSignal> turnEnd() {
+    public Array<StateSignal> aiTurnEnd() {
         // Pools.get(StateSignal.class).freeAll(this.actions);
         Array<StateSignal> actions = new Array();
         for (Entity aiEntity : aiControllableEntities) {

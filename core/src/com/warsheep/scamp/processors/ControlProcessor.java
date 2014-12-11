@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import com.warsheep.scamp.StateSignal;
+import com.warsheep.scamp.TurnSystem;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.State;
 import com.warsheep.scamp.components.StateComponent.Directionality;
@@ -30,8 +31,10 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     private int selectedSpell = 0;
     private boolean hasAttacked = false; // If player can attack more than once, change this to an int-variable inside AttackerComp
     private final Pool<StateSignal> pool = Pools.get(StateSignal.class);
+    private final TurnSystem turnSystem;
 
-    public ControlProcessor() {
+    public ControlProcessor(TurnSystem turnSystem) {
+        this.turnSystem = turnSystem;
         actions = new Array<>();
     }
 
@@ -41,79 +44,81 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     }
 
     private void addAction(StateSignal signal) {
-        for (Entity entity : this.entities) {
-            signal.entity = entity;
-            TileComponent tilePos = ECSMapper.tile.get(signal.entity);
-            if (signal.state == State.MOVING) {
-                if (ECSMapper.control.get(signal.entity).movesConsumed <= ECSMapper.control.get(signal.entity).movementBonus) {
-                    if (collisions.checkMove(tilePos.x + simulatedX,
-                            tilePos.y + simulatedY,
-                            signal.entity, signal.direction, false)) {
-                        System.out.println("Blocked");
-                        // Some visual feedback
-                    } else {
-                        actions.add(signal);
+        if(turnSystem.isPlanningTurn()) {
+            for (Entity entity : this.entities) {
+                signal.entity = entity;
+                TileComponent tilePos = ECSMapper.tile.get(signal.entity);
+                if (signal.state == State.MOVING) {
+                    if (ECSMapper.control.get(signal.entity).movesConsumed <= ECSMapper.control.get(signal.entity).movementBonus) {
+                        if (collisions.checkMove(tilePos.x + simulatedX,
+                                tilePos.y + simulatedY,
+                                signal.entity, signal.direction, false)) {
+                            System.out.println("Blocked");
+                            // Some visual feedback
+                        } else {
+                            actions.add(signal);
+                            switch (signal.direction) {
+                                case UP:
+                                    if (hasAttacked) MainGameScreen.attackPos.y++;
+                                    simulatedY++;
+                                    break;
+                                case DOWN:
+                                    if (hasAttacked) MainGameScreen.attackPos.y--;
+                                    simulatedY--;
+                                    break;
+                                case LEFT:
+                                    if (hasAttacked) MainGameScreen.attackPos.x--;
+                                    simulatedX--;
+                                    break;
+                                case RIGHT:
+                                    if (hasAttacked) MainGameScreen.attackPos.x++;
+                                    simulatedX++;
+                                    break;
+                            }
+                            MainGameScreen.moveToPos.x = simulatedX;
+                            MainGameScreen.moveToPos.y = simulatedY;
+                            ECSMapper.control.get(signal.entity).movesConsumed++;
+                        }
+                    }
+                }
+                if (signal.state == State.ATTACKING) {
+                    if (!hasAttacked) {
+                        MainGameScreen.attackPos.x = simulatedX;
+                        MainGameScreen.attackPos.y = simulatedY;
                         switch (signal.direction) {
                             case UP:
-                                if (hasAttacked) MainGameScreen.attackPos.y++;
-                                simulatedY++;
+                                MainGameScreen.attackPos.y++;
                                 break;
                             case DOWN:
-                                if (hasAttacked) MainGameScreen.attackPos.y--;
-                                simulatedY--;
+                                MainGameScreen.attackPos.y--;
                                 break;
                             case LEFT:
-                                if (hasAttacked) MainGameScreen.attackPos.x--;
-                                simulatedX--;
+                                MainGameScreen.attackPos.x--;
                                 break;
                             case RIGHT:
-                                if (hasAttacked) MainGameScreen.attackPos.x++;
-                                simulatedX++;
+                                MainGameScreen.attackPos.x++;
                                 break;
                         }
-                        MainGameScreen.moveToPos.x = simulatedX;
-                        MainGameScreen.moveToPos.y = simulatedY;
-                        ECSMapper.control.get(signal.entity).movesConsumed++;
-                    }
-                }
-            }
-            if (signal.state == State.ATTACKING) {
-                if (!hasAttacked) {
-                    MainGameScreen.attackPos.x = simulatedX;
-                    MainGameScreen.attackPos.y = simulatedY;
-                    switch (signal.direction) {
-                        case UP:
-                            MainGameScreen.attackPos.y++;
-                            break;
-                        case DOWN:
-                            MainGameScreen.attackPos.y--;
-                            break;
-                        case LEFT:
-                            MainGameScreen.attackPos.x--;
-                            break;
-                        case RIGHT:
-                            MainGameScreen.attackPos.x++;
-                            break;
-                    }
 
-                    actions.add(signal);
-                    hasAttacked = true;
-                }
-            }
-
-            if (signal.state == State.CASTING) {
-                if (!hasAttacked) {
-                    if (tryCastingSpell(selectedSpell)) {
                         actions.add(signal);
+                        hasAttacked = true;
                     }
+                }
 
+                if (signal.state == State.CASTING) {
+                    if (!hasAttacked) {
+                        if (tryCastingSpell(selectedSpell)) {
+                            actions.add(signal);
+                        }
+
+                    }
                 }
             }
         }
     }
 
     @Override
-    public Array<StateSignal> turnEnd() {
+    public Array<StateSignal> playerTurnEnd() {
         for (int i = 0; i < entities.size(); i++) {
             ECSMapper.control.get(entities.get(i)).movesConsumed = 0;
         }
