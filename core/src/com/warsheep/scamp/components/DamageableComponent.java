@@ -7,5 +7,7 @@ public class DamageableComponent extends Component {
     public int currentHealth = 5;
     public int maxHealth = 5;
     public boolean essential = false;
+    public boolean shieldOn = false;
+    public int shieldDuration = 0;
 
 }

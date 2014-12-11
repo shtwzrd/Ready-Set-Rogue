@@ -49,10 +49,10 @@ public class LevelingProcessor extends IteratingSystem {
         }
 
         if (hitMilestone(levelComp.level)) {
-            addSpell();
+            addSpell(levelComp.level);
         }
 
-        resetCooldowns();
+        resetCooldowns(); // Reset all cooldowns on levelUp
     }
 
     private boolean hitMilestone(int level) {
@@ -64,21 +64,74 @@ public class LevelingProcessor extends IteratingSystem {
         return false;
     }
 
-    private void addSpell() {
-        // Cooldown spell
-        Entity cooldownSpell = new Entity();
-        cooldownSpell.add(new CooldownComponent());
-        MainGameScreen.ecs.addEntity(cooldownSpell);
+    private void addSpell(int milestone) {
+        Entity spell = new Entity();
 
-        // Add cooldown spell to player
+        EffectCooldownComponent cooldownComponent = new EffectCooldownComponent();
+        EffectAreaComponent effectAreaComponent = new EffectAreaComponent();
+        EffectTargetingComponent effectTargetingComponent = new EffectTargetingComponent();
+        EffectHealingComponent effectHealingComponent = new EffectHealingComponent();
+        EffectShieldingComponent effectShieldingComponent = new EffectShieldingComponent();
+        EffectDamagingComponent effectDamagingComponent = new EffectDamagingComponent();
+
+        switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
+            case 2: // Healing spell
+                System.out.println("\n++ Healing spell gained\n");
+                cooldownComponent.maxCooldown = 7;
+                spell.add(cooldownComponent);
+                spell.add(effectHealingComponent);
+                spell.add(effectAreaComponent);
+                spell.add(effectTargetingComponent);
+                break;
+            case 3: // Shielding spell
+                System.out.println("\n++ Shielding spell gained\n");
+                cooldownComponent.maxCooldown = 5;
+                spell.add(cooldownComponent);
+                spell.add(effectShieldingComponent);
+                spell.add(effectAreaComponent);
+                spell.add(effectTargetingComponent);
+                break;
+            case 4: // AOE spell
+                System.out.println("\n++ Meteor spell gained\n");
+                cooldownComponent.maxCooldown = 10;
+                spell.add(cooldownComponent);
+                effectDamagingComponent.damage = 3;
+                spell.add(effectDamagingComponent);
+                effectAreaComponent.radius = 3; // 1 + 8 + 16 = 25 blocks
+                spell.add(effectAreaComponent);
+                spell.add(effectTargetingComponent);
+                break;
+            case 5:
+                System.out.println("\n++ Homing missile spell gained\n");
+                spell.add(cooldownComponent);
+                spell.add(effectDamagingComponent);
+                effectDamagingComponent.damage = 10;
+                spell.add(effectAreaComponent);
+                effectTargetingComponent.effect = EffectTargetingComponent.Effect.HOMING;
+                spell.add(effectTargetingComponent);
+                break;
+            case 6:
+                System.out.println("\n++ New spell gained\n");
+                spell.add(cooldownComponent);
+                break;
+            default:
+                System.out.println("\n++ We should neva be here...\n");
+                System.out.println();
+                break;
+        }
+
+        // Add spell to Entity System
+        MainGameScreen.ecs.addEntity(spell);
+
+        // Add spell to the player's spellbook
         SpellbookComponent spellbook = ECSMapper.spellBook.get(entity);
-        spellbook.spellbook.add(cooldownSpell);
+        spellbook.spellbook.add(spell);
     }
 
     private void resetCooldowns() {
         SpellbookComponent spellbook = ECSMapper.spellBook.get(entity);
         for (Entity spell : spellbook.spellbook) {
-            CooldownComponent cooldownComponent = ECSMapper.cooldown.get(spell);
+            EffectCooldownComponent cooldownComponent = ECSMapper.cooldown.get(spell);
             if (cooldownComponent != null) {
                 cooldownComponent.currentCooldown = 0;
             }

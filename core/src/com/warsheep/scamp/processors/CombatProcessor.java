@@ -26,18 +26,6 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
     }
 
     @Override
-    public void spellCasting(Array<StateSignal> signals) {
-        for(StateSignal signal : signals) {
-            System.out.println("Spell fired");
-            SpellbookComponent spellbook = ECSMapper.spellBook.get(signal.entity);
-            CooldownComponent cooldown = ECSMapper.cooldown.get(spellbook.lastSpellCast);
-            if (cooldown != null) {
-                cooldown.currentCooldown = cooldown.maxCooldown;
-            }
-        }
-    }
-
-    @Override
     public void attacking(Array<StateSignal> actions) {
         for(StateSignal a: actions) {
             this.processAttack(a.entity, a.direction);
@@ -85,21 +73,22 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
                             if (dmgComp != null && dmgFaction != null) {
                                 hadDamageable = true;
                                 if (!shareFaction(atkFaction, dmgFaction)) {
+                                    if (!dmgComp.shieldOn) {
+                                        // Apply damage
+                                        System.out.println("Hit! ");
+                                        dmgComp.currentHealth -= atkComp.baseDamage;
 
-                                    // Apply damage
-                                    System.out.println("Hit! ");
-                                    dmgComp.currentHealth -= atkComp.baseDamage;
+                                        // Check to see if the damageable entity is dead and if it has anything to drop
+                                        DropComponent dropComponent = ECSMapper.drop.get(damageable);
+                                        if (dmgComp.currentHealth <= 0 && dropComponent != null) {
 
-                                    // Check to see if the damageable entity is dead and if it has anything to drop
-                                    DropComponent dropComponent = ECSMapper.drop.get(damageable);
-                                    if (dmgComp.currentHealth <= 0 && dropComponent != null) {
-
-                                        // Check to see if exp points can be applied to attacker entity
-                                        LevelComponent levelComp = ECSMapper.level.get(entity);
-                                        if (levelComp != null) {
-                                            levelComp.experiencePoints += dropComponent.experience;
-                                            if (dropComponent.itemDrop != null) {
-                                                // TODO: Drop item
+                                            // Check to see if exp points can be applied to attacker entity
+                                            LevelComponent levelComp = ECSMapper.level.get(entity);
+                                            if (levelComp != null) {
+                                                levelComp.experiencePoints += dropComponent.experience;
+                                                if (dropComponent.itemDrop != null) {
+                                                    // TODO: Drop item
+                                                }
                                             }
                                         }
                                     }

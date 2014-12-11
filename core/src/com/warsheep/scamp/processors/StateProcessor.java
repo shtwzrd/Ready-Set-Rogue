@@ -6,11 +6,10 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Sort;
 import com.warsheep.scamp.StateSignal;
-import com.warsheep.scamp.adt.Pair;
-import com.warsheep.scamp.components.CooldownComponent;
+import com.warsheep.scamp.components.DamageableComponent;
+import com.warsheep.scamp.components.EffectCooldownComponent;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.StateComponent;
 import com.warsheep.scamp.components.StateComponent.*;
@@ -23,6 +22,7 @@ public class StateProcessor extends EntitySystem {
     private List<StateListener> listeners;
     private ImmutableArray<Entity> statefuls;
     private ImmutableArray<Entity> cooldowners;
+    private ImmutableArray<Entity> damageables;
     private float interval;
     private float accumulator = interval;
     private Array<StateSignal> actionQueue;
@@ -69,7 +69,8 @@ public class StateProcessor extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         statefuls = engine.getEntitiesFor(Family.all(StateComponent.class).get());
-        cooldowners = engine.getEntitiesFor(Family.all(CooldownComponent.class).get());
+        cooldowners = engine.getEntitiesFor(Family.all(EffectCooldownComponent.class).get());
+        damageables = engine.getEntitiesFor(Family.all(DamageableComponent.class).get());
     }
 
     @Override
@@ -84,14 +85,28 @@ public class StateProcessor extends EntitySystem {
 
     protected void updateInterval() {
         this.updateCooldowns();
+        this.updateDamageables();
         this.pullActions();
         this.resolveTurn();
+    }
+
+    private void updateDamageables() {
+        // Update all damageables
+        for (Entity c : this.damageables) {
+            DamageableComponent damageable = ECSMapper.damage.get(c);
+            if (damageable.shieldOn) {
+                damageable.shieldDuration--;
+                if (damageable.shieldDuration < 1) {
+                    damageable.shieldOn = false;
+                }
+            }
+        }
     }
 
     private void updateCooldowns() {
         // Update all cooldowns
         for (Entity c : this.cooldowners) {
-            CooldownComponent cooldown = ECSMapper.cooldown.get(c);
+            EffectCooldownComponent cooldown = ECSMapper.cooldown.get(c);
             if (cooldown.currentCooldown > 0) {
                 cooldown.currentCooldown--;
                 System.out.println("Cooldown: " + cooldown.currentCooldown + "/" + cooldown.maxCooldown);
@@ -109,7 +124,6 @@ public class StateProcessor extends EntitySystem {
             actionQueue.addAll(listener.turnEnd());
         }
 
-        System.out.println(actionQueue.size);
         for (StateSignal action : actionQueue) {
             if (action.state == State.MOVING) {
                 moves.add(action);

@@ -106,6 +106,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                     if (tryCastingSpell(selectedSpell)) {
                         actions.add(signal);
                     }
+                    hasAttacked = true;
 
                 }
             }
@@ -205,6 +206,14 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 input.direction = Directionality.LEFT;
                 input.state = State.ATTACKING;
                 break;
+            case Input.Keys.X:
+                for (Entity e : entities) {
+                    LevelComponent levelComponent = ECSMapper.level.get(e);
+                    if (levelComponent != null) {
+                        levelComponent.experiencePoints += 1000;
+                    }
+                }
+                break;
 
             // Spell casting scheme
             case Input.Keys.NUM_6:
@@ -256,7 +265,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 Entity lastCastSpell = spellBook.spellbook.get(spellNum);
                 if (lastCastSpell != null) {
                     // Check if the spell has a cooldown, if yes, check if current cooldown = 0, else fire
-                    CooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
+                    EffectCooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
                     if (cooldown != null) {
                         if (cooldown.currentCooldown == 0) {
                             spellBook.lastSpellCast = lastCastSpell;
@@ -292,6 +301,8 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         int clickPosX = screenX - Gdx.graphics.getWidth() / 2;
         int clickPosY = screenY - Gdx.graphics.getHeight() / 2;
 
+        System.out.println(clickPosX + " " + clickPosY);
+
         StateSignal input = pool.obtain();
         if (screenX > Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7) {
             if (screenY > Gdx.graphics.getHeight() / 7 && screenY <= Gdx.graphics.getHeight() / 7 * 2) {
@@ -316,30 +327,28 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 this.selectedSpell = 4;
             }
         } else if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
-            if (Math.abs(clickPosX) > Math.abs(clickPosY)) {
-                // Move Left or Right
-                if (clickPosX > 0) {
-                    input.direction = Directionality.RIGHT;
-                    input.state = State.MOVING;
-                } else {
-                    input.direction = Directionality.LEFT;
-                    input.state = State.MOVING;
-                }
+            // Move Left or Right
+            if (clickPosX > 0) {
+                input.direction = Directionality.RIGHT;
+                input.state = State.MOVING;
             } else {
-                // Move Up or Down
-                if (clickPosY > 0) {
-                    input.direction = Directionality.DOWN;
-                    input.state = State.MOVING;
-                } else {
-                    input.direction = Directionality.UP;
-                    input.state = State.MOVING;
-                }
+                input.direction = Directionality.LEFT;
+                input.state = State.MOVING;
             }
+        } else {
+            // Move Up or Down
+            if (clickPosY > 0) {
+                input.direction = Directionality.DOWN;
+                input.state = State.MOVING;
+            } else {
+                input.direction = Directionality.UP;
+                input.state = State.MOVING;
+            }
+        }
 
-            if(input.state != null) {
-                this.addAction(input);
-                return true;
-            }
+        if (input.state != null) {
+            this.addAction(input);
+            return true;
         }
 
         return false;
@@ -373,7 +382,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                 }
             }
         }
-        if(input.state != null) {
+        if (input.state != null) {
             this.addAction(input);
             return true;
         }

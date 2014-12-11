@@ -60,8 +60,23 @@ public class ECSMapper {
     public static final ComponentMapper<SpellbookComponent> spellBook =
             ComponentMapper.getFor(SpellbookComponent.class);
 
-    public static final ComponentMapper<CooldownComponent> cooldown =
-            ComponentMapper.getFor(CooldownComponent.class);
+    public static final ComponentMapper<EffectCooldownComponent> cooldown =
+            ComponentMapper.getFor(EffectCooldownComponent.class);
+
+    public static final ComponentMapper<EffectAreaComponent> effectArea =
+            ComponentMapper.getFor(EffectAreaComponent.class);
+
+    public static final ComponentMapper<EffectDamagingComponent> effectDamaging =
+            ComponentMapper.getFor(EffectDamagingComponent.class);
+
+    public static final ComponentMapper<EffectHealingComponent> effectHealing =
+            ComponentMapper.getFor(EffectHealingComponent.class);
+
+    public static final ComponentMapper<EffectShieldingComponent> effectShielding =
+            ComponentMapper.getFor(EffectShieldingComponent.class);
+
+    public static final ComponentMapper<EffectTargetingComponent> effectTargeting =
+            ComponentMapper.getFor(EffectTargetingComponent.class);
 
 }
 

@@ -40,6 +40,7 @@ public class MainGameScreen extends ScreenAdapter {
     AIProcessor aiProcessor;
     LevelingProcessor levelProcessor;
     AnimationProcessor animationProcessor;
+    SpellCastProcessor spellCastProcessor;
 
     Scamp game;
     public static GameState gameState;
@@ -79,11 +80,13 @@ public class MainGameScreen extends ScreenAdapter {
         combatProcessor = new CombatProcessor();
         aiProcessor = new AIProcessor();
         controlProcessor = new ControlProcessor();
+        spellCastProcessor = new SpellCastProcessor();
         ArrayList<StateProcessor.StateListener> stateListeners = new ArrayList();
         stateListeners.add(movementProcessor);
         stateListeners.add(combatProcessor);
         stateListeners.add(aiProcessor);
         stateListeners.add(controlProcessor);
+        stateListeners.add(spellCastProcessor);
         stateProcessor = new StateProcessor(stateListeners, TURN_DURATION);
 
         collisionProcessor = new CollisionProcessor(collisionListeners);
@@ -92,7 +95,6 @@ public class MainGameScreen extends ScreenAdapter {
         levelProcessor = new LevelingProcessor();
         animationProcessor = new AnimationProcessor();
 
-
         ecs.addSystem(tileProcessor);
         ecs.addSystem(visibilityProcessor);
         ecs.addSystem(collisionProcessor);
@@ -100,6 +102,7 @@ public class MainGameScreen extends ScreenAdapter {
         ecs.addSystem(cameraProcessor);
         ecs.addSystem(deathProcessor);
         ecs.addSystem(combatProcessor);
+        ecs.addSystem(spellCastProcessor);
         ecs.addSystem(stateProcessor);
         ecs.addSystem(aiProcessor);
         ecs.addSystem(controlProcessor);
@@ -113,14 +116,14 @@ public class MainGameScreen extends ScreenAdapter {
         // Skeleton blocker of doom
 
         Random rand = new Random();
-        for (int i = 1; i < 15; i++) {
+        for (int i = 1; i < 40; i++) {
             Entity skeleton = fab.buildEntity("creatures/skeleton");
             ECSMapper.tile.get(skeleton).x = rand.nextInt(30) + 1;
             ECSMapper.tile.get(skeleton).y = rand.nextInt(30) + 1;
             ecs.addEntity(skeleton);
         }
 
-        for (int i = 1; i < 10; i++) {
+        for (int i = 1; i < 20; i++) {
             Entity skeleton = fab.buildEntity("creatures/ghost");
             ECSMapper.tile.get(skeleton).x = rand.nextInt(12 - 6) + 1;
             ECSMapper.tile.get(skeleton).y = rand.nextInt(12 - 6) + 1;
@@ -133,8 +136,8 @@ public class MainGameScreen extends ScreenAdapter {
 
         ECSMapper.tile.get(wizard).x = 8;
         ECSMapper.tile.get(wizard).y = 8;
-        ECSMapper.transform.get(wizard).position.x = 8 * 24;
-        ECSMapper.transform.get(wizard).position.y = 8 * 24;
+        ECSMapper.transform.get(wizard).position.x = 8 * 24 + ECSMapper.transform.get(wizard).xOffset;
+        ECSMapper.transform.get(wizard).position.y = 8 * 24 + ECSMapper.transform.get(wizard).yOffset;
 
         createCamera(wizard);
 
@@ -216,9 +219,6 @@ public class MainGameScreen extends ScreenAdapter {
     private void addTimeCircle(float delta) {
         ShapeRenderer shapeRenderer = new ShapeRenderer();
 
-        if (delta - accumulator > TURN_DURATION) {
-            accumulator = delta;
-        }
         int size = (int) (10 - (delta % 3 * 3)) - 1;
 
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -229,6 +229,7 @@ public class MainGameScreen extends ScreenAdapter {
         shapeRenderer.end();
         shapeRenderer.dispose();
         Gdx.gl.glDisable(GL20.GL_BLEND);
+
     }
 
     private void addPlayerStats() {
