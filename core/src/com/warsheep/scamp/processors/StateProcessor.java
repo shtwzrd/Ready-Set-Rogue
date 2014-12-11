@@ -100,6 +100,8 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
         if (accumulator <= 0) {
             this.updateInterval(turn);
             if (turn == Turn.AI_COMBAT) {
+                this.updateCooldowns();
+                this.updateDamageables();
                 turn = Turn.PLANNING;
                 this.updateCooldowns();
                 this.updateDamageables();
@@ -111,7 +113,6 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
     }
 
     protected void updateInterval(Turn currentTurn) {
-
         switch (currentTurn) {
             case PLANNING:
 
@@ -255,6 +256,11 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
     @Override
     public int getTurnsPerRound() {
         return TURNS_PER_ROUND;
+    }
+
+    @Override
+    public Turn getCurrentTurn() {
+        return turn;
     }
 
     public void addListener(StateListener listener) {

@@ -8,6 +8,8 @@ public interface TurnSystem {
 
     public int getTurnsPerRound();
 
+    public Turn getCurrentTurn();
+
     public enum Turn {
         PLANNING,
         PLAYER_MOVE,

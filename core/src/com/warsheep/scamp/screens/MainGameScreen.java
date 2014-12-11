@@ -120,15 +120,15 @@ public class MainGameScreen extends ScreenAdapter {
         Random rand = new Random();
         for (int i = 1; i < 40; i++) {
             Entity skeleton = fab.buildEntity("creatures/skeleton");
-            ECSMapper.tile.get(skeleton).x = rand.nextInt(30) + 1;
-            ECSMapper.tile.get(skeleton).y = rand.nextInt(30) + 1;
+            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
+            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
             ecs.addEntity(skeleton);
         }
 
         for (int i = 1; i < 20; i++) {
             Entity skeleton = fab.buildEntity("creatures/ghost");
-            ECSMapper.tile.get(skeleton).x = rand.nextInt(12 - 6) + 1;
-            ECSMapper.tile.get(skeleton).y = rand.nextInt(12 - 6) + 1;
+            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
+            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
             ecs.addEntity(skeleton);
         }
 
@@ -171,6 +171,7 @@ public class MainGameScreen extends ScreenAdapter {
                 addTimeCircle(delta);
                 addMoveToPos();
                 addSpellGrid();
+                addTurnTimer();
                 break;
             case GAME_OVER:
                 game.setScreen(new MainMenuScreen(game));
@@ -247,6 +248,19 @@ public class MainGameScreen extends ScreenAdapter {
         spriteBatch.enableBlending();
         spriteBatch.begin();
         font.draw(spriteBatch, str, 10, Gdx.graphics.getHeight() - 10);
+        spriteBatch.end();
+        spriteBatch.dispose();
+        font.dispose();
+    }
+
+    private void addTurnTimer() {
+        CharSequence str = String.format("%s %s", "Processing... ", stateProcessor.getCurrentTurn().toString());
+        SpriteBatch spriteBatch = new SpriteBatch();
+        BitmapFont font = new BitmapFont();
+
+        spriteBatch.enableBlending();
+        spriteBatch.begin();
+        font.draw(spriteBatch, str, 10, 20);
         spriteBatch.end();
         spriteBatch.dispose();
         font.dispose();
