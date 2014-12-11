@@ -101,6 +101,8 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
             this.updateInterval(turn);
             if (turn == Turn.AI_COMBAT) {
                 turn = Turn.PLANNING;
+                this.updateCooldowns();
+                this.updateDamageables();
             } else {
                 turn = Turn.values()[turn.ordinal() + 1];
             }
@@ -109,8 +111,7 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
     }
 
     protected void updateInterval(Turn currentTurn) {
-        this.updateCooldowns();
-        this.updateDamageables();
+
         switch (currentTurn) {
             case PLANNING:
 
