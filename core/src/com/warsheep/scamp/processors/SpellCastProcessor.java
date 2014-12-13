@@ -152,20 +152,23 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
     }
 
     private void damage(EffectDamagingComponent damageEffect, Entity entity) {
-        DamageableComponent damageable = ECSMapper.damage.get(entity);
-        if (damageable != null) {
-            damageable.currentHealth -= damageEffect.damage;
+        StateComponent state = ECSMapper.state.get(entity);
+        if (state.state != StateComponent.State.DEAD) {
+            DamageableComponent damageable = ECSMapper.damage.get(entity);
+            if (damageable != null) {
+                damageable.currentHealth -= damageEffect.damage;
 
-            // Check to see if the damageable entity is dead and if it has anything to drop
-            DropComponent dropComponent = ECSMapper.drop.get(entity);
-            if (damageable.currentHealth <= 0 && dropComponent != null) {
+                // Check to see if the damageable entity is dead and if it has anything to drop
+                DropComponent dropComponent = ECSMapper.drop.get(entity);
+                if (damageable.currentHealth <= 0 && dropComponent != null) {
 
-                // Check to see if exp points can be applied to attacker entity
-                LevelComponent levelComp = ECSMapper.level.get(casterEntity);
-                if (levelComp != null) {
-                    levelComp.experiencePoints += dropComponent.experience;
-                    if (dropComponent.itemDrop != null) {
-                        // TODO: Drop item
+                    // Check to see if exp points can be applied to attacker entity
+                    LevelComponent levelComp = ECSMapper.level.get(casterEntity);
+                    if (levelComp != null) {
+                        levelComp.experiencePoints += dropComponent.experience;
+                        if (dropComponent.itemDrop != null) {
+                            // TODO: Drop item
+                        }
                     }
                 }
             }
