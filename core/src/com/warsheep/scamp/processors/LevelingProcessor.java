@@ -95,6 +95,7 @@ public class LevelingProcessor extends IteratingSystem {
         EffectHealingComponent effectHealingComponent = new EffectHealingComponent();
         EffectShieldingComponent effectShieldingComponent = new EffectShieldingComponent();
         EffectDamagingComponent effectDamagingComponent = new EffectDamagingComponent();
+        VisualEffectComponent vfx = new VisualEffectComponent();
 
         switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
             case 2:
@@ -102,9 +103,13 @@ public class LevelingProcessor extends IteratingSystem {
                 cooldownComponent.maxCooldown = 6;
                 spell.add(cooldownComponent);
                 effectHealingComponent.healAmount = 1;
+                vfx.includesTarget = true;
+                vfx.shape = VisualEffectComponent.EffectShape.SINGLE;
+                vfx.file = "vfx/heal";
                 spell.add(effectHealingComponent);
                 spell.add(effectAreaComponent);
                 spell.add(effectTargetingComponent);
+                spell.add(vfx);
                 break;
             case 4:
                 System.out.println("\n++ Meteor spell gained\n");

@@ -1,6 +1,8 @@
 package com.warsheep.scamp.components;
 
-public class VisualEffectComponent {
+import com.badlogic.ashley.core.Component;
+
+public class VisualEffectComponent extends Component {
 
     public String file;
     public int distance = 0;

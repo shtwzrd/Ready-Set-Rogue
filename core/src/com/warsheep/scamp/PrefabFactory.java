@@ -73,6 +73,10 @@ public class PrefabFactory {
                 return cloner.shallowClone(c);
             case SpellbookComponent:
                 return cloner.shallowClone(c);
+            case VisualEffectComponent:
+                return cloner.deepClone(c);
+            case ManagedLifetimeComponent:
+                return new ManagedLifetimeComponent();
             default:
                 return cloner.shallowClone(c);
         }
@@ -91,10 +95,12 @@ public class PrefabFactory {
         InventoryComponent,
         LevelComponent,
         MovementComponent,
+        ManagedLifetimeComponent,
         StateComponent,
         TileComponent,
         TransformComponent,
         VisibleComponent,
+        VisualEffectComponent,
         SpellbookComponent
     }
 }

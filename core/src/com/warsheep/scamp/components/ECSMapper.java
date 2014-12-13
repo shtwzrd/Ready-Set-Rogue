@@ -78,5 +78,11 @@ public class ECSMapper {
     public static final ComponentMapper<EffectTargetingComponent> effectTargeting =
             ComponentMapper.getFor(EffectTargetingComponent.class);
 
+    public static final ComponentMapper<VisualEffectComponent> visualEffect =
+            ComponentMapper.getFor(VisualEffectComponent.class);
+
+    public static final ComponentMapper<ManagedLifetimeComponent> managedLifetime =
+            ComponentMapper.getFor(ManagedLifetimeComponent.class);
+
 }
 

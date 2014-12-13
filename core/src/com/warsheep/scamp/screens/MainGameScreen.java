@@ -41,6 +41,8 @@ public class MainGameScreen extends ScreenAdapter {
     LevelingProcessor levelProcessor;
     AnimationProcessor animationProcessor;
     SpellCastProcessor spellCastProcessor;
+    LifetimeProcessor lifetimeProcessor;
+    VisualEffectProcessor visualEffectProcessor;
 
     Scamp game;
     public static GameState gameState;
@@ -89,13 +91,16 @@ public class MainGameScreen extends ScreenAdapter {
         stateProcessor = new StateProcessor(stateListeners, TURN_DURATION);
         controlProcessor = new ControlProcessor(stateProcessor);
         stateListeners.add(controlProcessor);
-        stateProcessor.addListener(controlProcessor);
 
         collisionProcessor = new CollisionProcessor(collisionListeners);
         cameraProcessor = new CameraProcessor();
         deathProcessor = new DeathProcessor();
         levelProcessor = new LevelingProcessor();
         animationProcessor = new AnimationProcessor();
+        lifetimeProcessor = new LifetimeProcessor(ecs);
+        visualEffectProcessor = new VisualEffectProcessor(ecs);
+        stateProcessor.addListener(controlProcessor);
+        stateProcessor.addListener(visualEffectProcessor);
 
         ecs.addSystem(tileProcessor);
         ecs.addSystem(visibilityProcessor);
@@ -110,34 +115,12 @@ public class MainGameScreen extends ScreenAdapter {
         ecs.addSystem(controlProcessor);
         ecs.addSystem(levelProcessor);
         ecs.addSystem(animationProcessor);
+        ecs.addSystem(lifetimeProcessor);
+        ecs.addSystem(visualEffectProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
 
         PrefabFactory fab = new PrefabFactory();
 
-
-        // Skeleton blocker of doom
-
-//        Random rand = new Random();
-//        for (int i = 1; i < 20; i++) {
-//            Entity skeleton = fab.buildEntity("creatures/skeleton");
-//            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
-//            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
-//            ecs.addEntity(skeleton);
-//        }
-//
-//        for (int i = 1; i < 5; i++) {
-//            Entity skeleton = fab.buildEntity("creatures/ghost");
-//            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
-//            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
-//            ecs.addEntity(skeleton);
-//        }
-//
-//        for (int i = 1; i < 10; i++) {
-//            Entity skeleton = fab.buildEntity("creatures/skeleton_archer");
-//            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
-//            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
-//            ecs.addEntity(skeleton);
-//        }
 
         // Crappy Debug Wizard mans
         Entity wizard = fab.buildEntity("creatures/debugwizard");

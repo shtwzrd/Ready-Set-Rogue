@@ -1,52 +1,26 @@
 {
-  "name": "debugwizard",
+  "name": "heal",
   "components": [
     {
       "class": "com.warsheep.scamp.components.VisibleComponent",
-      "dir": "creatures_24x24",
-      "file": "oryx_m_wizard",
-      "originX": 12,
-      "originY": 0
+      "dir": "fx_24x24",
+      "file": "oryx_yellow_splash",
+      "originX": 0,
+      "originY": 0,
+      "color":  {
+        "r": 1,
+        "g": 1,
+        "b": 0,
+        "a": 1
+      }
     },
     {
-      "class": "com.warsheep.scamp.components.AnimatableComponent"
+      "class": "com.warsheep.scamp.components.AnimatableComponent",
+      "timeIndexed": true,
+      "frameTimings": [ 0.2, 0.2, 0.5 ]
     },
     {
-      "class": "com.warsheep.scamp.components.ControllableComponent",
-      "movementBonus": 1
-    },
-    {
-      "class": "com.warsheep.scamp.components.DamageableComponent",
-      "essential": true
-    },
-    {
-      "class": "com.warsheep.scamp.components.AttackerComponent",
-      "attackRange": 1
-    },
-    {
-      "class": "com.warsheep.scamp.components.FactionComponent",
-      "factions": [
-        "GOOD"
-      ]
-    },
-    {
-      "class": "com.warsheep.scamp.components.LevelComponent"
-    },
-    {
-      "class": "com.warsheep.scamp.components.CollidableComponent"
-    },
-    {
-      "class": "com.warsheep.scamp.components.StateComponent"
-    },
-    {
-      "class": "com.warsheep.scamp.components.TileComponent"
-    },
-    {
-      "class": "com.warsheep.scamp.components.TransformComponent",
-      "yOffset": 5
-    },
-    {
-      "class": "com.warsheep.scamp.components.SpellbookComponent"
+      "class": "com.warsheep.scamp.components.ManagedLifetimeComponent"
     }
   ]
 }

@@ -3,12 +3,9 @@ package com.warsheep.scamp.processors;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.warsheep.scamp.AssetDepot;
-import com.warsheep.scamp.components.AnimatableComponent;
-import com.warsheep.scamp.components.ECSMapper;
-import com.warsheep.scamp.components.StateComponent;
+import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.components.StateComponent.Directionality;
 import com.warsheep.scamp.components.VisibleComponent;
 
@@ -24,34 +21,96 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
         VisibleComponent tex = ECSMapper.visible.get(entity);
         AnimatableComponent anim = ECSMapper.animatable.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
-        if (anim.animations.size == 0) {
-            for (int i = 0; i < StateComponent.State.values().length; i++) {
-                TextureAtlas.AtlasRegion oneStep = assets.fetchImage(tex.dir, tex.file);
-                TextureAtlas.AtlasRegion twoStep = assets.fetchImage(tex.dir, tex.file, 2);
-                TextureAtlas.AtlasRegion[] frames = new TextureAtlas.AtlasRegion[2];
-                frames[0] = oneStep;
-                frames[1] = twoStep;
-                Animation ani = new Animation(.7f, frames);
-                ani.setPlayMode(Animation.PlayMode.LOOP);
-                anim.animations.put(StateComponent.State.values()[i].ordinal(), ani);
-            }
-
+        VisibleComponent vis = ECSMapper.visible.get(entity);
+        if(vis.file.equals("oryx_yellow_splash")) {
+            System.out.println("We processin dat ole yeller");
+            System.out.println(anim.frames.length);
+        }
+        if (state != null) {
+            animateStateful(tex, anim, state, deltaTime);
         }
 
-        Animation animation = anim.animations.get(state.state.ordinal());
-        if (animation != null) {
-            tex.image = (TextureAtlas.AtlasRegion) animation.getKeyFrame(state.time);
-            if (state.direction == Directionality.RIGHT) {
-                if (!tex.image.isFlipX()) {
-                    tex.image.flip(true, false);
-                }
+        VisualEffectComponent vfx = ECSMapper.visualEffect.get(entity);
+        if (vfx != null) {
+            animateVfx(tex, anim, vfx, deltaTime);
+        }
+
+        anim.playTime += deltaTime;
+    }
+
+    private void animateVfx(VisibleComponent tex, AnimatableComponent anim, VisualEffectComponent vfx, float deltaTime) {
+        System.out.println("animateVfx");
+        if (anim.frames.length == 0 || anim.frames == null) {
+            anim.frames = new TextureAtlas.AtlasRegion[anim.frameTimings.length];
+            for (int i = 0; i < anim.frameTimings.length; i++) {
+                anim.frames[i] = assets.fetchImage(tex.dir, tex.file, i + 1);
             }
-            if (state.direction == Directionality.LEFT) {
-                if (tex.image.isFlipX()) {
-                    tex.image.flip(true, false);
-                }
+
+            if (anim.timeIndexed) {
+                System.out.println("anim.timeIndexed...");
+                animateTimeIndexed(anim, tex);
             }
         }
+
+
+    }
+
+
+    private void animateStateful(VisibleComponent tex, AnimatableComponent anim, StateComponent state,
+                                 float deltaTime) {
+        if (anim.frames.length == 0) {
+            initializeDefaultWalk(tex, anim);
+        }
+
+        if (anim.timeIndexed) {
+            animateTimeIndexed(anim, tex);
+        }
+        if (state.direction == Directionality.RIGHT) {
+            if (!tex.image.isFlipX()) {
+                tex.image.flip(true, false);
+            }
+        }
+        if (state.direction == Directionality.LEFT) {
+            if (tex.image.isFlipX()) {
+                tex.image.flip(true, false);
+            }
+        }
+
         state.time += deltaTime;
+    }
+
+    private void initializeDefaultWalk(VisibleComponent tex, AnimatableComponent anim) {
+        TextureAtlas.AtlasRegion oneStep = assets.fetchImage(tex.dir, tex.file);
+        TextureAtlas.AtlasRegion twoStep = assets.fetchImage(tex.dir, tex.file, 2);
+        float[] frameTrans = {12, 12};
+        anim.frames = new TextureAtlas.AtlasRegion[2];
+        anim.frames[0] = oneStep;
+        anim.frames[1] = twoStep;
+        anim.frameTransformsX = frameTrans;
+        anim.frameTransformsY = frameTrans;
+        anim.title = "Walk";
+        anim.timeIndexed = true; // TODO: don't be timeIndexed; use transforms for walking
+        double[] frameTimings = {1f, 1f};
+        anim.frameTimings = frameTimings;
+    }
+
+    private void animateTimeIndexed(AnimatableComponent anim, VisibleComponent tex) {
+        if (tex.file.equals("oryx_yellow_splash")) {
+            System.out.println(anim.playTime);
+            System.out.println(anim.frameTimings[anim.currentFrameIndex]);
+            System.out.println(anim.currentFrameIndex);
+        }
+
+        tex.image = anim.frames[anim.currentFrameIndex];
+        if (anim.playTime >= anim.frameTimings[anim.currentFrameIndex]) {
+            if (anim.currentFrameIndex < anim.frames.length - 1) {
+                anim.currentFrameIndex++;
+
+            } else {
+                anim.currentFrameIndex = 0;
+            }
+            anim.playTime = 0;
+        }
+
     }
 }

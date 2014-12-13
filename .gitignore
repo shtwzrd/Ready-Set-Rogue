@@ -65,3 +65,5 @@ build/
 ## Can't push our assets to a public repo due to licensing
 android/assets/world_24x24
 android/assets/creatures_24x24
+android/assets/fx_24x24
+android/assets/fx_32x32
