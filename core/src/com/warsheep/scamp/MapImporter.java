@@ -23,6 +23,7 @@ public class MapImporter {
     private ArrayList<Entity> entities;
     private JsonReader reader;
     private Map<Integer, String[]> tileMaps;
+    private PrefabFactory fab;
 
     public MapImporter() {
         this.tileComponents = new ArrayList();
@@ -31,6 +32,8 @@ public class MapImporter {
         this.entities = new ArrayList();
         this.reader = new JsonReader();
         this.tileMaps = new HashMap();
+        this.fab = new PrefabFactory();
+
     }
 
     public void loadTiledMapJson(String mapPath) {
@@ -62,8 +65,16 @@ public class MapImporter {
                 String[] tilePathHandle = tileMaps.get(id);
 
                 if (tilePathHandle != null && !tilePathHandle[1].equals(MAGIC_BLANK_TILE)) {
-                    boolean walls = name.equals("Walls") ? true : false;
-                    this.buildTile(x, y, layerLevel, tilePathHandle, walls);
+                    boolean monster = name.equals("Monsters") ? true : false;
+                    if (!monster) {
+                        boolean walls = name.equals("Walls") || name.equals("Obstacles") ? true : false;
+                        this.buildTile(x, y, layerLevel, tilePathHandle, walls);
+                    }
+                    else {
+                        // Spawn monster
+                        this.spawnMonster(x, y, layerLevel, tilePathHandle);
+                    }
+
                 }
 
 
@@ -133,6 +144,8 @@ public class MapImporter {
         this.tileComponents.add(tc);
 
         VisibleComponent vc = new VisibleComponent();
+        vc.dir = tilePathHandle[0];
+        vc.file = imageHandle;
 
         AssetDepot assets = AssetDepot.getInstance();
 
@@ -153,4 +166,20 @@ public class MapImporter {
         e.add(new TransformComponent());
         this.entities.add(e);
     }
+
+    private void spawnMonster(int x, int y, int z, String[] tilePathHandle) {
+
+        // Separate handle from index
+        String imageIndex = tilePathHandle[1]
+                .substring(tilePathHandle[1].lastIndexOf('_') + 1, tilePathHandle[1].length());
+        String imageHandle = tilePathHandle[1].substring(0, tilePathHandle[1].lastIndexOf('_'));
+
+        Entity skeleton = fab.buildEntity("creatures/" + imageHandle.substring(7, imageHandle.length()));
+        ECSMapper.tile.get(skeleton).x = x;
+        ECSMapper.tile.get(skeleton).y = y;
+        ECSMapper.tile.get(skeleton).z = z;
+
+        this.entities.add(skeleton);
+    }
+
 }

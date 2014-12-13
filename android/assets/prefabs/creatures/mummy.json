@@ -4,24 +4,25 @@
     {
       "class": "com.warsheep.scamp.components.VisibleComponent",
       "dir": "creatures_24x24",
-      "file": "oryx_n_skeleton_archer",
+      "file": "oryx_n_mummy",
       "originX": 12,
       "originY": 12
     },
     {
       "class": "com.warsheep.scamp.components.DamageableComponent",
-      "currentHealth": 2
+      "currentHealth": 15
     },
     {
       "class": "com.warsheep.scamp.components.AnimatableComponent"
     },
     {
       "class": "com.warsheep.scamp.components.AttackerComponent",
-      "attackRange": 4
+      "attackRange": 2,
+      "baseDamage": 4
     },
     {
       "class": "com.warsheep.scamp.components.DropComponent",
-      "experience": 250
+      "experience": 400
     },
     {
       "class": "com.warsheep.scamp.components.FactionComponent"

@@ -10,7 +10,7 @@ public class LevelingProcessor extends IteratingSystem {
 
     private LevelComponent levelComp;
     private Entity entity;
-    private final int[] levelMilestones = {2, 3, 4, 5, 6};
+    private final int[] levelMilestones = {2, 4, 7, 12, 18};
 
     public LevelingProcessor() {
         super(Family.all(LevelComponent.class).get());
@@ -39,7 +39,7 @@ public class LevelingProcessor extends IteratingSystem {
         AttackerComponent atkComp = ECSMapper.attack.get(entity);
         DamageableComponent dmgComp = ECSMapper.damage.get(entity);
 
-        if (atkComp != null) {
+        if (atkComp != null && levelComp.level % 2 == 0) { // +1 dmg every other level
             atkComp.baseDamage += levelComp.damageOnLevel;
         }
 
@@ -50,6 +50,28 @@ public class LevelingProcessor extends IteratingSystem {
 
         if (hitMilestone(levelComp.level)) {
             addSpell(levelComp.level);
+        }
+
+        SpellbookComponent spellbook = ECSMapper.spellBook.get(entity);
+        if (spellbook != null) {
+            if (levelComp.level % 4 == 0) { // TODO: Temp! Change this after MVP
+                EffectHealingComponent effectHealingComponent = ECSMapper.effectHealing.get(spellbook.spellbook.get(0));
+                effectHealingComponent.healAmount++;
+            }
+            if (levelComp.level > 4 && levelComp.level % 4 == 0) {
+                EffectDamagingComponent effectDamagingComponent = ECSMapper.effectDamaging.get(spellbook.spellbook.get(1));
+                effectDamagingComponent.damage++;
+            }
+            if (levelComp.level > 7 && levelComp.level % 5 == 0) {
+                EffectShieldingComponent effectShieldingComponent = ECSMapper.effectShielding.get(spellbook.spellbook.get(2));
+                effectShieldingComponent.duration++;
+            }
+        }
+        if (levelComp.level % 5 == 0) {
+            ControllableComponent controllableComponent = ECSMapper.control.get(entity);
+            if (controllableComponent != null) {
+                controllableComponent.movementBonus++;
+            }
         }
 
         resetCooldowns(); // Reset all cooldowns on levelUp
@@ -75,43 +97,38 @@ public class LevelingProcessor extends IteratingSystem {
         EffectDamagingComponent effectDamagingComponent = new EffectDamagingComponent();
 
         switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
-            case 2: // Healing spell
+            case 2:
                 System.out.println("\n++ Healing spell gained\n");
-                cooldownComponent.maxCooldown = 7;
+                cooldownComponent.maxCooldown = 6;
                 spell.add(cooldownComponent);
-                effectHealingComponent.healAmount = 3;
+                effectHealingComponent.healAmount = 1;
                 spell.add(effectHealingComponent);
                 spell.add(effectAreaComponent);
                 spell.add(effectTargetingComponent);
                 break;
-            case 3: // Shielding spell
-                System.out.println("\n++ Shielding spell gained\n");
-                cooldownComponent.maxCooldown = 5;
-                spell.add(cooldownComponent);
-                spell.add(effectShieldingComponent);
-                spell.add(effectAreaComponent);
-                spell.add(effectTargetingComponent);
-                break;
-            case 4: // AOE spell
+            case 4:
                 System.out.println("\n++ Meteor spell gained\n");
                 cooldownComponent.maxCooldown = 10;
                 spell.add(cooldownComponent);
-                effectDamagingComponent.damage = 5;
+                effectDamagingComponent.damage = 3;
                 spell.add(effectDamagingComponent);
                 effectAreaComponent.radius = 3; // 1 + 8 + 16 = 25 blocks
                 spell.add(effectAreaComponent);
                 spell.add(effectTargetingComponent);
                 break;
-            case 5:
-                System.out.println("\n++ Homing missile spell gained\n");
+            case 7:
+                System.out.println("\n++ Shielding spell gained\n");
+                cooldownComponent.maxCooldown = 10;
                 spell.add(cooldownComponent);
-                spell.add(effectDamagingComponent);
-                effectDamagingComponent.damage = 10;
+                spell.add(effectShieldingComponent);
                 spell.add(effectAreaComponent);
-                effectTargetingComponent.effect = EffectTargetingComponent.Effect.HOMING;
                 spell.add(effectTargetingComponent);
                 break;
-            case 6:
+            case 12:
+                System.out.println("\n++ New spell gained\n");
+                spell.add(cooldownComponent);
+                break;
+            case 18:
                 System.out.println("\n++ New spell gained\n");
                 spell.add(cooldownComponent);
                 break;

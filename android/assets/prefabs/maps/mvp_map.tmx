@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="left-up" width="47" height="65" tilewidth="24" tileheight="24">
+ <tileset firstgid="1" name="World" tilewidth="24" tileheight="24">
+  <tile id="0">
+   <image width="24" height="24" source="../../world_24x24/blank_1.png"/>
+  </tile>
+  <tile id="1">
+   <image width="24" height="24" source="../../world_24x24/oryx_chest_1.png"/>
+  </tile>
+  <tile id="2">
+   <image width="24" height="24" source="../../world_24x24/oryx_chest_2.png"/>
+  </tile>
+  <tile id="3">
+   <image width="24" height="24" source="../../world_24x24/oryx_chest_3.png"/>
+  </tile>
+  <tile id="4">
+   <image width="24" height="24" source="../../world_24x24/oryx_chest_4.png"/>
+  </tile>
+  <tile id="5">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_barrel_1.png"/>
+  </tile>
+  <tile id="6">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_barrel_2.png"/>
+  </tile>
+  <tile id="7">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_bookshelf_1.png"/>
+  </tile>
+  <tile id="8">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_bookshelf_2.png"/>
+  </tile>
+  <tile id="9">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_bucket_1.png"/>
+  </tile>
+  <tile id="10">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_bucket_2.png"/>
+  </tile>
+  <tile id="11">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_bottom_1.png"/>
+  </tile>
+  <tile id="12">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_bottomleft_1.png"/>
+  </tile>
+  <tile id="13">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_bottomright_1.png"/>
+  </tile>
+  <tile id="14">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_center_1.png"/>
+  </tile>
+  <tile id="15">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_left_1.png"/>
+  </tile>
+  <tile id="16">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_right_1.png"/>
+  </tile>
+  <tile id="17">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_top_1.png"/>
+  </tile>
+  <tile id="18">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_topleft_1.png"/>
+  </tile>
+  <tile id="19">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_red_topright_1.png"/>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="animated" value=""/>
+   </properties>
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cauldron_1.png"/>
+  </tile>
+  <tile id="21">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cobweb_1.png"/>
+  </tile>
+  <tile id="22">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cobweb_2.png"/>
+  </tile>
+  <tile id="23">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cobweb_3.png"/>
+  </tile>
+  <tile id="24">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cobweb_4.png"/>
+  </tile>
+  <tile id="25">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cobweb_5.png"/>
+  </tile>
+  <tile id="26">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cobweb_6.png"/>
+  </tile>
+  <tile id="27">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_grill_1.png"/>
+  </tile>
+  <tile id="28">
+   <properties>
+    <property name="animated" value=""/>
+   </properties>
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_light_2.png"/>
+  </tile>
+  <tile id="29">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_1.png"/>
+  </tile>
+  <tile id="30">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_2.png"/>
+  </tile>
+  <tile id="31">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_3.png"/>
+  </tile>
+  <tile id="32">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_4.png"/>
+  </tile>
+  <tile id="33">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_5.png"/>
+  </tile>
+  <tile id="34">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_6.png"/>
+  </tile>
+  <tile id="35">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_skeleton_7.png"/>
+  </tile>
+  <tile id="36">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_table_small_1.png"/>
+  </tile>
+  <tile id="37">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_table_small_2.png"/>
+  </tile>
+  <tile id="38">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_throne_purple_1.png"/>
+  </tile>
+  <tile id="39">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_blue_1.png"/>
+  </tile>
+  <tile id="40">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_blue_2.png"/>
+  </tile>
+  <tile id="41">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_blue_3.png"/>
+  </tile>
+  <tile id="42">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_gold_1.png"/>
+  </tile>
+  <tile id="43">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_gold_2.png"/>
+  </tile>
+  <tile id="44">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_gold_3.png"/>
+  </tile>
+  <tile id="45">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_green_1.png"/>
+  </tile>
+  <tile id="46">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_green_2.png"/>
+  </tile>
+  <tile id="47">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_green_3.png"/>
+  </tile>
+  <tile id="48">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_red_1.png"/>
+  </tile>
+  <tile id="49">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_red_2.png"/>
+  </tile>
+  <tile id="50">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_red_3.png"/>
+  </tile>
+  <tile id="51">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_stone_1.png"/>
+  </tile>
+  <tile id="52">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_stone_2.png"/>
+  </tile>
+  <tile id="53">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_stone_3.png"/>
+  </tile>
+  <tile id="54">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_stone_4.png"/>
+  </tile>
+  <tile id="55">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_stone_5.png"/>
+  </tile>
+  <tile id="56">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_vase_stone_6.png"/>
+  </tile>
+  <tile id="57">
+   <image width="24" height="24" source="../../world_24x24/oryx_door_closed_stone_1.png"/>
+  </tile>
+  <tile id="58">
+   <image width="24" height="24" source="../../world_24x24/oryx_door_closed_stone_2.png"/>
+  </tile>
+  <tile id="59">
+   <image width="24" height="24" source="../../world_24x24/oryx_door_open_stone_1.png"/>
+  </tile>
+  <tile id="60">
+   <image width="24" height="24" source="../../world_24x24/oryx_door_open_stone_2.png"/>
+  </tile>
+  <tile id="61">
+   <image width="24" height="24" source="../../world_24x24/oryx_floor_blackwhite_stone_1.png"/>
+  </tile>
+  <tile id="62">
+   <image width="24" height="24" source="../../world_24x24/oryx_floor_blackwhite_stone_2.png"/>
+  </tile>
+  <tile id="63">
+   <image width="24" height="24" source="../../world_24x24/oryx_floor_darkgrey_stone_1.png"/>
+  </tile>
+  <tile id="64">
+   <image width="24" height="24" source="../../world_24x24/oryx_floor_darkgrey_stone_2.png"/>
+  </tile>
+  <tile id="65">
+   <image width="24" height="24" source="../../world_24x24/oryx_floor_darkgrey_stone_3.png"/>
+  </tile>
+  <tile id="66">
+   <image width="24" height="24" source="../../world_24x24/oryx_floor_darkgrey_stone_4.png"/>
+  </tile>
+  <tile id="67">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_1.png"/>
+  </tile>
+  <tile id="68">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_2.png"/>
+  </tile>
+  <tile id="69">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_3.png"/>
+  </tile>
+  <tile id="70">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_4.png"/>
+  </tile>
+  <tile id="71">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_5.png"/>
+  </tile>
+  <tile id="72">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_6.png"/>
+  </tile>
+  <tile id="73">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_7.png"/>
+  </tile>
+  <tile id="74">
+   <image width="24" height="24" source="../../world_24x24/oryx_shrine_8.png"/>
+  </tile>
+  <tile id="75">
+   <image width="24" height="24" source="../../world_24x24/oryx_stairs_down_stone_1.png"/>
+  </tile>
+  <tile id="76">
+   <image width="24" height="24" source="../../world_24x24/oryx_stairs_down_stone_2.png"/>
+  </tile>
+  <tile id="77">
+   <image width="24" height="24" source="../../world_24x24/oryx_stairs_up_stone_1.png"/>
+  </tile>
+  <tile id="78">
+   <image width="24" height="24" source="../../world_24x24/oryx_stairs_up_stone_2.png"/>
+  </tile>
+  <tile id="79">
+   <image width="24" height="24" source="../../world_24x24/oryx_trap_fox_1.png"/>
+  </tile>
+  <tile id="80">
+   <image width="24" height="24" source="../../world_24x24/oryx_trap_spikes_1.png"/>
+  </tile>
+  <tile id="81">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_4wayconnector_stone_1.png"/>
+  </tile>
+  <tile id="82">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_bottom_stone_1.png"/>
+  </tile>
+  <tile id="83">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_bottomleft_stone_1.png"/>
+  </tile>
+  <tile id="84">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_bottomright_stone_1.png"/>
+  </tile>
+  <tile id="85">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_horizontal_3wayconnector_bottom_stone_1.png"/>
+  </tile>
+  <tile id="86">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_horizontal_3wayconnector_top_stone_1.png"/>
+  </tile>
+  <tile id="87">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_horizontal_stone_1.png"/>
+  </tile>
+  <tile id="88">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_horizontal_stone_2.png"/>
+  </tile>
+  <tile id="89">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_island_stone_1.png"/>
+  </tile>
+  <tile id="90">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_island_stone_2.png"/>
+  </tile>
+  <tile id="91">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_island_stone_3.png"/>
+  </tile>
+  <tile id="92">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_island_stone_4.png"/>
+  </tile>
+  <tile id="93">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_left_stone_1.png"/>
+  </tile>
+  <tile id="94">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_right_stone_1.png"/>
+  </tile>
+  <tile id="95">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_top_stone_1.png"/>
+  </tile>
+  <tile id="96">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_topleft_stone_1.png"/>
+  </tile>
+  <tile id="97">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_topright_stone_1.png"/>
+  </tile>
+  <tile id="98">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_vertical_3wayconnector_left_stone_1.png"/>
+  </tile>
+  <tile id="99">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_vertical_3wayconnector_right_stone_1.png"/>
+  </tile>
+  <tile id="100">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_vertical_stone_1.png"/>
+  </tile>
+  <tile id="101">
+   <image width="24" height="24" source="../../world_24x24/oryx_wall_vertical_stone_2.png"/>
+  </tile>
+  <tile id="102">
+   <image width="24" height="24" source="../../world_24x24/oryx_water_blue_1.png"/>
+  </tile>
+  <tile id="103">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_m_lich_1.png"/>
+  </tile>
+  <tile id="104">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_ghost_1.png"/>
+  </tile>
+  <tile id="105">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_mummy_1.png"/>
+  </tile>
+  <tile id="106">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_mummy_pharoah_1.png"/>
+  </tile>
+  <tile id="107">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_shade_1.png"/>
+  </tile>
+  <tile id="108">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_skeleton_1.png"/>
+  </tile>
+  <tile id="109">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_skeleton_archer_1.png"/>
+  </tile>
+  <tile id="110">
+   <image width="24" height="24" source="../../creatures_24x24/oryx_n_skeleton_swordsman_1.png"/>
+  </tile>
+  <tile id="111">
+   <image width="24" height="24" source="../../world_24x24/oryx_grass_1.png"/>
+  </tile>
+  <tile id="112">
+   <image width="24" height="24" source="../../world_24x24/oryx_grass_2.png"/>
+  </tile>
+  <tile id="113">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_bush_1.png"/>
+  </tile>
+  <tile id="114">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_bush_2.png"/>
+  </tile>
+  <tile id="115">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_cachair_1.png"/>
+  </tile>
+  <tile id="116">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_centerpiece_1.png"/>
+  </tile>
+  <tile id="117">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_centerpiece_2.png"/>
+  </tile>
+  <tile id="118">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_carpet_centerpiece_3.png"/>
+  </tile>
+  <tile id="119">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_flower_1.png"/>
+  </tile>
+  <tile id="120">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_flower_2.png"/>
+  </tile>
+  <tile id="121">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_flower_3.png"/>
+  </tile>
+  <tile id="122">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_tree_1.png"/>
+  </tile>
+  <tile id="123">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_well_1.png"/>
+  </tile>
+  <tile id="124">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_shadow_1.png"/>
+  </tile>
+  <tile id="125">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_shadow_2.png"/>
+  </tile>
+  <tile id="126">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_shadow_3.png"/>
+  </tile>
+  <tile id="127">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_9.png"/>
+  </tile>
+  <tile id="128">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_10.png"/>
+  </tile>
+  <tile id="129">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_11.png"/>
+  </tile>
+  <tile id="130">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_12.png"/>
+  </tile>
+  <tile id="131">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_13.png"/>
+  </tile>
+  <tile id="132">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_14.png"/>
+  </tile>
+  <tile id="133">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_15.png"/>
+  </tile>
+  <tile id="134">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_16.png"/>
+  </tile>
+  <tile id="135">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_17.png"/>
+  </tile>
+  <tile id="136">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_18.png"/>
+  </tile>
+  <tile id="137">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_19.png"/>
+  </tile>
+  <tile id="138">
+   <image width="24" height="24" source="../../world_24x24/oryx_decoration_fence_20.png"/>
+  </tile>
+ </tileset>
+ <layer name="DecorationsBack" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJzVmlFu20AMRHWA1k1bf+owsnqh+KP3r4WaADEYDoeygaILEEkkivvIJaldx/dlWe5P+fyP5S4Edd5pf2qjsqn40Adl85X5ld+dran+mdipOV/VV/F+lb17Rq3vdB3VmrJrbExieUamtYT38rgl6Xw4mx8Vo8OfryPz9pD9+RN9qOy80r/cNVHcB+vPh/xIck0+uPF/930WI8b9jcj1uQ6M/2zuq57BBj4f3Lvgzvxb4sc5nfkUP4tnla9Z52D6aNi/L3XuOPNNciGYQjBeqOOyO7aYTpXXHftObIVO9JOvDfvFYN+FjsPv2mL+VfyZ27XlsLM+nse66MH4vyS5LJypGjjfO/M9X8/8N/JMfhZrEH1R+e7sS5x8v5FreVQMlU622+V7t8+8wzwbmRuvYUwPhnXhazO1PXknBTvGJs+9JR2MFwrey3Z2sMPWo4sz3svsDtdKrjFZxT202/WZ6kwaA+MRXDdyv+sfTLfac1bv1epcgv6wuTdgZ4OdAZQ/ymaVK27PZ+ugONk6Kn8qm+r90/V5rAn3POWK63fVG7s+f3bP353HprrTuLPYqPru8sTJWza3ipOT/yq2rFaOETns1IGKn2Ka5m/HEmNLv3frN6mlST1U/jOOGNH7sH84dVqtg2J3fFTxQ+4Qxj+tBcefaWzy38GNe4L8fp/UvBPvqt6cnFQxZ/tZN/bVGjh1Xa0Jm4dxM6lyn8Vb1W1Xq5O+4HAf4uSOyqfuupvrZ9hz7Cd15PQ8lSMx2J4prlf7dpb3jl3Hl8ofHKxn4z3Gm0U9q/bAXT9h3NX5n50RVN7sRNe1qzjZWjAWFsvM5PaZaW0odpY31RzueVP5ywTt5pgoZsWu5o57Z+Lu+IRnbcWP7DEPO2tnWUCf6bDPZSre6qxd9RjWl3BgP8DzPuox7upZ5l/m7uKt1iTGln7/BcL48Ro+w+x2vGpvoPhjDsaR+dkaKf2wW8VUvYM7/hh7E8fMujbseU2yXcWv+rqzT1R54Ma9y69ur1OtC4s57su7z/QqP9lnerkv5f0Oy5euz+C1PMe61D0BuZFH6aJddx9W3e/2uBjHkBzHfaBbsbvv1Srf1bsJOZV0Ou9g784WkfNOLJUu00P2Sc7gM5n9X+e76ouKnfUD7FUL6GPfc+0qpi5vcI6YB3thtQ+K76Fck49ov7NbMTn7BMx5HNX74hgfD/m9/P0OQcWe+fN4Ze/C9Lr8Y+zx/Qdkn679u9m7NYr/y1+ef3c9ovLNYVd1rDjZPTaUXSfeHZfyh4l6VuVW9Xw3h4q1sqnio57p7LlzqLgoromoOunWdFKbTs51a6fqfZIDVa0q/yfxeLc4DIr9D6Qh7Yk=
+  </data>
+ </layer>
+ <layer name="DecorationsBack2" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJztmlEOgzAIhj3JdMmus/uopzc+NOmaSgGhwOqXLDFOC5QfWt2myR/bwPaT7Z1wz559KDY8QIlTit7xU3JDHVcbi/xQ7X7VvPjFum6kcnEVh3V8HoHmBNurrWoIg2ffWkj6Lql9ylj/WnMR44ro84M+jy76A/X2SGtWqZ1Ivkck0vzWtEF97rektO9xH8yxOUK/7xljzdYIczwK84Srs7egTU39zIx7oPhLX7fKOe7YJRjfX8B3mHcaGN8xfozw7jeRtK8dM2W/2apHTh20WLNjzlxo+HTWg7QuoBrTRltjGjmogY0DM9fUtUdyrfICpu9Lj3uHCDlYhMeLti+2fgbVZG1fwiKCrhPae4Ac6X2uFJ5rssc8UPTaMy8Qd2v3To2WOvasn5MFeZ1Er/eiDywYHXyyY258VI1orU1XRMvbaEjtw6z3c957ZQLys1ab2r/rXPljnc8HHtT+rrkeePnvKuXdpnUf6bE+H920Mts=
+  </data>
+ </layer>
+ <layer name="Shadows" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJztmesOgyAMhX3x8ezL/hHWSoFeyfkSMl3q6cEAWnweAACoSetaFSi/Ffow85fVv9RXNv+rfrz8e885rXzUnJvF7GpL8wFgRT9nqGON+TTLYYnmXI1Ccp8i1tr+eLa2Sd5n3mKsx0wbfqN1buJzeO3YvH1Ickt9rvRHo8+UHneeRRMAsEbV507V+ofzWcV/RbC3BG7Cas221JXUaFl0e53dOGl9q5H/lGx+uLy3r3OR35tWay+rMWNZa/+QjiVpnEWtTfkYOf0ftfY/1Z6roz53nk13l2x+KBrTTmMByMrKPrvWnrwVb/vvEVj58eqn5ncYD11QC4wDAPT5AoNqZhs=
+  </data>
+ </layer>
+ <layer name="Obstacles" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJzlms1OwzAMx3vqJO4cdwTOsFcATeveBrhtD88iNVJkxY4/4qQpP6kqSpP4X9dx3I7bNE035KiJZv60H6ZRq5nb16IbG2vRLBmjscP1s1a3NK6oMaV2qW7seu01Qc2n8bfXmi3ZovRzdHnmGwyJnpImreajsJ1LD3/WBsaPF28Oc3rvod7sTf9IjKo7Qmn/YIzn9MlxUsyN1WOj4BHn3L3nv+9ROd0j3UdO+0j6IyPHUCCnW5IDS+tQsk4pu6P6WJJnvv3liGxa37e5fDrMmUJp/3G2XaL0zEeN+8DI+1Okd50gyQm5WO6tH8O67rzWbZx3Wc+tcvJS7jIsz43scGPii7j2XhhLvefdH8cTaONoovr0qAkweu+VFlI/Wp/JXsjV5gdmPytYXP8+jtdM+/w4XtbrNZkFfUNMbGU9zlNZexrDPXWHmJqTv2tSyteQ0nc66fe/1P4CzhfmHNr1pfWlxt5W4j7HdT1Hv5+Tay3zuCSXYFj8XMM+BfRljO8rOO8NbQxhuUmasyAwv5yxjgzbMd9pcxA2DovFLeeRQNBt3aOwe8T27APSniPURpoaKLyX3BXjIlEj1zfe3/QgpbhK/ZuLWcn/QkjWCpY7JDmlds2kRbJ2YR3Frbs4v6NSdmqSe87S/AX7n9Z5pfe5F6A/atdn3Pl6v98fwTnFkqe3guc+T83d47l66rH6UTu+ZZ3W8plZbHHGbu033Bb8AZ4TgcM=
+  </data>
+ </layer>
+ <layer name="Walls" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJztWWtOwzAMzrk4xjbE9mOjwMY5BgzGsVm0WhjLTmznQRH9pKoPuc5X105sJ4QZM2b8Vzxcjs3lWI/nx9+lo0LkHPnekuerMO1viLwpZ4r4DVPjr+ENmBJ/C29AD/445tbCeAenbu49iJdNKIsPzp7UXh6bW3R5/49kz2fh2oODcC2N59FrHU8LjR083KV3anLX6PKMsQ/XuLkf73fj/SJ8x9NdKIunO6RrMZ7peE8O3Vr/88QTF5c17a7xGQD8o9S8huc/zpY1/V3yGewnXP6yQu8AdowMXi+w/7T0mYglOXuh0VPTZ3rDw10TgwPzDPv1OqTjgHuf6ipZt1Nj78PPGoPL3akuLMv5Mv52L+/Py3EmY+MYpPHnQU7n6XK8OvS+lZCqCA+Pv8w9/q9zVqotjsHnMxEl/AdytuIY/LwBHv54bvPkO8dQzhvwEa5+Jx342zT1z3tG30cl3nSu5HAax0ytJcA/yuVsGvW9GDhy0PDGyK3fljyjhL+Vd4vekpe/ZV5t2VtqvTZZcz2L77Tmbs2XLd9aY12NfoFrGvzfJe5b4TmWT+k9Bv88j3t6Ul/aU5fh+pbTm+ohalAaf1Bv0tq1R8/Y6sPa2tVa43pqPu6dLTn3QM2enoSB3Es+Q+VyaFVrA6C/kpPXymH5FrX2gK6XSD7VFwMe2OcHRq601qbAvDT5IuWjkS+xcw7ge7lYoD6qlW/Vz7LUQhbupTVWDta9IMpVmitq7jFJsPSzLXxq9q0lSHbDOU1ubqCyqf5f6V5QK10SBnTdw+41UXMPDqNHLx6vVz18BvL73L49yNK+vCTbw+7cGJZ1teZetgTrOk85peYpi14v6ByX0q9dm6x6e8Caz0wJFrtPDZD334S6efiMGTP+Jr4AGAy0jQ==
+  </data>
+ </layer>
+ <layer name="DecorationsFront" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJztmEsShCAMRDnFjM79DzrlwpKykF8InWC/lQsKEkl3gBAIIeRiRweQYUMH0Elr3Jb3gPSjWb/fyevNJpVfC59BYyzh2Sd+YVz8xzxb9B2zkgYsItVlDVp7iK4Nb35jGbQXatcSOr9aauNsqX3t3DU8LDcndU+IPuj+3kspbg+9wJvHea2VNzDjjtGDtxqXgPYcyfoj3xru5HxDUrcr+FFJH1Z1TTDM8pjWddDed5DSyhlXyiu0epN0Xmo+jbbfz+4nKM085YnUcI1mRuwPWltvOg8Tcgd9Zn/yuFiXJY9oGatFz50K5T1a/8haniuB1ikhhEj4A9g5ByI=
+  </data>
+ </layer>
+ <layer name="Monsters" width="47" height="65">
+  <data encoding="base64" compression="zlib">
+   eJzt1jkSgCAMQFGPq4V6/87KGWRcwCSQ6H+NhQsEE8gwAAAkpt4TAHBATQIAACAyq36WPtm3JbvCxlz43F4vpc9r6jFmD2PvCeDU1R6kuTdd5bin3Nc6M/OYPMVoIV03q1hrclGat5IYpPHTD3yLdh8eIT9Wwbt39SP57htf37dTXmMt/ede55+rmWeLmKKsW2st1+VsT38aP70f4Uz4A+/1Sq1jRy7YaN2j4j3P/0qrPqnzWDbJYBU6
+  </data>
+ </layer>
+</map>

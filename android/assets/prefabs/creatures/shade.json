@@ -1,33 +1,29 @@
 {
-  "name": "skeleton",
+  "name": "ghost",
   "components": [
     {
       "class": "com.warsheep.scamp.components.VisibleComponent",
       "dir": "creatures_24x24",
-      "file": "oryx_n_skeleton_archer",
+      "file": "oryx_n_shade",
       "originX": 12,
       "originY": 12
     },
     {
-      "class": "com.warsheep.scamp.components.DamageableComponent",
-      "currentHealth": 2
+      "class": "com.warsheep.scamp.components.DamageableComponent"
     },
     {
       "class": "com.warsheep.scamp.components.AnimatableComponent"
     },
     {
       "class": "com.warsheep.scamp.components.AttackerComponent",
-      "attackRange": 4
+      "baseDamage": 4
     },
     {
       "class": "com.warsheep.scamp.components.DropComponent",
-      "experience": 250
+      "experience": 1500
     },
     {
       "class": "com.warsheep.scamp.components.FactionComponent"
-    },
-    {
-      "class": "com.warsheep.scamp.components.CollidableComponent"
     },
     {
       "class": "com.warsheep.scamp.components.AIControllableComponent"
@@ -36,11 +32,15 @@
       "class": "com.warsheep.scamp.components.StateComponent"
     },
     {
-      "class": "com.warsheep.scamp.components.TileComponent"
+      "class": "com.warsheep.scamp.components.TileComponent",
+      "z": 14
     },
     {
       "class": "com.warsheep.scamp.components.TransformComponent",
-      "yOffset": 5
+      "yOffset": 2
+    },
+    {
+      "class": "com.warsheep.scamp.components.SpellbookComponent"
     }
   ]
 }

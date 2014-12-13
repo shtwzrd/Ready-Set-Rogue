@@ -19,7 +19,7 @@
     },
     {
       "class": "com.warsheep.scamp.components.DropComponent",
-      "experience": 100
+      "experience": 300
     },
     {
       "class": "com.warsheep.scamp.components.FactionComponent"

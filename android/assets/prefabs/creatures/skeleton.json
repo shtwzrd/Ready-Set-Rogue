@@ -10,17 +10,17 @@
     },
     {
       "class": "com.warsheep.scamp.components.DamageableComponent",
-      "currentHealth": 1
+      "currentHealth": 2
     },
     {
       "class": "com.warsheep.scamp.components.AnimatableComponent"
     },
     {
-      "class": "com.warsheep.scamp.components.AttackerComponent",
+      "class": "com.warsheep.scamp.components.AttackerComponent"
     },
     {
       "class": "com.warsheep.scamp.components.DropComponent",
-      "experience": 100
+      "experience": 150
     },
     {
       "class": "com.warsheep.scamp.components.FactionComponent"

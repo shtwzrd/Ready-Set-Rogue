@@ -24,8 +24,8 @@ public class MainGameScreen extends ScreenAdapter {
 
     public static Engine ecs; // Ashley Entity-Component System
     public static final float TURN_DURATION = 2.2f;
-    public static final int MAP_WIDTH = 40;
-    public static final int MAP_HEIGHT = 40;
+    public static final int MAP_WIDTH = 47;
+    public static final int MAP_HEIGHT = 65;
     public static Vector3 moveToPos = new Vector3();
     public static Vector3 attackPos = new Vector3();
     VisibilityProcessor visibilityProcessor;
@@ -117,36 +117,36 @@ public class MainGameScreen extends ScreenAdapter {
 
         // Skeleton blocker of doom
 
-        Random rand = new Random();
-        for (int i = 1; i < 20; i++) {
-            Entity skeleton = fab.buildEntity("creatures/skeleton");
-            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
-            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
-            ecs.addEntity(skeleton);
-        }
-
-        for (int i = 1; i < 5; i++) {
-            Entity skeleton = fab.buildEntity("creatures/ghost");
-            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
-            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
-            ecs.addEntity(skeleton);
-        }
-
-        for (int i = 1; i < 10; i++) {
-            Entity skeleton = fab.buildEntity("creatures/skeleton_archer");
-            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
-            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
-            ecs.addEntity(skeleton);
-        }
+//        Random rand = new Random();
+//        for (int i = 1; i < 20; i++) {
+//            Entity skeleton = fab.buildEntity("creatures/skeleton");
+//            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
+//            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
+//            ecs.addEntity(skeleton);
+//        }
+//
+//        for (int i = 1; i < 5; i++) {
+//            Entity skeleton = fab.buildEntity("creatures/ghost");
+//            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
+//            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
+//            ecs.addEntity(skeleton);
+//        }
+//
+//        for (int i = 1; i < 10; i++) {
+//            Entity skeleton = fab.buildEntity("creatures/skeleton_archer");
+//            ECSMapper.tile.get(skeleton).x = rand.nextInt(30-1) + 1;
+//            ECSMapper.tile.get(skeleton).y = rand.nextInt(30-1) + 1;
+//            ecs.addEntity(skeleton);
+//        }
 
         // Crappy Debug Wizard mans
         Entity wizard = fab.buildEntity("creatures/debugwizard");
         ecs.addEntity(wizard);
 
-        ECSMapper.tile.get(wizard).x = 8;
-        ECSMapper.tile.get(wizard).y = 8;
-        ECSMapper.transform.get(wizard).position.x = 8 * 24 + ECSMapper.transform.get(wizard).xOffset;
-        ECSMapper.transform.get(wizard).position.y = 8 * 24 + ECSMapper.transform.get(wizard).yOffset;
+        ECSMapper.tile.get(wizard).x = 23;
+        ECSMapper.tile.get(wizard).y = 7;
+        ECSMapper.transform.get(wizard).position.x = 23 * 24 + ECSMapper.transform.get(wizard).xOffset;
+        ECSMapper.transform.get(wizard).position.y = 7 * 24 + ECSMapper.transform.get(wizard).yOffset;
 
         createCamera(wizard);
 

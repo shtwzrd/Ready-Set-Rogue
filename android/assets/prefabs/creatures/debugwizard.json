@@ -13,7 +13,7 @@
     },
     {
       "class": "com.warsheep.scamp.components.ControllableComponent",
-      "movementBonus": 5
+      "movementBonus": 1
     },
     {
       "class": "com.warsheep.scamp.components.DamageableComponent",
@@ -21,11 +21,7 @@
     },
     {
       "class": "com.warsheep.scamp.components.AttackerComponent",
-      "attackRange": 2
-    },
-    {
-      "class": "com.warsheep.scamp.components.DropComponent",
-      "experience": 10000
+      "attackRange": 1
     },
     {
       "class": "com.warsheep.scamp.components.FactionComponent",
@@ -50,7 +46,7 @@
       "yOffset": 5
     },
     {
-      "class": "com.warsheep.scamp.components.SpellbookComponent",
+      "class": "com.warsheep.scamp.components.SpellbookComponent"
     }
   ]
 }
