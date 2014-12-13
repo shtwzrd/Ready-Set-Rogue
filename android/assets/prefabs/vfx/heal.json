@@ -1,0 +1,52 @@
+{
+  "name": "debugwizard",
+  "components": [
+    {
+      "class": "com.warsheep.scamp.components.VisibleComponent",
+      "dir": "creatures_24x24",
+      "file": "oryx_m_wizard",
+      "originX": 12,
+      "originY": 0
+    },
+    {
+      "class": "com.warsheep.scamp.components.AnimatableComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.ControllableComponent",
+      "movementBonus": 1
+    },
+    {
+      "class": "com.warsheep.scamp.components.DamageableComponent",
+      "essential": true
+    },
+    {
+      "class": "com.warsheep.scamp.components.AttackerComponent",
+      "attackRange": 1
+    },
+    {
+      "class": "com.warsheep.scamp.components.FactionComponent",
+      "factions": [
+        "GOOD"
+      ]
+    },
+    {
+      "class": "com.warsheep.scamp.components.LevelComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.CollidableComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.StateComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.TileComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.TransformComponent",
+      "yOffset": 5
+    },
+    {
+      "class": "com.warsheep.scamp.components.SpellbookComponent"
+    }
+  ]
+}
