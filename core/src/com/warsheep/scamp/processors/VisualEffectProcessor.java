@@ -10,6 +10,7 @@ import com.warsheep.scamp.PrefabFactory;
 import com.warsheep.scamp.StateSignal;
 import com.warsheep.scamp.components.*;
 
+import java.util.List;
 import java.util.Arrays;
 
 public class VisualEffectProcessor extends IteratingSystem implements StateProcessor.StateListener {
@@ -37,33 +38,46 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
         life = new ManagedLifetimeComponent();
         life.timeToLive = 1.5;
         for (StateSignal attack : attacks) {
-            attacker = ECSMapper.attack.get(attack.entity);
-            target = ECSMapper.tile.get(attack.entity);
-            int offsetX = 0;
-            int offsetY = 0;
-            TransformComponent t;
-            for(int i = 1; i < attacker.attackRange + 1; i++) {
-                t = new TransformComponent();
-                Entity effect = fab.buildEntity("vfx/slash");
+            if (ECSMapper.state.get(attack.entity).state != StateComponent.State.DEAD) {
+                attacker = ECSMapper.attack.get(attack.entity);
+                target = ECSMapper.tile.get(attack.entity);
+                int offsetX = 0;
+                int offsetY = 0;
+                TransformComponent t;
+                for (int i = 1; i < attacker.attackRange + 1; i++) {
+                    t = new TransformComponent();
+                    Entity effect = fab.buildEntity("vfx/slash");
 
-                switch(attack.direction) {
-                    case UP:
-                        offsetY++;
+                    switch (attack.direction) {
+                        case UP:
+                            offsetY++;
+                            break;
+                        case DOWN:
+                            offsetY--;
+                            break;
+                        case LEFT:
+                            offsetX--;
+                            break;
+                        case RIGHT:
+                            offsetX++;
+                            break;
+                    }
+                    t.position = new Vector3((target.x + offsetX) * 24.0f, (target.y + offsetY) * 24.0f, -10);
+                    effect.add(t);
+                    effect.add(life);
+                    engine.addEntity(effect);
+                    List<Entity> contents = engine.getSystem(TileProcessor.class).queryByPosition(target.x + offsetX, target.y + offsetY);
+                    boolean collided = false;
+                    for(Entity content : contents) {
+                        if(ECSMapper.collide.get(content) != null) {
+                            collided = true;
+                            break;
+                        }
+                    }
+                    if(collided) {
                         break;
-                    case DOWN:
-                        offsetY--;
-                        break;
-                    case LEFT:
-                        offsetX--;
-                        break;
-                    case RIGHT:
-                        offsetX++;
-                        break;
+                    }
                 }
-                t.position = new Vector3((target.x + offsetX) * 24.0f, (target.y + offsetY) * 24.0f, -10);
-                effect.add(t);
-                effect.add(life);
-                engine.addEntity(effect);
             }
         }
     }
