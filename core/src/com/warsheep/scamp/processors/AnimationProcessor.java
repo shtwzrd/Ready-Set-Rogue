@@ -21,11 +21,7 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
         VisibleComponent tex = ECSMapper.visible.get(entity);
         AnimatableComponent anim = ECSMapper.animatable.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
-        VisibleComponent vis = ECSMapper.visible.get(entity);
-        if (vis.file.equals("oryx_yellow_splash")) {
-            System.out.println("We processin dat ole yeller");
-            System.out.println(anim.frames.length);
-        }
+
         if (state != null) {
             animateStateful(tex, anim, state, deltaTime);
         }
@@ -39,7 +35,6 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
     }
 
     private void animateVfx(VisibleComponent tex, AnimatableComponent anim, VisualEffectComponent vfx, float deltaTime) {
-        System.out.println("animateVfx");
         if (anim.frames.length == 0 || anim.frames == null) {
             anim.frames = new TextureAtlas.AtlasRegion[anim.frameTimings.length];
             for (int i = 0; i < anim.frameTimings.length; i++) {
@@ -48,12 +43,10 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
         }
 
         if (anim.timeIndexed) {
-            System.out.println("anim.timeIndexed...");
             animateTimeIndexed(anim, tex);
         }
 
     }
-
 
     private void animateStateful(VisibleComponent tex, AnimatableComponent anim, StateComponent state,
                                  float deltaTime) {
@@ -94,11 +87,6 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
     }
 
     private void animateTimeIndexed(AnimatableComponent anim, VisibleComponent tex) {
-        if (tex.file.equals("oryx_yellow_splash")) {
-            System.out.println(anim.playTime);
-            System.out.println(anim.frameTimings[anim.currentFrameIndex]);
-            System.out.println(anim.currentFrameIndex);
-        }
 
         tex.image = anim.frames[anim.currentFrameIndex];
         if (anim.playTime >= anim.frameTimings[anim.currentFrameIndex]) {
@@ -110,6 +98,5 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
             }
             anim.playTime = 0;
         }
-
     }
 }

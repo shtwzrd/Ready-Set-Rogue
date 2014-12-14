@@ -78,7 +78,7 @@ public class PrefabFactory {
             case ManagedLifetimeComponent:
                 return new ManagedLifetimeComponent();
             default:
-                return cloner.shallowClone(c);
+                return cloner.deepClone(c);
         }
     }
 
@@ -91,6 +91,12 @@ public class PrefabFactory {
         ControllableComponent,
         DamageableComponent,
         DropComponent,
+        EffectAreaComponent,
+        EffectShieldingComponent,
+        EffectHealingComponent,
+        EffectDamagingComponent,
+        EffectCooldownComponent,
+        EffectTargetingComponent,
         FactionComponent,
         InventoryComponent,
         LevelComponent,

@@ -3,6 +3,7 @@ package com.warsheep.scamp.processors;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.warsheep.scamp.PrefabFactory;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.screens.MainGameScreen;
 
@@ -11,9 +12,11 @@ public class LevelingProcessor extends IteratingSystem {
     private LevelComponent levelComp;
     private Entity entity;
     private final int[] levelMilestones = {2, 4, 7, 12, 18};
+    private PrefabFactory fab;
 
     public LevelingProcessor() {
         super(Family.all(LevelComponent.class).get());
+        fab = new PrefabFactory();
     }
 
     @Override
@@ -92,7 +95,6 @@ public class LevelingProcessor extends IteratingSystem {
         EffectCooldownComponent cooldownComponent = new EffectCooldownComponent();
         EffectAreaComponent effectAreaComponent = new EffectAreaComponent();
         EffectTargetingComponent effectTargetingComponent = new EffectTargetingComponent();
-        EffectHealingComponent effectHealingComponent = new EffectHealingComponent();
         EffectShieldingComponent effectShieldingComponent = new EffectShieldingComponent();
         EffectDamagingComponent effectDamagingComponent = new EffectDamagingComponent();
         VisualEffectComponent vfx = new VisualEffectComponent();
@@ -100,16 +102,7 @@ public class LevelingProcessor extends IteratingSystem {
         switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
             case 2:
                 System.out.println("\n++ Healing spell gained\n");
-                cooldownComponent.maxCooldown = 6;
-                spell.add(cooldownComponent);
-                effectHealingComponent.healAmount = 1;
-                vfx.includesTarget = true;
-                vfx.shape = VisualEffectComponent.EffectShape.SINGLE;
-                vfx.file = "vfx/heal";
-                spell.add(effectHealingComponent);
-                spell.add(effectAreaComponent);
-                spell.add(effectTargetingComponent);
-                spell.add(vfx);
+                spell = this.fab.buildEntity("spells/heal");
                 break;
             case 4:
                 System.out.println("\n++ Meteor spell gained\n");

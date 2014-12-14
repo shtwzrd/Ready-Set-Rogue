@@ -44,7 +44,7 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
             trans.position = new Vector3(target.x * 24.0f, target.y * 24.0f, -10);
             Entity e = fab.buildEntity(vfx.file);
             ani = ECSMapper.animatable.get(e);
-            life.timeToLive = Arrays.stream(e.getComponent(AnimatableComponent.class).frameTimings).sum() + 5;
+            life.timeToLive = Arrays.stream(e.getComponent(AnimatableComponent.class).frameTimings).sum();
             switch (vfx.shape) { // TODO: Implement the other shapes
                 case SINGLE:
                     e.add(trans);

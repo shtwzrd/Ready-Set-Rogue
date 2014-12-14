@@ -1,0 +1,26 @@
+{
+  "name": "meteor",
+  "components": [
+    {
+      "class": "com.warsheep.scamp.components.EffectCooldownComponent",
+      "maxCooldown": 10
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectDamagingComponent",
+      "damage": 3
+    },
+    {
+      "class": "com.warsheep.scamp.components.VisualEffectComponent",
+      "shape": "CIRCLE",
+      "file": "vfx/meteor",
+      "includesTarget": false
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectAreaComponent",
+      "area": 3
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectTargetingComponent"
+    }
+  ]
+}

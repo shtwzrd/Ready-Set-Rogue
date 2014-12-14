@@ -1,0 +1,25 @@
+{
+  "name": "heal",
+  "components": [
+    {
+      "class": "com.warsheep.scamp.components.EffectCooldownComponent",
+      "maxCooldown": 6
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectHealingComponent",
+      "healAmount": 1
+    },
+    {
+      "class": "com.warsheep.scamp.components.VisualEffectComponent",
+      "shape": "SINGLE",
+      "file": "vfx/heal",
+      "includesTarget" : true
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectAreaComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectTargetingComponent"
+    }
+  ]
+}
