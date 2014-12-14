@@ -22,7 +22,7 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
         AnimatableComponent anim = ECSMapper.animatable.get(entity);
         StateComponent state = ECSMapper.state.get(entity);
         VisibleComponent vis = ECSMapper.visible.get(entity);
-        if(vis.file.equals("oryx_yellow_splash")) {
+        if (vis.file.equals("oryx_yellow_splash")) {
             System.out.println("We processin dat ole yeller");
             System.out.println(anim.frames.length);
         }
@@ -45,13 +45,12 @@ public class AnimationProcessor extends IteratingSystem implements StateProcesso
             for (int i = 0; i < anim.frameTimings.length; i++) {
                 anim.frames[i] = assets.fetchImage(tex.dir, tex.file, i + 1);
             }
-
-            if (anim.timeIndexed) {
-                System.out.println("anim.timeIndexed...");
-                animateTimeIndexed(anim, tex);
-            }
         }
 
+        if (anim.timeIndexed) {
+            System.out.println("anim.timeIndexed...");
+            animateTimeIndexed(anim, tex);
+        }
 
     }
 
