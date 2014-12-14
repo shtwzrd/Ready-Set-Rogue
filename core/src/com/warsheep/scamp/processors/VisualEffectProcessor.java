@@ -18,6 +18,7 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
     private TransformComponent trans;
     private TileComponent target;
     private ManagedLifetimeComponent life;
+    private AttackerComponent attacker;
     private PrefabFactory fab;
 
     public VisualEffectProcessor(Engine engine) {
@@ -29,6 +30,42 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         vfx = ECSMapper.visualEffect.get(entity);
+    }
+
+    @Override
+    public void attacking(Array<StateSignal> attacks) {
+        life = new ManagedLifetimeComponent();
+        life.timeToLive = 1.5;
+        for (StateSignal attack : attacks) {
+            attacker = ECSMapper.attack.get(attack.entity);
+            target = ECSMapper.tile.get(attack.entity);
+            int offsetX = 0;
+            int offsetY = 0;
+            TransformComponent t;
+            for(int i = 1; i < attacker.attackRange + 1; i++) {
+                t = new TransformComponent();
+                Entity effect = fab.buildEntity("vfx/slash");
+
+                switch(attack.direction) {
+                    case UP:
+                        offsetY++;
+                        break;
+                    case DOWN:
+                        offsetY--;
+                        break;
+                    case LEFT:
+                        offsetX--;
+                        break;
+                    case RIGHT:
+                        offsetX++;
+                        break;
+                }
+                t.position = new Vector3((target.x + offsetX) * 24.0f, (target.y + offsetY) * 24.0f, -10);
+                effect.add(t);
+                effect.add(life);
+                engine.addEntity(effect);
+            }
+        }
     }
 
     @Override
@@ -56,7 +93,7 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
                     int z = -10;
                     for (int i = target.x - area.radius + 1; i < target.x + area.radius; i++) {
                         for (int j = target.y - area.radius + 1; j < target.y + area.radius; j++) {
-                            if(i == target.x && j == target.y && !vfx.includesTarget) {
+                            if (i == target.x && j == target.y && !vfx.includesTarget) {
                                 // Don't.
                             } else {
                                 e = fab.buildEntity(vfx.file);
