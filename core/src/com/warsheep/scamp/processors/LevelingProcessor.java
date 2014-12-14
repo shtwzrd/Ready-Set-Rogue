@@ -96,8 +96,6 @@ public class LevelingProcessor extends IteratingSystem {
         EffectAreaComponent effectAreaComponent = new EffectAreaComponent();
         EffectTargetingComponent effectTargetingComponent = new EffectTargetingComponent();
         EffectShieldingComponent effectShieldingComponent = new EffectShieldingComponent();
-        EffectDamagingComponent effectDamagingComponent = new EffectDamagingComponent();
-        VisualEffectComponent vfx = new VisualEffectComponent();
 
         switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
             case 2:
@@ -106,13 +104,7 @@ public class LevelingProcessor extends IteratingSystem {
                 break;
             case 4:
                 System.out.println("\n++ Meteor spell gained\n");
-                cooldownComponent.maxCooldown = 10;
-                spell.add(cooldownComponent);
-                effectDamagingComponent.damage = 3;
-                spell.add(effectDamagingComponent);
-                effectAreaComponent.radius = 3; // 1 + 8 + 16 = 25 blocks
-                spell.add(effectAreaComponent);
-                spell.add(effectTargetingComponent);
+                spell = this.fab.buildEntity("spells/meteor"); // 1 + 8 + 16 = 25 blocks
                 break;
             case 7:
                 System.out.println("\n++ Shielding spell gained\n");

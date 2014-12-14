@@ -10,7 +10,8 @@ public class AnimatableComponent extends Component {
     public double[] frameTimings = {};
     public float[] frameTransformsY = {};
     public float[] frameTransformsX = {};
-    public Vector3 additiveTransform = new Vector3();
+    public Vector3 interpolationStart = new Vector3();
+    public Vector3 interpolationEnd = new Vector3();
     public int currentFrameIndex = 0;
     public boolean timeIndexed = true;
     public double playTime;

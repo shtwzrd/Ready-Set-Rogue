@@ -1,8 +1,9 @@
 package com.warsheep.scamp.desktop;
+
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 public class AssetPacker {
-    public static void main (String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         TexturePacker.Settings settings = new TexturePacker.Settings();
         settings.pot = true;
         settings.square = true;
@@ -20,5 +21,19 @@ public class AssetPacker {
 
         TexturePacker.processIfModified(settings, worldInputDir,
                 worldOutputDir, worldPackFileName);
+
+        String fxInputDir = "../android/assets/fx_24x24";
+        String fxOutputDir = "../android/assets/fx_24x24";
+        String fxPackFileName = "fx";
+
+        TexturePacker.processIfModified(settings, fxInputDir,
+                fxOutputDir, fxPackFileName);
+
+        String fx32InputDir = "../android/assets/fx_32x32";
+        String fx32OutputDir = "../android/assets/fx_32x32";
+        String fx32PackFileName = "fx32";
+
+        TexturePacker.processIfModified(settings, fx32InputDir,
+                fx32OutputDir, fx32PackFileName);
     }
 }

@@ -18,7 +18,6 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
     private TransformComponent trans;
     private TileComponent target;
     private ManagedLifetimeComponent life;
-    private AnimatableComponent ani;
     private PrefabFactory fab;
 
     public VisualEffectProcessor(Engine engine) {
@@ -43,7 +42,6 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
 
             trans.position = new Vector3(target.x * 24.0f, target.y * 24.0f, -10);
             Entity e = fab.buildEntity(vfx.file);
-            ani = ECSMapper.animatable.get(e);
             life.timeToLive = Arrays.stream(e.getComponent(AnimatableComponent.class).frameTimings).sum();
             switch (vfx.shape) { // TODO: Implement the other shapes
                 case SINGLE:
@@ -53,6 +51,24 @@ public class VisualEffectProcessor extends IteratingSystem implements StateProce
                     this.engine.addEntity(e);
                     break;
                 case CIRCLE:
+
+                    EffectAreaComponent area = spell.getComponent(EffectAreaComponent.class);
+                    int z = -10;
+                    for (int i = target.x - area.radius + 1; i < target.x + area.radius; i++) {
+                        for (int j = target.y - area.radius + 1; j < target.y + area.radius; j++) {
+                            if(i == target.x && j == target.y && !vfx.includesTarget) {
+                                // Don't.
+                            } else {
+                                e = fab.buildEntity(vfx.file);
+                                TransformComponent t = new TransformComponent();
+                                t.position = new Vector3(i * 24.0f, j * 24.0f, z);
+                                e.add(t);
+                                e.add(life);
+                                e.add(vfx);
+                                this.engine.addEntity(e);
+                            }
+                        }
+                    }
                     break;
                 case CIRCLE_EDGE:
                     break;

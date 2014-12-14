@@ -17,7 +17,7 @@
     },
     {
       "class": "com.warsheep.scamp.components.EffectAreaComponent",
-      "area": 3
+      "radius": 3
     },
     {
       "class": "com.warsheep.scamp.components.EffectTargetingComponent"
