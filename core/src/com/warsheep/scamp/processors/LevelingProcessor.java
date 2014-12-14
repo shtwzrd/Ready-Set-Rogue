@@ -93,9 +93,6 @@ public class LevelingProcessor extends IteratingSystem {
         Entity spell = new Entity();
 
         EffectCooldownComponent cooldownComponent = new EffectCooldownComponent();
-        EffectAreaComponent effectAreaComponent = new EffectAreaComponent();
-        EffectTargetingComponent effectTargetingComponent = new EffectTargetingComponent();
-        EffectShieldingComponent effectShieldingComponent = new EffectShieldingComponent();
 
         switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
             case 2:
@@ -108,11 +105,7 @@ public class LevelingProcessor extends IteratingSystem {
                 break;
             case 7:
                 System.out.println("\n++ Shielding spell gained\n");
-                cooldownComponent.maxCooldown = 10;
-                spell.add(cooldownComponent);
-                spell.add(effectShieldingComponent);
-                spell.add(effectAreaComponent);
-                spell.add(effectTargetingComponent);
+                spell = this.fab.buildEntity("spells/shield");
                 break;
             case 12:
                 System.out.println("\n++ New spell gained\n");

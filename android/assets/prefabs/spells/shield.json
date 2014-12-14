@@ -1,0 +1,24 @@
+{
+  "name": "shield",
+  "components": [
+    {
+      "class": "com.warsheep.scamp.components.EffectCooldownComponent",
+      "maxCooldown": 10
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectShieldingComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.VisualEffectComponent",
+      "shape": "SINGLE",
+      "file": "vfx/shield",
+      "includesTarget" : true
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectAreaComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.EffectTargetingComponent"
+    }
+  ]
+}
