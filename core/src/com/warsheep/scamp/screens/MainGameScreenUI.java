@@ -38,6 +38,7 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     private TextureAtlas.AtlasRegion currentEntityImage;
     private AssetDepot assets = AssetDepot.getInstance();
     private TextureAtlas.AtlasRegion attackIcon = assets.fetchImage("icons_26x28", "oryx_attack_icon");
+    private TextureAtlas.AtlasRegion turnIcon = assets.fetchImage("world_24x24", "blank");
 
     public MainGameScreenUI(TurnSystem turnSystem) {
         this.currentEntity = new Entity();
@@ -59,10 +60,8 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
         batcher.begin();
         addPlayerStats();
         addMoveToPos();
-        addTurnTimer();
         addSpellGrid();
         batcher.end();
-
 
         addTimeCircle(delta);
 
@@ -139,6 +138,7 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     public void movingRoundEnd() {
         update();
         this.selectedMoves = new Array();
+        this.turnIcon = assets.fetchImage("icons_26x28", "oryx_round_attack");
     }
 
     @Override
@@ -150,11 +150,13 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     @Override
     public void planningRoundEnd() {
         update();
+        this.turnIcon = assets.fetchImage("icons_26x28", "oryx_round_move");
     }
 
     @Override
     public void turnEnd() {
         update();
+        this.turnIcon = assets.fetchImage("icons_26x28", "oryx_round_planning");
     }
 
     private void update() {
@@ -217,7 +219,7 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
                     }
                     batcher.draw(tex, Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * (5 - i));
                     batcher.setColor(1, 1, 1, 1);
-                    if(cooldown.currentCooldown != 0) {
+                    if (cooldown.currentCooldown != 0) {
                         font.draw(batcher, cooldown.currentCooldown + "",
                                 Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * (5 - i) + 10);
                     }
@@ -229,16 +231,28 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
 
     private void addTimeCircle(float delta) {
 
+        batcher.enableBlending();
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        int size = (int) (10 - (delta % 3 * 3)) - 1;
+        int size = 12;
 
         if (turnSystem.isPlanningTurn()) {
             shapeRenderer.setColor(0, 1, 0, 0.5f);
-        } else {
+        } else if (turnSystem.isMoveTurn()) {
             shapeRenderer.setColor(1, 0, 0, 0.5f);
+        } else {
+            shapeRenderer.setColor(0, 0, 0, 0.5f);
         }
         shapeRenderer.circle(Gdx.graphics.getWidth() - 15, Gdx.graphics.getHeight() - 15, size);
         shapeRenderer.end();
+        batcher.begin();
+        if (this.turnIcon != null) {
+            batcher.draw(this.turnIcon, Gdx.graphics.getWidth() - 22, Gdx.graphics.getHeight() - 22);
+        }
+        batcher.end();
+        batcher.disableBlending();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
     }
 
     private void addPlayerStats() {
@@ -246,11 +260,5 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
                 level, damage, currentHealth, maxHealth, currentExp, nextLevelExp);
 
         font.draw(batcher, str, 10, Gdx.graphics.getHeight() - 10);
-    }
-
-    private void addTurnTimer() {
-        CharSequence str = String.format("%s %s", "Processing... ", turnSystem.getCurrentTurn().toString());
-
-        font.draw(batcher, str, 10, 20);
     }
 }

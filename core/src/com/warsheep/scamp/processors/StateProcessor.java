@@ -265,6 +265,22 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
     }
 
     @Override
+    public boolean isCombatTurn() {
+        if (turn == Turn.AI_COMBAT || turn == Turn.PLAYER_COMBAT) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isMoveTurn() {
+        if (turn == Turn.AI_MOVE || turn == Turn.PLAYER_MOVE) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public float getTurnLength() {
         return interval;
     }

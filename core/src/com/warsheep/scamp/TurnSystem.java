@@ -4,6 +4,10 @@ public interface TurnSystem {
 
     public boolean isPlanningTurn();
 
+    public boolean isCombatTurn();
+
+    public boolean isMoveTurn();
+
     public float getTurnLength();
 
     public int getTurnsPerRound();
