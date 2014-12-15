@@ -31,6 +31,10 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     private static int level = 0;
     private static int currentExp = 0;
     private static int nextLevelExp = 0;
+    private static int moves = 0;
+    private static int range = 0;
+    private float selectedActorIconTimer = 0;
+    private float selectedActorIconOffsetY = 6;
     private ArrayList<Entity> spells;
     private Array<Vector2> selectedMoves;
     private Array<Vector2> selectedAttacks;
@@ -39,6 +43,13 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     private AssetDepot assets = AssetDepot.getInstance();
     private TextureAtlas.AtlasRegion attackIcon = assets.fetchImage("icons_26x28", "oryx_attack_icon");
     private TextureAtlas.AtlasRegion turnIcon = assets.fetchImage("world_24x24", "blank");
+    private TextureAtlas.AtlasRegion selectedActorIcon = assets.fetchImage("icons_26x28", "oryx_round_planning");
+    private TextureAtlas.AtlasRegion damageIcon = assets.fetchImage("icons_26x28", "oryx_icon_damage");
+    private TextureAtlas.AtlasRegion healthIcon = assets.fetchImage("icons_26x28", "oryx_icon_health");
+    private TextureAtlas.AtlasRegion expIcon = assets.fetchImage("icons_26x28", "oryx_icon_exp");
+    private TextureAtlas.AtlasRegion rangeIcon = assets.fetchImage("icons_26x28", "oryx_icon_range");
+    private TextureAtlas.AtlasRegion levelIcon = assets.fetchImage("icons_26x28", "oryx_icon_level");
+    private TextureAtlas.AtlasRegion movesIcon = assets.fetchImage("icons_26x28", "oryx_icon_moves");
 
     public MainGameScreenUI(TurnSystem turnSystem) {
         this.currentEntity = new Entity();
@@ -58,6 +69,7 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
         batcher.enableBlending();
 
         batcher.begin();
+        addActiveActorIcon(delta);
         addPlayerStats();
         addMoveToPos();
         addSpellGrid();
@@ -165,6 +177,10 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
         DamageableComponent dmgCmp = ECSMapper.damage.get(currentEntity);
         AttackerComponent atkCmp = ECSMapper.attack.get(currentEntity);
         SpellbookComponent book = ECSMapper.spellBook.get(currentEntity);
+        ControllableComponent control = ECSMapper.control.get(currentEntity);
+        if (control != null) {
+            moves = control.movementBonus + 1;
+        }
 
         if (book != null && book.spellbook != null) {
             this.spells = book.spellbook;
@@ -183,14 +199,16 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
 
         if (atkCmp != null) {
             damage = atkCmp.baseDamage;
+            range = atkCmp.attackRange;
         }
     }
 
     private void addMoveToPos() {
+
+        batcher.enableBlending();
         for (Vector2 move : this.selectedMoves) {
             Vector3 pack = new Vector3(move.x, move.y, 0);
             pack = MainGameScreen.worldToScreen(pack);
-            batcher.enableBlending();
             batcher.setColor(1, 1, 1, .5f);
             batcher.draw(currentEntity.getComponent(VisibleComponent.class).image, pack.x, pack.y + 5);
             batcher.setColor(1, 1, 1, 1);
@@ -200,6 +218,29 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
             pack = MainGameScreen.worldToScreen(pack);
             batcher.setColor(1, 1, 1, .5f);
             batcher.draw(attackIcon, pack.x, pack.y);
+            batcher.setColor(1, 1, 1, 1);
+        }
+        batcher.disableBlending();
+    }
+
+    private void addActiveActorIcon(float delta) {
+        this.selectedActorIconTimer += delta;
+        if (this.selectedActorIconTimer >= .3) {
+            if (selectedActorIconOffsetY == 6) {
+                selectedActorIconOffsetY = 8;
+            } else {
+                selectedActorIconOffsetY = 6;
+            }
+            this.selectedActorIconTimer = 0;
+        }
+        if (turnSystem.isPlanningTurn()) {
+            Vector3 actorCoord = ECSMapper.transform.get(this.currentEntity).position;
+
+            Vector3 trans = new Vector3(actorCoord.x, actorCoord.y, 0);
+            Vector3 screenCoord = MainGameScreen.worldToScreen(trans);
+
+            batcher.setColor(1, 1, 1, .8f);
+            batcher.draw(this.selectedActorIcon, screenCoord.x + 4, screenCoord.y + 28.0f + selectedActorIconOffsetY);
             batcher.setColor(1, 1, 1, 1);
         }
     }
@@ -256,9 +297,32 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     }
 
     private void addPlayerStats() {
-        CharSequence str = String.format("Lvl %d | Dmg %d | HP %d/%d | Exp %d/%d",
-                level, damage, currentHealth, maxHealth, currentExp, nextLevelExp);
+        int i = 2;
 
-        font.draw(batcher, str, 10, Gdx.graphics.getHeight() - 10);
+        batcher.draw(levelIcon, 10, Gdx.graphics.getHeight() - 16 * i);
+        font.draw(batcher, level + "", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+        i++;
+
+        batcher.draw(healthIcon, 10, Gdx.graphics.getHeight() - 16 * i);
+        font.draw(batcher, currentHealth + "/" + maxHealth, 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+        i++;
+
+        batcher.draw(damageIcon, 10, Gdx.graphics.getHeight() - 16 * i);
+        font.draw(batcher, damage + "", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+        i++;
+
+        batcher.draw(rangeIcon, 10, Gdx.graphics.getHeight() - 16 * i);
+        font.draw(batcher, range + "", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+        i++;
+
+        batcher.draw(movesIcon, 10, Gdx.graphics.getHeight() - 16 * i);
+        font.draw(batcher, moves + "", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+        i++;
+
+        if(currentExp != 0 && nextLevelExp != 0) {
+            batcher.draw(expIcon, 10, Gdx.graphics.getHeight() - 16 * i);
+            font.draw(batcher, (int)(((float) currentExp / nextLevelExp) * 100) / 1 + "%", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+            i++;
+        }
     }
 }
