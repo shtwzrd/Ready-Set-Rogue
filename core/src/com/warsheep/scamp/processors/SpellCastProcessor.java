@@ -28,7 +28,6 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
     public void spellCasting(Array<StateSignal> signals) {
         // Figure out what spell was cast and process it
         for(StateSignal signal : signals) {
-            System.out.println("Spell fired");
             // Get Entity
             casterEntity = signal.entity;
             // Get spellbook from entity
@@ -92,7 +91,6 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
                         }
                     }
                 }
-                System.out.println();
             }
 
             // Reset cooldown on spell
@@ -135,7 +133,6 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
                 if (damageable.currentHealth == damageable.maxHealth) {
                     break;
                 } else {
-                    System.out.println("Healed by 1");
                     damageable.currentHealth++;
                 }
             }
@@ -147,7 +144,6 @@ public class SpellCastProcessor extends EntitySystem implements StateProcessor.S
         if (damageable != null) {
             damageable.shieldOn = true;
             damageable.shieldDuration = shieldEffect.duration;
-            System.out.println("Shield on for " + shieldEffect.duration);
         }
     }
 

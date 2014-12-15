@@ -81,7 +81,6 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                         if (collisions.checkMove(tilePos.x + simulatedX,
                                 tilePos.y + simulatedY,
                                 signal.entity, signal.direction, false)) {
-                            System.out.println("Blocked");
 
                             // Notify Listeners of movementBlocked
                             for (ControlListener listener : listeners) {
@@ -183,10 +182,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     }
 
     public void update(float deltaTime) {
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
 
-        }
     }
 
     @Override
@@ -330,7 +326,6 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                     signal.entity = entities.get(0);
                     listener.spellLocked(signal);
                 }
-                System.out.println("Spell not unlocked");
             }
         }
         return false;
@@ -353,8 +348,6 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
 
         int clickPosX = screenX - Gdx.graphics.getWidth() / 2;
         int clickPosY = screenY - Gdx.graphics.getHeight() / 2;
-
-        System.out.println(clickPosX + " " + clickPosY);
 
         StateSignal input = pool.obtain();
         if (screenX > Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7) {

@@ -76,7 +76,6 @@ public class CombatProcessor extends EntitySystem implements StateProcessor.Stat
                                 if (!shareFaction(atkFaction, dmgFaction)) {
                                     if (!dmgComp.shieldOn) {
                                         // Apply damage
-                                        System.out.println("Hit! ");
                                         dmgComp.currentHealth -= atkComp.baseDamage;
 
                                         // Check to see if the damageable entity is dead and if it has anything to drop

@@ -94,30 +94,23 @@ public class LevelingProcessor extends IteratingSystem {
 
         EffectCooldownComponent cooldownComponent = new EffectCooldownComponent();
 
-        switch (milestone) { // TODO: Have prefabs for spells to use instead! <<<
+        switch (milestone) {
             case 2:
-                System.out.println("\n++ Healing spell gained\n");
                 spell = this.fab.buildEntity("spells/heal");
                 break;
             case 4:
-                System.out.println("\n++ Meteor spell gained\n");
                 spell = this.fab.buildEntity("spells/meteor"); // 1 + 8 + 16 = 25 blocks
                 break;
             case 7:
-                System.out.println("\n++ Shielding spell gained\n");
                 spell = this.fab.buildEntity("spells/shield");
                 break;
             case 12:
-                System.out.println("\n++ New spell gained\n");
                 spell.add(cooldownComponent);
                 break;
             case 18:
-                System.out.println("\n++ New spell gained\n");
                 spell.add(cooldownComponent);
                 break;
             default:
-                System.out.println("\n++ We should neva be here...\n");
-                System.out.println();
                 break;
         }
 

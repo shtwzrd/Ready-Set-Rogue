@@ -177,7 +177,6 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
             EffectCooldownComponent cooldown = ECSMapper.cooldown.get(c);
             if (cooldown.currentCooldown > 0) {
                 cooldown.currentCooldown--;
-                System.out.println("Cooldown: " + cooldown.currentCooldown + "/" + cooldown.maxCooldown);
             }
         }
     }
@@ -199,8 +198,6 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
             playerQueue.addAll(listener.playerTurnEnd());
         }
 
-        System.out.println("Player Queue");
-        System.out.println(playerQueue.size);
         sortActions(playerQueue, playerMoves, playerAttacks, playerCasts);
     }
 
