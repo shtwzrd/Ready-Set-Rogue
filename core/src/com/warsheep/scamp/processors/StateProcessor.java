@@ -68,6 +68,22 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
         default public Array<StateSignal> playerTurnEnd() {
             return new Array<>();
         }
+
+        default public void turnEnd() {
+
+        }
+
+        default public void planningRoundEnd() {
+
+        }
+
+        default public void movingRoundEnd() {
+
+        }
+
+        default public void combatRoundEnd() {
+
+        }
     }
 
     public StateProcessor(List<StateListener> listeners, float interval) {
@@ -103,6 +119,7 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
                 this.updateCooldowns();
                 this.updateDamageables();
                 turn = Turn.PLANNING;
+                this.listeners.forEach(StateProcessor.StateListener::turnEnd);
             } else {
                 turn = Turn.values()[turn.ordinal() + 1];
             }
@@ -119,16 +136,19 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
                 pullPlayerActions();
                 this.resolveTurn(playerMoves, empty, empty);
                 playerMoves = new Array();
+                this.listeners.forEach(StateProcessor.StateListener::planningRoundEnd);
                 break;
             case AI_MOVE:
                 pullAiActions();
                 this.resolveTurn(aiMoves, empty, empty);
                 aiMoves = new Array();
+                this.listeners.forEach(StateProcessor.StateListener::movingRoundEnd);
                 break;
             case PLAYER_COMBAT:
                 this.resolveTurn(empty, playerAttacks, playerCasts);
                 playerAttacks = new Array();
                 playerCasts = new Array();
+                this.listeners.forEach(StateProcessor.StateListener::combatRoundEnd);
                 break;
             case AI_COMBAT:
                 this.resolveTurn(empty, aiAttacks, aiCasts);
@@ -179,6 +199,8 @@ public class StateProcessor extends EntitySystem implements TurnSystem {
             playerQueue.addAll(listener.playerTurnEnd());
         }
 
+        System.out.println("Player Queue");
+        System.out.println(playerQueue.size);
         sortActions(playerQueue, playerMoves, playerAttacks, playerCasts);
     }
 

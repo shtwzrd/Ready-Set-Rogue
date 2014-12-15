@@ -18,7 +18,9 @@ import com.warsheep.scamp.components.StateComponent.State;
 import com.warsheep.scamp.components.StateComponent.Directionality;
 import com.warsheep.scamp.screens.MainGameScreen;
 
+import javax.naming.ldap.Control;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class ControlProcessor extends EntitySystem implements InputProcessor, StateProcessor.StateListener {
 
@@ -32,10 +34,36 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     private boolean hasAttacked = false; // If player can attack more than once, change this to an int-variable inside AttackerComp
     private final Pool<StateSignal> pool = Pools.get(StateSignal.class);
     private final TurnSystem turnSystem;
+    private ArrayList<ControlListener> listeners;
+
+    public static interface ControlListener {
+
+        default public void selectMove(StateSignal signal) {
+        }
+
+        default public void selectAttack(StateSignal signal) {
+        }
+
+        default public void selectSpell(StateSignal signal) {
+        }
+
+        default public void alreadyAttacked(StateSignal signal) {
+        }
+
+        default public void onCooldown(StateSignal signal) {
+        }
+
+        default public void spellLocked(StateSignal signal) {
+        }
+
+        default public void movementBlocked(StateSignal signal) {
+        }
+    }
 
     public ControlProcessor(TurnSystem turnSystem) {
         this.turnSystem = turnSystem;
         actions = new Array<>();
+        this.listeners = new ArrayList<>();
     }
 
     public void addedToEngine(Engine engine) {
@@ -44,7 +72,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     }
 
     private void addAction(StateSignal signal) {
-        if(turnSystem.isPlanningTurn()) {
+        if (turnSystem.isPlanningTurn()) {
             for (Entity entity : this.entities) {
                 signal.entity = entity;
                 TileComponent tilePos = ECSMapper.tile.get(signal.entity);
@@ -54,7 +82,12 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                                 tilePos.y + simulatedY,
                                 signal.entity, signal.direction, false)) {
                             System.out.println("Blocked");
-                            // Some visual feedback
+
+                            // Notify Listeners of movementBlocked
+                            for (ControlListener listener : listeners) {
+                                listener.movementBlocked(signal);
+                            }
+
                         } else {
                             actions.add(signal);
                             switch (signal.direction) {
@@ -75,6 +108,11 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                                     simulatedX++;
                                     break;
                             }
+
+                            for (ControlListener listener : listeners) {
+                                listener.selectMove(signal);
+                            }
+
                             MainGameScreen.moveToPos.x = simulatedX;
                             MainGameScreen.moveToPos.y = simulatedY;
                             ECSMapper.control.get(signal.entity).movesConsumed++;
@@ -101,7 +139,15 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                         }
 
                         actions.add(signal);
+                        for (ControlListener listener : this.listeners) {
+                            listener.selectAttack(signal);
+                        }
                         hasAttacked = true;
+                    } else {
+
+                        for (ControlListener listener : listeners) {
+                            listener.alreadyAttacked(signal);
+                        }
                     }
                 }
 
@@ -109,10 +155,13 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                     if (!hasAttacked) {
                         if (tryCastingSpell(selectedSpell)) {
                             actions.add(signal);
+                            hasAttacked = true;
                         }
-
+                    } else {
+                        for (ControlListener listener : listeners) {
+                            listener.alreadyAttacked(signal);
+                        }
                     }
-                    hasAttacked = true;
                 }
             }
         }
@@ -136,24 +185,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
     public void update(float deltaTime) {
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            LevelComponent lvlCmp = ECSMapper.level.get(entity);
-            DamageableComponent dmgCmp = ECSMapper.damage.get(entity);
-            AttackerComponent atkCmp = ECSMapper.attack.get(entity);
 
-            if (lvlCmp != null) {
-                MainGameScreen.level = lvlCmp.level;
-                MainGameScreen.currentExp = lvlCmp.experiencePoints;
-                MainGameScreen.nextLevelExp = lvlCmp.nextLevelExp;
-            }
-
-            if (dmgCmp != null) {
-                MainGameScreen.maxHealth = dmgCmp.maxHealth;
-                MainGameScreen.currentHealth = dmgCmp.currentHealth;
-            }
-
-            if (atkCmp != null) {
-                MainGameScreen.damage = atkCmp.baseDamage;
-            }
         }
     }
 
@@ -268,6 +300,8 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
             if (spellBook.spellbook.size() >= spellNum + 1) { // +1 cause zero-indexed
                 // Set lastCastSpell to the spell cast
                 Entity lastCastSpell = spellBook.spellbook.get(spellNum);
+                StateSignal signal = new StateSignal();
+                signal.entity = lastCastSpell;
                 if (lastCastSpell != null) {
                     // Check if the spell has a cooldown, if yes, check if current cooldown = 0, else fire
                     EffectCooldownComponent cooldown = ECSMapper.cooldown.get(lastCastSpell);
@@ -275,13 +309,27 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
                         if (cooldown.currentCooldown == 0) {
                             spellBook.lastSpellCast = lastCastSpell;
                             return true;
+                        } else {
+                            // Alert Listeners that the spell is on cooldown
+                            for (ControlListener listener : this.listeners) {
+
+                                listener.onCooldown(signal);
+                            }
                         }
                     } else {
                         spellBook.lastSpellCast = lastCastSpell;
+                        for (ControlListener listener : listeners) {
+                            listener.selectSpell(signal);
+                        }
                         return true;
                     }
                 }
             } else {
+                for (ControlListener listener : this.listeners) {
+                    StateSignal signal = new StateSignal();
+                    signal.entity = entities.get(0);
+                    listener.spellLocked(signal);
+                }
                 System.out.println("Spell not unlocked");
             }
         }
@@ -409,4 +457,7 @@ public class ControlProcessor extends EntitySystem implements InputProcessor, St
         return false;
     }
 
+    public void addListener(ControlListener listener) {
+        this.listeners.add(listener);
+    }
 }

@@ -98,6 +98,7 @@ public class PrefabFactory {
         EffectCooldownComponent,
         EffectTargetingComponent,
         FactionComponent,
+        IconComponent,
         InventoryComponent,
         LevelComponent,
         MovementComponent,

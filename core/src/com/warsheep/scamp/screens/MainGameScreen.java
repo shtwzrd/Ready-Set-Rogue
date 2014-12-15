@@ -4,10 +4,8 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
@@ -18,7 +16,6 @@ import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class MainGameScreen extends ScreenAdapter {
 
@@ -46,15 +43,10 @@ public class MainGameScreen extends ScreenAdapter {
 
     Scamp game;
     public static GameState gameState;
-    private float accumulator = 0;
+    private MainGameScreenUI hud;
 
     // Temp UI Values
-    public static int damage = 0;
-    public static int currentHealth = 0;
-    public static int maxHealth = 0;
-    public static int level = 0;
-    public static int currentExp = 0;
-    public static int nextLevelExp = 0;
+
 
     public enum GameState {
         GAME_RUNNING, GAME_PAUSED, GAME_OVER, GAME_READY
@@ -118,6 +110,9 @@ public class MainGameScreen extends ScreenAdapter {
         ecs.addSystem(lifetimeProcessor);
         ecs.addSystem(visualEffectProcessor);
         Gdx.input.setInputProcessor(controlProcessor);
+        this.hud = new MainGameScreenUI(stateProcessor);
+        stateProcessor.addListener(this.hud);
+        controlProcessor.addListener(this.hud);
 
         PrefabFactory fab = new PrefabFactory();
 
@@ -125,6 +120,7 @@ public class MainGameScreen extends ScreenAdapter {
         // Crappy Debug Wizard mans
         Entity wizard = fab.buildEntity("creatures/debugwizard");
         ecs.addEntity(wizard);
+        this.hud.changeEntity(wizard);
 
         ECSMapper.tile.get(wizard).x = 23;
         ECSMapper.tile.get(wizard).y = 7;
@@ -154,14 +150,9 @@ public class MainGameScreen extends ScreenAdapter {
         switch (gameState) {
             case GAME_RUNNING:
                 visibilityProcessor.startBatch();
-                // delta = ((System.currentTimeMillis() - startTime) / 1000);
                 ecs.update(delta);
                 visibilityProcessor.endBatch();
-                addPlayerStats();
-                addTimeCircle(delta);
-                addMoveToPos();
-                addSpellGrid();
-                addTurnTimer();
+                this.hud.drawHud(delta);
                 break;
             case GAME_OVER:
                 game.setScreen(new MainMenuScreen(game));
@@ -171,89 +162,9 @@ public class MainGameScreen extends ScreenAdapter {
         }
     }
 
-    private void addMoveToPos() {
-        boolean attackHappened = attackPos.x != 0 || attackPos.y != 0;
-        boolean moveHappened = moveToPos.x != 0 || moveToPos.y != 0;
-        if (attackHappened || moveHappened) {
-            SpriteBatch spriteBatch = new SpriteBatch();
-            BitmapFont font = new BitmapFont();
-
-            spriteBatch.enableBlending();
-            spriteBatch.begin();
-            if (moveHappened) {
-                font.draw(spriteBatch, "X", moveToPos.x * 24 + Gdx.graphics.getWidth() / 2 - 5, moveToPos.y * 24 + Gdx.graphics.getHeight() / 2);
-            }
-            if (attackHappened) {
-                font.draw(spriteBatch, "O", attackPos.x * 24 + Gdx.graphics.getWidth() / 2 - 5, attackPos.y * 24 + Gdx.graphics.getHeight() / 2);
-            }
-            spriteBatch.end();
-            font.dispose();
-            spriteBatch.dispose();
-        }
-    }
-
-    private void addSpellGrid() {
-        ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 1, 1, 0.5f);
-
-        for (int i = 1; i < 6; i++) {
-            shapeRenderer.rect(Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * i, Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7);
-        }
-        shapeRenderer.end();
-        shapeRenderer.dispose();
-
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-    }
-
-    private void addTimeCircle(float delta) {
-        ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-        int size = (int) (10 - (delta % 3 * 3)) - 1;
-
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        if(stateProcessor.isPlanningTurn()) {
-            shapeRenderer.setColor(0, 1, 0, 0.5f);
-        } else {
-            shapeRenderer.setColor(1, 0, 0, 0.5f);
-        }
-        shapeRenderer.circle(Gdx.graphics.getWidth() - 15, Gdx.graphics.getHeight() - 15, size);
-        shapeRenderer.end();
-        shapeRenderer.dispose();
-        Gdx.gl.glDisable(GL20.GL_BLEND);
-
-    }
-
-    private void addPlayerStats() {
-        CharSequence str = String.format("Lvl %d | Dmg %d | HP %d/%d | Exp %d/%d",
-                level, damage, currentHealth, maxHealth, currentExp, nextLevelExp);
-        SpriteBatch spriteBatch = new SpriteBatch();
-        BitmapFont font = new BitmapFont();
-
-        spriteBatch.enableBlending();
-        spriteBatch.begin();
-        font.draw(spriteBatch, str, 10, Gdx.graphics.getHeight() - 10);
-        spriteBatch.end();
-        spriteBatch.dispose();
-        font.dispose();
-    }
-
-    private void addTurnTimer() {
-        CharSequence str = String.format("%s %s", "Processing... ", stateProcessor.getCurrentTurn().toString());
-        SpriteBatch spriteBatch = new SpriteBatch();
-        BitmapFont font = new BitmapFont();
-
-        spriteBatch.enableBlending();
-        spriteBatch.begin();
-        font.draw(spriteBatch, str, 10, 20);
-        spriteBatch.end();
-        spriteBatch.dispose();
-        font.dispose();
+    public static Vector3 worldToScreen(Vector3 worldCoord) {
+       Camera cam = ecs.getSystem(VisibilityProcessor.class).getCamera();
+       return cam.project(worldCoord);
     }
 
     private void createCamera(Entity target) {
@@ -264,6 +175,7 @@ public class MainGameScreen extends ScreenAdapter {
         camera.target = target;
 
         entity.add(camera);
+        this.hud.changeEntity(target);
 
         ecs.addEntity(entity);
     }

@@ -21,6 +21,11 @@
     },
     {
       "class": "com.warsheep.scamp.components.EffectTargetingComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.IconComponent",
+      "dir": "icons_26x28",
+      "file": "oryx_spell_meteor"
     }
   ]
 }

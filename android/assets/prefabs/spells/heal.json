@@ -13,13 +13,18 @@
       "class": "com.warsheep.scamp.components.VisualEffectComponent",
       "shape": "SINGLE",
       "file": "vfx/heal",
-      "includesTarget" : true
+      "includesTarget": true
     },
     {
       "class": "com.warsheep.scamp.components.EffectAreaComponent"
     },
     {
       "class": "com.warsheep.scamp.components.EffectTargetingComponent"
+    },
+    {
+      "class": "com.warsheep.scamp.components.IconComponent",
+      "dir": "icons_26x28",
+      "file": "oryx_spell_heal"
     }
   ]
 }

@@ -84,5 +84,8 @@ public class ECSMapper {
     public static final ComponentMapper<ManagedLifetimeComponent> managedLifetime =
             ComponentMapper.getFor(ManagedLifetimeComponent.class);
 
+    public static final ComponentMapper<IconComponent> icon =
+            ComponentMapper.getFor(IconComponent.class);
+
 }
 

@@ -35,5 +35,12 @@ public class AssetPacker {
 
         TexturePacker.processIfModified(settings, fx32InputDir,
                 fx32OutputDir, fx32PackFileName);
+
+        String iconInputDir = "../android/assets/icons_26x28";
+        String iconOutputDir = "../android/assets/icons_26x28";
+        String iconPackFileName = "icons";
+
+        TexturePacker.processIfModified(settings, iconInputDir,
+                iconOutputDir, iconPackFileName);
     }
 }
