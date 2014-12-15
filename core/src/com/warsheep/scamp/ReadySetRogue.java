@@ -13,11 +13,11 @@ import com.warsheep.scamp.screens.MainMenuScreen;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Scamp extends Game {
+public class ReadySetRogue extends Game {
 
     public static final int V_WIDTH = 320, V_HEIGHT = 240; // Internal dimensions in pixels
 
-    public static final String TITLE = "SCAMP";
+    public static final String TITLE = "Ready, Set, Rogue!";
 
     public SpriteBatch batcher;
 

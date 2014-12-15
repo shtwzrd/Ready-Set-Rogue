@@ -5,12 +5,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.warsheep.scamp.AssetDepot;
 import com.warsheep.scamp.MapImporter;
 import com.warsheep.scamp.PrefabFactory;
-import com.warsheep.scamp.Scamp;
+import com.warsheep.scamp.ReadySetRogue;
 import com.warsheep.scamp.algorithms.BSPMapGenerator;
 import com.warsheep.scamp.components.*;
 import com.warsheep.scamp.processors.*;
@@ -41,7 +40,7 @@ public class MainGameScreen extends ScreenAdapter {
     LifetimeProcessor lifetimeProcessor;
     VisualEffectProcessor visualEffectProcessor;
 
-    Scamp game;
+    ReadySetRogue game;
     public static GameState gameState;
     private MainGameScreenUI hud;
 
@@ -54,7 +53,7 @@ public class MainGameScreen extends ScreenAdapter {
 
     private long startTime;
 
-    public MainGameScreen(Scamp game) {
+    public MainGameScreen(ReadySetRogue game) {
         this.game = game;
         gameState = GameState.GAME_RUNNING;
         create();

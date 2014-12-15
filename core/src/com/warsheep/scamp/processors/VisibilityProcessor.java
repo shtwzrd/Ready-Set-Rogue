@@ -1,7 +1,6 @@
 package com.warsheep.scamp.processors;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
@@ -10,7 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.warsheep.scamp.AssetDepot;
-import com.warsheep.scamp.Scamp;
+import com.warsheep.scamp.ReadySetRogue;
 import com.warsheep.scamp.components.ECSMapper;
 import com.warsheep.scamp.components.TransformComponent;
 import com.warsheep.scamp.components.VisibleComponent;
@@ -28,8 +27,8 @@ public class VisibilityProcessor extends SortedIteratingSystem {
         super(Family.all(VisibleComponent.class).get(), new ZComparator());
         this.batch = new SpriteBatch();
 
-        this.camera = new OrthographicCamera(Scamp.V_WIDTH, Scamp.V_HEIGHT);
-        this.camera.position.set(Scamp.V_WIDTH / 2, Scamp.V_HEIGHT / 2, 0);
+        this.camera = new OrthographicCamera(ReadySetRogue.V_WIDTH, ReadySetRogue.V_HEIGHT);
+        this.camera.position.set(ReadySetRogue.V_WIDTH / 2, ReadySetRogue.V_HEIGHT / 2, 0);
         this.assets = AssetDepot.getInstance();
     }
 

@@ -8,13 +8,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.warsheep.scamp.Scamp;
+import com.warsheep.scamp.ReadySetRogue;
 
 import java.util.Random;
 
 public class MainMenuScreen extends ScreenAdapter {
 
-    Scamp game;
+    ReadySetRogue game;
     OrthographicCamera guiCam;
     Rectangle playBounds;
     Vector3 touchPoint;
@@ -23,11 +23,11 @@ public class MainMenuScreen extends ScreenAdapter {
 
     private static Random rnd = new Random();
 
-    public MainMenuScreen(Scamp game) {
+    public MainMenuScreen(ReadySetRogue game) {
         this.game = game;
 
-        guiCam = new OrthographicCamera(Scamp.V_WIDTH, Scamp.V_HEIGHT);
-        guiCam.position.set(Scamp.V_WIDTH / 2, Scamp.V_HEIGHT / 2, 0);
+        guiCam = new OrthographicCamera(ReadySetRogue.V_WIDTH, ReadySetRogue.V_HEIGHT);
+        guiCam.position.set(ReadySetRogue.V_WIDTH / 2, ReadySetRogue.V_HEIGHT / 2, 0);
         playBounds = new Rectangle(Gdx.graphics.getWidth() / 4, Gdx.graphics.getHeight() / 4, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
         touchPoint = new Vector3();
         spriteBatch = new SpriteBatch();
