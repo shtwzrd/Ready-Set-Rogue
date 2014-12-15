@@ -147,6 +147,16 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
         this.selectedAttacks = new Array();
     }
 
+    @Override
+    public void planningRoundEnd() {
+        update();
+    }
+
+    @Override
+    public void turnEnd() {
+        update();
+    }
+
     private void update() {
 
         LevelComponent lvlCmp = ECSMapper.level.get(currentEntity);
@@ -194,26 +204,25 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
 
     private void addSpellGrid() {
 
-
         if (this.spells != null) {
-            //shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            //shapeRenderer.setColor(1, 1, 1, 0.5f);
 
             for (int i = 0; i < this.spells.size(); i++) {
                 IconComponent icon = ECSMapper.icon.get(spells.get(i));
-                EffectCooldownComponent cooldown = ECSMapper.cooldown.get(spells.get(i));
+                if (icon != null) {
+                    EffectCooldownComponent cooldown = ECSMapper.cooldown.get(spells.get(i));
 
-                TextureAtlas.AtlasRegion tex = assets.fetchImage(icon.dir, icon.file);
-                if (cooldown.currentCooldown != 0) {
-                    batcher.setColor(.5f, .5f, .5f, .5f);
+                    TextureAtlas.AtlasRegion tex = assets.fetchImage(icon.dir, icon.file);
+                    if (cooldown.currentCooldown != 0) {
+                        batcher.setColor(.5f, .5f, .5f, .5f);
+                    }
+                    batcher.draw(tex, Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * (5 - i));
+                    batcher.setColor(1, 1, 1, 1);
+                    if(cooldown.currentCooldown != 0) {
+                        font.draw(batcher, cooldown.currentCooldown + "",
+                                Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * (5 - i) + 10);
+                    }
                 }
-                batcher.draw(tex, Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * (5 - i));
-                batcher.setColor(1, 1, 1, 1);
             }
-            for (int i = 1; i < 6; i++) {
-                //    shapeRenderer.rect(Gdx.graphics.getWidth() - Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7 * i, Gdx.graphics.getHeight() / 7, Gdx.graphics.getHeight() / 7);
-            }
-            // shapeRenderer.end();
         }
 
     }
