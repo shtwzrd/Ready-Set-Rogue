@@ -31,6 +31,7 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
     private static int level = 0;
     private static int currentExp = 0;
     private static int nextLevelExp = 0;
+    private static int previousLevelExp = 0;
     private static int moves = 0;
     private static int range = 0;
     private float selectedActorIconTimer = 0;
@@ -69,10 +70,10 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
         batcher.enableBlending();
 
         batcher.begin();
+        addSpellGrid();
         addActiveActorIcon(delta);
         addPlayerStats();
         addMoveToPos();
-        addSpellGrid();
         batcher.end();
 
         addTimeCircle(delta);
@@ -187,6 +188,9 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
         }
 
         if (lvlCmp != null) {
+            if(lvlCmp.level > level) {
+                previousLevelExp = nextLevelExp;
+            }
             level = lvlCmp.level;
             currentExp = lvlCmp.experiencePoints;
             nextLevelExp = lvlCmp.nextLevelExp;
@@ -321,7 +325,7 @@ public class MainGameScreenUI implements ControlProcessor.ControlListener, State
 
         if(currentExp != 0 && nextLevelExp != 0) {
             batcher.draw(expIcon, 10, Gdx.graphics.getHeight() - 16 * i);
-            font.draw(batcher, (int)(((float) currentExp / nextLevelExp) * 100) / 1 + "%", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
+            font.draw(batcher, (int)(((float) (currentExp - previousLevelExp) / (nextLevelExp - previousLevelExp)) * 100) / 1 + "%", 28, Gdx.graphics.getHeight() - 16 * (i - 1));
             i++;
         }
     }
